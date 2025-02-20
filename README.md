@@ -6,4 +6,4 @@
 - `3123410413` Phạm Văn Tuấn
 # Yêu cầu
 # Python modules
-  -`Pygame-ce` các module hỗ trợ thiết kế game
+- `Pygame-ce` các module hỗ trợ thiết kế game
