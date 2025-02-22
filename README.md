@@ -20,6 +20,8 @@
 ## Python modules
 - `Python` >= 3.9
 - `Pygame-ce` các module hỗ trợ thiết kế game
+## Graphics
+- 'Pixilart' https://www.pixilart.com/draw#
 
 ## run
 ```sh
