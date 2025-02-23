@@ -5,10 +5,10 @@ import pygame
 from typing import Optional
 from abc import ABC, abstractmethod
 
-from .AIBehavior import AIBehavior
 
 class GameObject(ABC):
     def __init__(self, x, y, width, height):
+        from .AIBehavior import AIBehavior
         self.position = pygame.Vector2(x, y)
         self.size = (width, height)
         self.visible = True
@@ -16,6 +16,7 @@ class GameObject(ABC):
         self.collision_rect = pygame.Rect(x, y, width, height)
         self.ai_behavior: Optional[AIBehavior]= None
         self.interactable = False
+        self.velocity = pygame.Vector2(0, 0)
 
     def update(self):
         if self.ai_behavior:
@@ -29,5 +30,4 @@ class GameObject(ABC):
         pass
 
     def interact(self):
-        # Phương thức mặc định, sẽ được ghi đè bởi các class con
         pass
