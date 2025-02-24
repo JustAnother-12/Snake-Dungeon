@@ -1,5 +1,6 @@
 # tương lại
 from __future__ import annotations
+import typing
 
 import pygame
 from typing import Optional
@@ -16,6 +17,7 @@ class GameObject(ABC):
         self.collision_rect = pygame.Rect(x, y, width, height)
         self.ai_behavior: Optional[AIBehavior]= None
         self.interactable = False
+        self.interact_rec: typing.Optional[pygame.Rect] = None
         self.velocity = pygame.Vector2(0, 0)
 
     def update(self):

@@ -51,6 +51,7 @@ class Wall(GameObject):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
         self.collidable = True
+        self.interactable = True
     
     def render(self, surface: Surface):
         pygame.draw.rect(surface, pygame.color.Color(0, 255, 0), self.collision_rect)
@@ -68,8 +69,8 @@ class MenuScene(Scene):
             Wall(500, 500, 50, 50),
             Wall(600, 600, 50, 50),
             Wall(700, 700, 50, 50),
-            Wall(800, 800, 50, 50),
             Wall(900, 900, 50, 50),
+            Wall(800, 800, 50, 50),
             Wall(1000, 1000, 50, 50),
         ]
         self.game_objects = [self.player ] + self.walls
