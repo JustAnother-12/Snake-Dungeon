@@ -90,15 +90,14 @@ class SNAKE:
 
     def move_snake(self):
         next_direction = Vector2(1,0) #Right
-        match self.direction:
-            case 'RIGHT':
-                next_direction = Vector2(1,0)
-            case 'LEFT':
-                next_direction = Vector2(-1,0) 
-            case 'UP':
-                next_direction = Vector2(0,-1)
-            case 'DOWN':
-                next_direction = Vector2(0,1)
+        if self.direction == 'RIGHT':
+            next_direction = Vector2(1,0)
+        if self.direction == 'LEFT':
+            next_direction = Vector2(-1,0)
+        if self.direction == 'UP':
+            next_direction = Vector2(0,-1)
+        if self.direction == 'DOWN':
+            next_direction = Vector2(0,1)
         
         if(self.add_block == True):
             body_copy = self.body[:]
@@ -142,14 +141,13 @@ class MAIN:
         for block in self.snake.body[1:]:
             if(self.snake.body[0] == block):
                 self.game_over()
-    def play_SFX(self, type):
-        match type:
-            case 'EAT':
-                self.blip_SFX.play()
-            case 'DEAD':
-                self.dead_SFX.play()
 
-                
+    def play_SFX(self, type):
+        if type == 'EAT':
+            self.blip_SFX.play()
+        elif type == 'DEAD':
+            self.blip_SFX.play()
+
     def game_over(self):
         self.play_SFX('DEAD')
         
@@ -212,4 +210,4 @@ while (True):
     screen.fill((47,51,69))
     main.draw_element()
     pygame.display.update()
-    clock.tick(120) # game max fps
+    clock.tick(60) # game max fps

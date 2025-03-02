@@ -1,217 +1,178 @@
-# importing libraries
+from __future__ import annotations
+import enum
 import pygame
-import time
-import random
+from pygame.sprite import Sprite, AbstractGroup
 
-snake_speed = 7
-stamina = 100
-# Window size
-window_x = 300
-window_y = 300
+TILE_SIZE = 32
 
-# defining colors
-black = pygame.Color(0, 0, 0)
-white = pygame.Color(255, 255, 255)
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
-blue = pygame.Color(0, 0, 255)
-stanima_color = pygame.Color(255, 255, 0)
 
-# Initialising pygame
-pygame.init()
+class SnakeBlockType(enum.Enum):
+    HEAD = 0
+    BODY = 1
+    FAKE_TAIL = 2
+    TAIL = 3
 
-# Initialise game window
-pygame.display.set_caption('GeeksforGeeks Snakes')
-game_window = pygame.display.set_mode((window_x, window_y))
-
-# FPS (frames per second) controller
-fps = pygame.time.Clock()
-
-# defining snake default position 
-snake_position = [100, 50]
-
-# defining first 4 blocks of snake
-# body
-snake_body = [  [100, 50],
-                [90, 50],
-                [80, 50],
-                [70, 50]
-            ]
-# fruit position 
-fruit_position = [random.randrange(1, (window_x//10)) * 10,
-                  random.randrange(1, (window_y//10)) * 10]
-fruit_spawn = True
-
-# setting default snake direction 
-# towards right
-direction = 'RIGHT'
-change_to = direction
-
-# initial score
-score = 0
-
-# displaying Score function
-def show_score(choice, color, font, size):
-  
-    # creating font object score_font 
-    score_font = pygame.font.SysFont(font, size)
-    
-    # create the display surface object
-    # score_surface
-    score_surface = score_font.render('Score : ' + str(score), True, color)
-    
-    # create a rectangular object for the 
-    # text surface object
-    score_rect = score_surface.get_rect()
-    
-    # displaying text
-    game_window.blit(score_surface, score_rect)
-
-# game over function
-def game_over():
-  
-    # creating font object my_font
-    my_font = pygame.font.SysFont('times new roman', 32)
-    
-    # creating a text surface on which text 
-    # will be drawn
-    game_over_surface = my_font.render('Your Score is : ' + str(score), True, red)
-    
-    # create a rectangular object for the text
-    # surface object
-    game_over_rect = game_over_surface.get_rect()
-    
-    # setting position of the text
-    game_over_rect.midtop = (window_x/2, window_y/4)
-    
-    # blit will draw the text on screen
-    game_window.blit(game_over_surface, game_over_rect)
-    pygame.display.flip()
-    
-    # after 2 seconds we will quit the 
-    # program
-    time.sleep(2)
-    
-    # deactivating pygame library
-    pygame.quit()
-    
-    # quit the program
-    quit()
-
-# Main Function
-running = True
-booster_active = False
-
-while running:
-  
-    # handling key events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP or event.key == pygame.K_w:
-                change_to = 'UP'
-            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                change_to = 'DOWN'
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                change_to = 'LEFT'
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                change_to = 'RIGHT'
-
-            if event.key == pygame.K_SPACE and stamina > 10:
-                snake_speed = 15
-                green = pygame.Color(0, 255, 180)
-                booster_active = True
-
-        if event.type == pygame.KEYUP :
-            if event.key == pygame.K_SPACE:
-                snake_speed = 7
-                green = pygame.Color(0, 255, 0)
-                booster_active = False
+class SnakeBlock(Sprite):
+    def __init__(self, pos_grid: tuple[int, int], type: SnakeBlockType) -> None:
+        pygame.sprite.Sprite.__init__(self)
+        self.image: pygame.Surface = pygame.surface.Surface((TILE_SIZE, TILE_SIZE))
+        self.rect: pygame.Rect = self.image.get_rect(topleft=(pos_grid[0] * TILE_SIZE, pos_grid[1] * TILE_SIZE))
+        self.target_pos = pygame.math.Vector2(self.rect.center)
+        self.pos = pygame.math.Vector2(self.rect.center)
         
+        self.moving = False
+        self.speed = 2
+        self.type = type
+
+        self.get_texture()
+   
+    @property 
+    def grid_pos(self) -> pygame.Vector2:
+        return pygame.Vector2(self.rect.topleft) // TILE_SIZE
+    
+    @grid_pos.setter
+    def grid_pos(self, pos: pygame.Vector2) -> None:
+        self.rect.topleft = pos * TILE_SIZE
+
+    def get_texture(self) -> pygame.surface.Surface:
+        
+        if self.type == SnakeBlockType.HEAD:
+            self.image.fill("red")
+        elif self.type == SnakeBlockType.BODY:
+            self.image.fill("blue")
+        elif self.type == SnakeBlockType.TAIL:
+            self.image.fill("green")
+
+        return self.image
+    
+    def set_target(self, target_pos: tuple[int, int]) -> None:
+        self.target_pos = pygame.math.Vector2(target_pos)
+        self.moving = True
+    
+    def move(self):
+        if not self.moving:
+            return False
+        
+        if self.pos.distance_to(self.target_pos) <= 1 or self.type == SnakeBlockType.BODY:
+            self.pos = self.target_pos
+            self.rect.center = (int(self.pos.x), int(self.pos.y))
+            self.moving = False
+            return False
+        
+        if self.type == SnakeBlockType.TAIL:
+            self.pos = self.pos.move_towards(self.target_pos, self.speed)
+            self.image = pygame.surface.Surface((abs(self.target_pos.x - self.pos.x) + TILE_SIZE, abs(self.target_pos.y - self.pos.y) + TILE_SIZE))
+            self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
+            self.get_texture()
+            return
+
+        self.pos = self.pos.move_towards(self.target_pos, self.speed)
+        self.rect.center = (int(self.pos.x), int(self.pos.y))
+        return True
+         
+
+class Snake(pygame.sprite.Group):
+    def __init__(self, pos_grid: tuple[int, int], init_len: int) -> None:
+        pygame.sprite.Group.__init__(self)
+        self.direction = pygame.math.Vector2()
+        self.head = SnakeBlock(pos_grid, SnakeBlockType.HEAD)
+        self.add(self.head)
+        for i in range(init_len - 1):
+            self.add(SnakeBlock((pos_grid[0], pos_grid[1] + i), SnakeBlockType.BODY))
+        self.add(SnakeBlock((pos_grid[0], pos_grid[1] + init_len - 1), SnakeBlockType.TAIL))
+        
+    def get_input(self) -> bool:
+        keys = pygame.key.get_pressed()
+        direction = pygame.math.Vector2()
+        
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            direction = pygame.math.Vector2(0, -1)
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            direction = pygame.math.Vector2(0, 1)
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            direction = pygame.math.Vector2(-1, 0)
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            direction = pygame.math.Vector2(1, 0)
+        
+        if direction.length() > 0:
+            self.direction = direction
+            next_ = (self.head.pos + direction * TILE_SIZE)
+            self.head.set_target((int(next_.x), int(next_.y)))
+            blocks = self.sprites()
+            for i in range(1, len(blocks)):
+                blocks[i].set_target(blocks[i - 1].pos)
+            return True
+        return False
+
+    def move(self) -> None:
+        blocks : list[SnakeBlock] = self.sprites()
+        for block in blocks:
+            block.move()
+    
+    def is_moving(self) -> bool:
+        return self.head.moving
+    
+    def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
+        return super().draw(surface)
+    
+class World(pygame.Surface):
+    def __init__(self, world_size: tuple[int, int]) -> None:
+        super().__init__(world_size)
+        self.snake = Snake((2, 2), 3)
+    
+    def update(self) -> None:
+        if not self.snake.is_moving():
+            self.snake.get_input()
+        self.draw_grid()
+        self.snake.move()
+        self.snake.draw(self)
+
+    def draw_grid(self) -> None:
+        rows = int(800 / TILE_SIZE)
+        gap = 800 // rows
+        for i in range(rows):
+            pygame.draw.line(self, "grey", (0, i * gap), (800, i * gap))
+            for j in range(rows):
+                pygame.draw.line(self, "grey", (j * gap, 0), (j * gap, 800))
+
+class Game:
+    def __init__(self) -> None:
+        pygame.init()
+        self.screen_info = pygame.display.Info()
+        self.screen = pygame.display.set_mode((800, 600))
+        self.clock = pygame.time.Clock()
+        self.world = World((self.screen_info.current_w, self.screen_info.current_h))
+    
+    def run(self) -> None:
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            self.update()
+            pygame.display.update()
+            self.clock.tick(60)
+        pygame.quit()
+    
+    def draw_grid(self) -> None:
+        rows = int(800 / TILE_SIZE)
+        display = pygame.display.get_surface()
+        gap = 800 // rows
+        if display is None:
+            return
+        for i in range(rows):
+            pygame.draw.line(display, "grey", (0, i * gap), (800, i * gap))
+            for j in range(rows):
+                pygame.draw.line(display, "grey", (j * gap, 0), (j * gap, 800))
             
-
-    if booster_active:
-        if stamina >=10:
-            stamina -= 10
-        else:
-            snake_speed = 7
-            green = pygame.Color(0, 255, 0)
-            stanima_color = pygame.Color(255, 0, 0)
-            booster_active = False
-    else: 
-        if stamina <= 95: stamina += 5
-        stanima_color = pygame.Color(255, 255, 0)
+    def update(self) -> None:
+        self.screen.fill("white")
+        self.world.update()
+        self.screen.blit(self.world, (0, 0), (0,0 , 800, 600))
+        self.draw_grid()
         
-
-    # If two keys pressed simultaneously 
-    # we don't want snake to move into two directions
-    # simultaneously
-    if change_to == 'UP' and direction != 'DOWN':
-        direction = 'UP'
-    if change_to == 'DOWN' and direction != 'UP':
-        direction = 'DOWN'
-    if change_to == 'LEFT' and direction != 'RIGHT':
-        direction = 'LEFT'
-    if change_to == 'RIGHT' and direction != 'LEFT':
-        direction = 'RIGHT'
-
-    # Moving the snake
-    if direction == 'UP':
-        snake_position[1] -= 10
-    if direction == 'DOWN':
-        snake_position[1] += 10
-    if direction == 'LEFT':
-        snake_position[0] -= 10
-    if direction == 'RIGHT':
-        snake_position[0] += 10
-
-    # Snake body growing mechanism 
-    # if fruits and snakes collide then scores will be 
-    # incremented by 10
-    snake_body.insert(0, list(snake_position))
-    if snake_position[0] == fruit_position[0] and snake_position[1] == fruit_position[1]:
-        score += 10
-        fruit_spawn = False
-    else:
-        snake_body.pop()
-        
-    if not fruit_spawn:
-        fruit_position = [random.randrange(1, (window_x//10)) * 10, 
-                          random.randrange(1, (window_y//10)) * 10]
-        
-    fruit_spawn = True
-    game_window.fill(black)
+if __name__ == "__main__":
+    game = Game()
+    game.run()
     
-    pygame.draw.rect(game_window, stanima_color, pygame.Rect(window_x/2 - 50, 20, stamina, 10))
-
-    for pos in snake_body:
-        pygame.draw.rect(game_window, green, pygame.Rect(
-          pos[0], pos[1], 10, 10))
-        
-    pygame.draw.rect(game_window, white, pygame.Rect(
-      fruit_position[0], fruit_position[1], 10, 10))
-
-    # Game Over conditions
-    if snake_position[0] < 0 or snake_position[0] > window_x-10:
-        game_over()
-    if snake_position[1] < 0 or snake_position[1] > window_y-10:
-        game_over()
     
-    # Touching the snake body
-    for block in snake_body[1:]:
-        if snake_position[0] == block[0] and snake_position[1] == block[1]:
-            game_over()
-    
-    # displaying score continuously
-    show_score(1, white, 'times new roman', 20)
-    
-    # Refresh game screen
-    pygame.display.update()
-
-    # Frame Per Second /Refresh Rate
-    fps.tick(snake_speed)
-
-pygame.quit()
-quit()
