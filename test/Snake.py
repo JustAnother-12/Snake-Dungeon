@@ -146,7 +146,7 @@ class MAIN:
         if type == 'EAT':
             self.blip_SFX.play()
         elif type == 'DEAD':
-            self.blip_SFX.play()
+            self.dead_SFX.play()
 
     def game_over(self):
         self.play_SFX('DEAD')
