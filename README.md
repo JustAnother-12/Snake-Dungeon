@@ -2,6 +2,7 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)
 ![Pygame-CE](https://img.shields.io/badge/pygame--ce-2.5.3-green)
+![Pillow](https://img.shields.io/badge/pillow-8A2BE2)
 ![Version](https://img.shields.io/badge/version-0.1.0-red.svg)
 
  Snake game với các yếu tố rogue like được phát triển bằng Python và thư viện pygame-ce
