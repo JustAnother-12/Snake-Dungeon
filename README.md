@@ -21,11 +21,12 @@
 
 ## Yêu cầu
 ### Python modules
-- `Python`: >= 3.9
-- `Pygame-ce`: các module hỗ trợ thiết kế game
+- `Python` >= 3.9
+- `Pygame-ce` các module hỗ trợ thiết kế game
+- `Pillow` sử lý ảnh
 
 ## Graphics
-- `Pixilart`: *https://www.pixilart.com/draw#*
+- `Pixilart` *https://www.pixilart.com/draw#*
 
 ## Cài đặt
 ```sh
