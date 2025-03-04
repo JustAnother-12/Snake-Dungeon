@@ -148,18 +148,20 @@ class World:
         self.foods.add(Food(self.snake.blocks))
         
         self.food_timer = 0
-        self.food_spawn_time = 3000  # 3 seconds in milliseconds
+        self.food_spawn_time = 5000  # 5 seconds in milliseconds
 
     def update(self, dt, actual_dt):
         self.snake.update(dt)
         
         # Update food spawn timer
         self.food_timer += actual_dt
-        if self.food_timer >= self.food_spawn_time:
+        if self.food_timer >= self.food_spawn_time and len(self.foods.sprites()) == 0:
             new_food = Food(self.snake.blocks)
             self.foods.add(new_food)
-            self.food_timer = 0
             print("New food appeared!")
+        for food in self.foods.sprites():
+                if check_collision(food, self.snake.blocks):
+                    self.food_timer = 0
 
     def draw(self, surface):
         self.snake.draw(surface)
