@@ -1,3 +1,4 @@
+from operator import truediv
 import random
 import pygame
 import sys
@@ -15,33 +16,35 @@ def check_collision(food, snake_blocks) -> bool:
     return collision is not None
 
 class Food(pygame.sprite.Sprite):
-    def __init__(self, snake_blocks, *groups: pygame.sprite.AbstractGroup):
+    def __init__(self, *groups: pygame.sprite.AbstractGroup):
         super().__init__(*groups)
         self.random_pos()
-        self.image = pygame.image.load('game-assets/graphics/png/apple.png').convert_alpha()
+        self.image: pygame.Surface = pygame.image.load('game-assets/graphics/png/apple.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=self.pos)
-        if check_collision(self, snake_blocks):
-            self.random_pos()
+        self.visible = True
+
+        
     
     def random_pos(self):
         self.pos = Vector2(random.randint(0, WINDOW_SIZE//TILE_SIZE - 1) * TILE_SIZE, random.randint(0, WINDOW_SIZE//TILE_SIZE - 1) * TILE_SIZE)
 
     def draw(self, surface):
-        
-        surface.blit(self.image, self.rect)
+        if self.visible:
+            self.rect = self.image.get_rect(topleft=self.pos)
+            surface.blit(self.image, self.rect)
 
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], *groups: pygame.sprite.AbstractGroup):
         super().__init__(*groups)
-        self.image = pygame.surface.Surface((TILE_SIZE, TILE_SIZE))
+        self.image:pygame.Surface = pygame.surface.Surface((TILE_SIZE, TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
-        self.image.fill("blue")
+        self.image.fill((255,139,38))
         self.direction = Vector2()
         self.target_pos = Vector2(self.rect.center)
         self.pos = Vector2(self.rect.center)
         self.moving = False
         self.speed = 32
-        self.tail_moment = False
+        self.tail_movement = False
 
     def set_target(self, target_pos):
         self.target_pos = Vector2(target_pos)
@@ -50,12 +53,13 @@ class SnakeBlock(pygame.sprite.Sprite):
     def move(self, dt, animation = True):
         if self.moving:
             if self.pos.distance_to(self.target_pos) > 1:
-                if animation and not self.tail_moment:
+                if animation and not self.tail_movement:
                     self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
                     self.rect.center = (int(self.pos.x), int(self.pos.y))
-                elif self.tail_moment:
+                elif self.tail_movement:
                     self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
                     self.image = pygame.surface.Surface((abs(self.target_pos.x - self.pos.x) + TILE_SIZE, abs(self.target_pos.y - self.pos.y) + TILE_SIZE))
+                    self.image.fill((255,139,38))
                     self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
                 else:
                     self.pos = self.target_pos
@@ -102,8 +106,9 @@ class Snake:
             SnakeBlock((x, y), block_group)
             self.blocks.append(block_group)
         
-        self.blocks[-1].sprite.tail_moment = True
-        self.blocks[-1].sprite.image.fill("red")
+        self.blocks[0].sprite.image = pygame.transform.rotate(pygame.image.load('game-assets/graphics/png/snake_head.png'), -90)
+        self.blocks[-1].sprite.tail_movement = True
+        # self.blocks[-1].sprite.image.fill("Red")
         
         # Set initial direction for head
         self.blocks[0].sprite.direction = Vector2(1, 0)
@@ -124,6 +129,14 @@ class Snake:
         animating = head.move(dt)
         # Update head
         if animating or head_moved:
+            if head.direction == Vector2(1,0):
+                head.image = pygame.transform.rotate(pygame.image.load('game-assets/graphics/png/snake_head.png'), -90)
+            elif head.direction == Vector2(-1,0):
+                head.image = pygame.transform.rotate(pygame.image.load('game-assets/graphics/png/snake_head.png'), 90)
+            elif head.direction == Vector2(0,1):
+                head.image = pygame.transform.rotate(pygame.image.load('game-assets/graphics/png/snake_head.png'), 180)
+            elif head.direction == Vector2(0,-1):
+                head.image = pygame.image.load('game-assets/graphics/png/snake_head.png')
             # Update body segments to follow
             for i in range(1, len(self.blocks)-1):
                 curr_block = self.blocks[i].sprite
@@ -136,17 +149,14 @@ class Snake:
         
 
     def draw(self, surface):
-        for block in self.blocks:
+        for block in reversed(self.blocks):
             block.draw(surface)
 
 
 class World:
     def __init__(self):
         self.snake = Snake(5)
-        self.foods = pygame.sprite.Group()  # Group to store all food items
-        # Start with one food
-        self.foods.add(Food(self.snake.blocks))
-        
+        self.food = Food()
         self.food_timer = 0
         self.food_spawn_time = 5000  # 5 seconds in milliseconds
 
@@ -154,19 +164,16 @@ class World:
         self.snake.update(dt)
         
         # Update food spawn timer
-        self.food_timer += actual_dt
-        if self.food_timer >= self.food_spawn_time and len(self.foods.sprites()) == 0:
-            new_food = Food(self.snake.blocks)
-            self.foods.add(new_food)
-            print("New food appeared!")
-        for food in self.foods.sprites():
-                if check_collision(food, self.snake.blocks):
-                    self.food_timer = 0
-
+        if not self.food.visible:
+            self.food_timer += actual_dt
+            if self.food_timer >= self.food_spawn_time:
+                self.food.visible = True
+                self.food.random_pos()
+                self.food_timer = 0
+                print("New food appeared!")
     def draw(self, surface):
         self.snake.draw(surface)
-        for food in self.foods:
-            food.draw(surface)
+        self.food.draw(surface)
 
 
 class Game:
@@ -184,10 +191,11 @@ class Game:
         rows = int(WINDOW_SIZE / TILE_SIZE)
         display = pygame.display.get_surface()
         gap = WINDOW_SIZE // rows
-        for i in range(rows):
-            pygame.draw.line(display, "grey", (0, i * gap), (WINDOW_SIZE, i * gap))
-            for j in range(rows):
-                pygame.draw.line(display, "grey", (j * gap, 0), (j * gap, WINDOW_SIZE))
+        if display:
+            for i in range(rows):
+                pygame.draw.line(display, "grey", (0, i * gap), (WINDOW_SIZE, i * gap))
+                for j in range(rows):
+                    pygame.draw.line(display, "grey", (j * gap, 0), (j * gap, WINDOW_SIZE))
 
     def update(self, dt, actual_dt):
         self.window.fill("white")
@@ -195,24 +203,20 @@ class Game:
         self.world.draw(self.window)
 
         # Check for collision with all foods
-        self.check_collisions()
+        if self.world.food.visible:
+            self.check_collisions()
 
         if self.show_grid:
             self.draw_grid()
 
     def check_collisions(self):
         # Check each food for collisions
-        foods_to_remove = []
-        for food in self.world.foods:
-            if check_collision(food, self.world.snake.blocks):
-                foods_to_remove.append(food)
-                print("Collision with food!")
-        
-        # Remove eaten foods
-        for food in foods_to_remove:
-            food.kill()  # Remove from all groups
-            print("Food removed")
-
+        if check_collision(self.world.food, self.world.snake.blocks):
+            self.world.food.visible = False
+            self.world.food_timer = 0
+            print("food collied")
+            return True
+        return False
     def run(self):
         while self.running:
             actual_dt = self.clock.tick(60)  # This gives us milliseconds since last frame

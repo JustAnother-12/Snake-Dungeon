@@ -12,6 +12,8 @@ import time
 from pixil_classdata import PixilType
 
 TILE_SIZE = 16
+SCREEN_WIDTH_TILES = 56
+SCREEN_HEIGHT_TILES = 48
 
 class Pixil:
     def __init__(self, frames: list[pygame.Surface], frames_delay_ms: list[int], original_size: tuple[int, int], zoom: int) -> None:
@@ -31,7 +33,7 @@ class Pixil:
         return surf
 
     @classmethod
-    def load(cls, path: str, multiply: int):
+    def load(cls, path: str, scale: int):
 
         with open(path) as file:
             pixil_file = PixilType.from_dict(json.loads(file.read()))
@@ -39,17 +41,17 @@ class Pixil:
             frames: list[pygame.Surface] = [] * len(frames_raw)
             frames_delay: list[int] = [] * len(frames_raw)
             for i, frame in enumerate(frames_raw):
-                surface = pygame.Surface((pixil_file.width * multiply, pixil_file.height * multiply))
+                surface = pygame.Surface((pixil_file.width * scale, pixil_file.height * scale))
                 surface.fill((255, 255, 255, 0))
                 for layer in frame.layers:
                     buff = BytesIO(base64.b64decode(layer.src.split(",")[1]))
                     image = pygame.image.load(buff)
                     image.set_alpha(layer.opacity * 255)
-                    surface.blit(pygame.transform.scale(image, (pixil_file.width * multiply, pixil_file.height * multiply)), (0, 0))
+                    surface.blit(pygame.transform.scale(image, (pixil_file.width * scale, pixil_file.height * scale)), (0, 0))
                 frames.append(surface)
                 frames_delay.append(frame.speed)
             
-            return cls(frames, frames_delay, (pixil_file.width, pixil_file.height), multiply)
+            return cls(frames, frames_delay, (pixil_file.width, pixil_file.height), scale)
 
 class SnakeBlockType(enum.Enum):
     HEAD = 0
@@ -67,7 +69,7 @@ class SnakeBlock(Sprite):
 
         self.head_texture = Pixil.load(r"game-assets\graphics\pixil\snake_head.pixil", 1)
         self.body_texture = Pixil.load(r"game-assets\graphics\pixil\snake_body.pixil", 1)
-        self.tail_texture = Pixil.load(r"game-assets\graphics\pixil\snake_tail.pixil", 1)
+        self.tail_texture = Pixil.load(r"game-assets\graphics\pixil\snake_body.pixil", 1)
         
         self.moving = False
         self.speed = 20
@@ -185,8 +187,18 @@ class World(pygame.Surface):
         
         self.fill("white")
         self.draw_grid()
+        self.draw_border()
         self.snake.move()
         self.snake.draw(self)
+
+    def draw_border(self) -> None:
+        border_rect = pygame.Rect(0,0, SCREEN_WIDTH_TILES*TILE_SIZE, SCREEN_HEIGHT_TILES*TILE_SIZE)
+        pygame.draw.rect(self, "black", border_rect,5*TILE_SIZE)
+        left_rect = pygame.Rect(5*TILE_SIZE, 5*TILE_SIZE, 4*TILE_SIZE, SCREEN_HEIGHT_TILES*TILE_SIZE - 5*2*TILE_SIZE)
+        pygame.draw.rect(self, "black", left_rect)
+        right_rect = pygame.Rect((SCREEN_WIDTH_TILES-9)*TILE_SIZE, 5*TILE_SIZE, 4*TILE_SIZE, SCREEN_HEIGHT_TILES*TILE_SIZE - 5*2*TILE_SIZE)
+        pygame.draw.rect(self, "black", right_rect)
+        
 
     def draw_grid(self) -> None:
 
@@ -199,10 +211,11 @@ class World(pygame.Surface):
 class Game:
     def __init__(self) -> None:
         pygame.init()
-        self.screen_info = pygame.display.Info()
-        self.screen = pygame.display.set_mode((16 * 10, 16*10))
+        # self.screen_info = pygame.display.Info()
+        self.screen = pygame.display.set_mode((TILE_SIZE*SCREEN_WIDTH_TILES, TILE_SIZE*SCREEN_HEIGHT_TILES))
         self.clock = pygame.time.Clock()
-        self.world = World((self.screen_info.current_w, self.screen_info.current_h))
+        # self.world = World((self.screen_info.current_w, self.screen_info.current_h))
+        self.world = World((self.screen.get_width(),self.screen.get_height()))
     
     def get_window_pos(self) -> tuple[int, int]:
         hwnd = pygame.display.get_wm_info()["window"]
