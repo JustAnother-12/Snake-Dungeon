@@ -58,7 +58,9 @@ class SnakeBlock(pygame.sprite.Sprite):
                     self.rect.center = (int(self.pos.x), int(self.pos.y))
                 elif self.tail_movement:
                     self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
-                    self.image = pygame.surface.Surface((abs(self.target_pos.x - self.pos.x) + TILE_SIZE, abs(self.target_pos.y - self.pos.y) + TILE_SIZE))
+                    d_x = abs(self.target_pos.x - self.pos.x)
+                    d_y = abs(self.target_pos.y - self.pos.y)
+                    self.image = pygame.surface.Surface((d_x + (2 if d_x > 0 else 0) + TILE_SIZE, d_y + (2 if d_y > 0 else 0) + TILE_SIZE))
                     self.image.fill((255,139,38))
                     self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
                 else:
@@ -94,7 +96,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake:
     def __init__(self, init_len):
-        self.blocks: list[pygame.sprite.GroupSingle[SnakeBlock]] = []
+        self.blocks: list[pygame.sprite.GroupSingle[SnakeBlock]] = []  # type: ignore
         # bao gồm head và body tail và tail giả
         # một cái có animation, cái còn lại không
         x = 0
@@ -199,6 +201,8 @@ class Game:
 
     def update(self, dt, actual_dt):
         self.window.fill("white")
+        if self.show_grid:
+            self.draw_grid()
         self.world.update(dt, actual_dt)
         self.world.draw(self.window)
 
@@ -206,8 +210,7 @@ class Game:
         if self.world.food.visible:
             self.check_collisions()
 
-        if self.show_grid:
-            self.draw_grid()
+        
 
     def check_collisions(self):
         # Check each food for collisions
