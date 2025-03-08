@@ -1,3 +1,4 @@
+from hmac import new
 from operator import truediv
 import random
 import pygame
@@ -39,6 +40,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.image:pygame.Surface = pygame.surface.Surface((TILE_SIZE, TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.image.fill((255,139,38))
+        # self.image.fill((random.randint(0, 255),random.randint(0, 255),random.randint(0, 255)))
         self.direction = Vector2()
         self.target_pos = Vector2(self.rect.center)
         self.pos = Vector2(self.rect.center)
@@ -50,7 +52,8 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.target_pos = Vector2(target_pos)
         self.moving = True
 
-    def move(self, dt, animation = True):
+    def move(self, dt, animation = True, tail_movement = False):
+        self.tail_movement = tail_movement
         if self.moving:
             if self.pos.distance_to(self.target_pos) > 1:
                 if animation and not self.tail_movement:
@@ -147,8 +150,13 @@ class Snake:
 
             # Update tail
             tail.set_target(self.last_positions[-2])
-            tail.move(dt)
-        
+            tail.move(dt, tail_movement=True)
+    
+    def grow_up(self):
+        tail = self.blocks[-1].sprite
+        new_tail = pygame.sprite.GroupSingle()
+        SnakeBlock((int(tail.pos.x), int(tail.pos.y)), new_tail)
+        self.blocks.insert(-1, new_tail)
 
     def draw(self, surface):
         for block in reversed(self.blocks):
@@ -214,10 +222,12 @@ class Game:
 
     def check_collisions(self):
         # Check each food for collisions
-        if check_collision(self.world.food, self.world.snake.blocks):
+        if check_collision(self.world.food, self.world.snake.blocks[0:1]):
             self.world.food.visible = False
             self.world.food_timer = 0
             print("food collied")
+            self.world.snake.grow_up()
+            print(list(x.sprite.image for x in self.world.snake.blocks))
             return True
         return False
     def run(self):
