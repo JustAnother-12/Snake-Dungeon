@@ -8,9 +8,11 @@ from pygame.math import Vector2
 
 TILE_SIZE = 32
 WINDOW_SIZE = 640
+BOOST_MULTIPLIER = 2
+STAMINA_RECOVERY_RATE = 0.2
+STAMINA_DECREASE_RATE = 1
 
-
-def check_collision(food, snake_blocks) -> bool:
+def check_collision(food, snake_blocks: list[pygame.sprite.GroupSingle]) -> bool:
     all_snake_parts = pygame.sprite.Group()
     for block_group in snake_blocks:
         all_snake_parts.add(block_group.sprite)
@@ -24,22 +26,24 @@ def cmp_vector2(v1: Vector2, v2: Vector2):
 class Food(pygame.sprite.Sprite):
     def __init__(self, *groups: pygame.sprite.AbstractGroup):
         super().__init__(*groups)
-        self.random_pos()
         self.image: pygame.Surface = pygame.image.load(
             "game-assets/graphics/png/apple.png"
         ).convert_alpha()
-        self.rect = self.image.get_rect(topleft=self.pos)
+        self.rect = self.image.get_rect(topleft=(0,0))
+        # self.random_pos()
         self.visible = True
 
-    def random_pos(self):
+    def random_pos(self, snake_blocks):
         self.pos = Vector2(
             random.randint(0, WINDOW_SIZE // TILE_SIZE - 1) * TILE_SIZE,
             random.randint(0, WINDOW_SIZE // TILE_SIZE - 1) * TILE_SIZE,
         )
+        self.rect = self.image.get_rect(topleft=self.pos)
+        if check_collision(self, snake_blocks):
+            self.random_pos(snake_blocks)
 
     def draw(self, surface):
         if self.visible:
-            self.rect = self.image.get_rect(topleft=self.pos)
             surface.blit(self.image, self.rect)
 
 
@@ -121,6 +125,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake:
     def __init__(self, init_len):
+        self.stamina = 100
         self.blocks: list[pygame.sprite.GroupSingle[SnakeBlock]] = []  # type: ignore
         # bao gồm head và body tail và tail giả
         # một cái có animation, cái còn lại không
@@ -143,6 +148,23 @@ class Snake:
         self.blocks[0].sprite.direction = Vector2(1, 0)
         self.last_positions = [block.sprite.pos.copy() for block in self.blocks]
 
+        # Add stamina attribute
+        self.stamina = 100
+        self.is_boosting = False
+
+
+    def boost(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            for block in self.blocks:
+                block.sprite.speed *= 2
+            print("Boost on")
+
+        if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            for block in self.blocks:
+                block.sprite.speed //= 2
+            print("Boost off")
+                
+
     def update(self, dt):
 
         # Handle input for head
@@ -154,8 +176,20 @@ class Snake:
             self.last_positions = [block.sprite.pos.copy() for block in self.blocks]
             head_moved = head.get_input()
 
+        # Handle stamina and boosting
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.stamina > 0:
+            self.is_boosting = True
+            self.stamina -= STAMINA_DECREASE_RATE
+        else:
+            self.is_boosting = False
+            self.stamina = min(100, self.stamina + STAMINA_RECOVERY_RATE)
+
+        # Adjust speed based on boosting
+        speed_multiplier = BOOST_MULTIPLIER if self.is_boosting else 1
+
         # Store last positions before movement
-        animating = head.move(dt)
+        animating = head.move(dt * speed_multiplier)
         # Update head
         if animating or head_moved:
             if head.direction == Vector2(1, 0):
@@ -178,11 +212,11 @@ class Snake:
             for i in range(1, len(self.blocks) - 1):
                 curr_block = self.blocks[i].sprite
                 curr_block.set_target(self.last_positions[i - 1])
-                curr_block.move(dt, False)
+                curr_block.move(dt * speed_multiplier, False)
 
             # Update tail
             tail.set_target(self.last_positions[-2])
-            tail.move(dt, tail_movement=True)
+            tail.move(dt * speed_multiplier, tail_movement=True)
 
     def grow_up(self):
         tail = self.blocks[-1].sprite
@@ -194,11 +228,18 @@ class Snake:
         for block in reversed(self.blocks):
             block.draw(surface)
 
+    def outOfWindow(self):
+        head = self.blocks[0].sprite
+        if head.rect.right > WINDOW_SIZE or head.rect.bottom > WINDOW_SIZE or head.rect.left < 0 or head.rect.top < 0:
+            return True
+        return False
+
 
 class World:
     def __init__(self):
         self.snake = Snake(5)
         self.food = Food()
+        self.food.random_pos(self.snake.blocks)
         self.food_timer = 0
         self.food_spawn_time = 5000  # 5 seconds in milliseconds
 
@@ -210,7 +251,7 @@ class World:
             self.food_timer += actual_dt
             if self.food_timer >= self.food_spawn_time:
                 self.food.visible = True
-                self.food.random_pos()
+                self.food.random_pos(self.snake.blocks)
                 self.food_timer = 0
                 print("New food appeared!")
 
@@ -242,10 +283,18 @@ class Game:
                         display, "grey", (j * gap, 0), (j * gap, WINDOW_SIZE)
                     )
 
+    def draw_stamina(self, stamina):
+        if stamina <= 0: return
+        image = pygame.surface.Surface((128*stamina//100, 16))
+        rect = image.get_rect(topleft = (0, 16))
+        image.fill((0, 255, 255))
+        self.window.blit(image, rect)
+
     def update(self, dt, actual_dt):
         self.window.fill("white")
         if self.show_grid:
             self.draw_grid()
+        self.draw_stamina(self.world.snake.stamina)
         self.world.update(dt, actual_dt)
         self.world.draw(self.window)
 
@@ -269,7 +318,7 @@ class Game:
         return False
     
     def check_collisions_snake(self):
-        if check_collision(self.world.snake.blocks[0].sprite, self.world.snake.blocks[2:]):
+        if check_collision(self.world.snake.blocks[0].sprite, self.world.snake.blocks[2:]) or self.world.snake.outOfWindow():
             return True
         return False
 
@@ -279,10 +328,10 @@ class Game:
                 60
             )  # This gives us milliseconds since last frame
             dt = actual_dt / 100.0  # Your scaled dt for movement
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                # self.world.snake.boost(event)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_g:
                         self.show_grid = not self.show_grid
