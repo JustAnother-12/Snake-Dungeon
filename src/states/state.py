@@ -1,11 +1,14 @@
-class State():
+import pygame
+
+
+class State(pygame.sprite.Group):
     def __init__(self, game) -> None:
+        super().__init__()
         self.game = game
         self.prev_state = None
+        self.visible = True
 
-    def update(self):
-        pass
-    def render(self, surface):
+    def get_event(self, event: pygame.event.Event):
         pass
 
     def enter_state(self):

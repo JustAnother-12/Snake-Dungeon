@@ -1,7 +1,14 @@
 import pygame
 from states.state import State
-from states.Level import Level
+from states.LevelTest import LevelTest
 from button_class import Button
+from pixil import Pixil
+
+class Menu_logo(pygame.sprite.Sprite):
+    def __init__(self, x_pos, y_pos) -> None:
+        super().__init__()
+        self.image = Pixil.load("game-assets/graphics/pixil/MENU_LOGO.pixil", 3).frames[0]
+        self.rect = self.image.get_rect(center=(x_pos, y_pos))
 
 
 class Main_menu(State):
@@ -19,12 +26,17 @@ class Main_menu(State):
         self.quit_button = Button(self.button_base, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/1.5)*game.TILE_SIZE, "QUIT", "white")
         self.Button_List = [self.play_button, self.quit_button]
 
-        self.Main_menu_img = pygame.image.load("game-assets/graphics/png/Main_Logo.png").convert_alpha()
-        self.Main_menu_img = pygame.transform.scale(self.Main_menu_img, (self.Main_menu_img.get_width()*3, self.Main_menu_img.get_height()*3))
-        self.Main_menu_rect = self.Main_menu_img.get_rect(center=((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/4)*game.TILE_SIZE))
+        # self.Main_menu_img = pygame.image.load("game-assets/graphics/png/Main_Logo.png").convert_alpha()
+        self.Main_menu = Menu_logo((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/4)*game.TILE_SIZE)
+
+        self.add(self.play_button, self.quit_button, self.Main_menu)
 
     def update(self):
-        pass
+        for button in self.Button_List:
+            if(button.checkForInputs(pygame.mouse.get_pos())):
+                button.image = self.button_glow
+            else:
+                button.image = self.button_base
 
     def get_event(self, event):
         from states.Loading import Loading_screen
@@ -37,13 +49,13 @@ class Main_menu(State):
                 self.game.running = False
                 self.game.playing = False
 
-    def render(self, surface):
-        surface.fill("black")
-        surface.blit(self.Main_menu_img, self.Main_menu_rect)
-        for button in self.Button_List:
-            if(button.checkForInputs(pygame.mouse.get_pos())):
-                button.img = self.button_glow
-            else:
-                button.img = self.button_base
-            button.update(surface)
+    # def render(self, surface):
+    #     surface.fill("black")
+    #     surface.blit(self.Main_menu_img, self.Main_menu_rect)
+    #     for button in self.Button_List:
+    #         if(button.checkForInputs(pygame.mouse.get_pos())):
+    #             button.img = self.button_glow
+    #         else:
+    #             button.img = self.button_base
+    #         button.update(surface)
     
