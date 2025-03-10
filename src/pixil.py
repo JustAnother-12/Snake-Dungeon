@@ -16,13 +16,17 @@ class Pixil:
             frames_raw = list(filter(lambda x: x['active'] == True, pixil_file['frames']))
             frames: list[pygame.Surface] = [] * len(frames_raw)
             frames_delay: list[int] = [] * len(frames_raw)
-            for i, frame in enumerate(frames_raw):
-                surface = pygame.Surface((int(pixil_file['width']) * scale, int(pixil_file['height']) * scale))
-                surface = surface.convert_alpha()
+            for frame in frames_raw:
+                surface = pygame.Surface((int(pixil_file['width']) * scale, int(pixil_file['height']) * scale), pygame.SRCALPHA)
+                surface.set_colorkey((0, 0, 0))
+                layers = []
                 for layer in frame['layers']:
                     buff = BytesIO(base64.b64decode(layer['src'].split(",")[1]))
                     image = pygame.image.load(buff).convert_alpha()
-                    surface.blit(pygame.transform.scale(image, (int(pixil_file['width']) * scale, int(pixil_file['height']) * scale)), (0, 0))
+                    image = pygame.transform.scale(image, (int(pixil_file['width']) * scale, int(pixil_file['height']) * scale)).convert_alpha()
+                    layers.append((image, (0, 0)))
+                surface.blits(layers)
+                surface.convert_alpha()
 
                 frames.append(surface)
                 frames_delay.append(frame['speed'])

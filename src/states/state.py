@@ -7,8 +7,12 @@ class State(pygame.sprite.Group):
         self.game = game
         self.prev_state = None
         self.visible = True
+        self.is_paused = False
 
     def get_event(self, event: pygame.event.Event):
+        pass
+
+    def reset(self):
         pass
 
     def enter_state(self):

@@ -1,7 +1,8 @@
 
 import random
-from re import S
+from re import I, S
 import pygame
+from states import Pause_menu
 from states.state import State
 from pixil import Pixil
 from pygame.sprite import AbstractGroup
@@ -41,8 +42,8 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.tail_movement = False
     
     def set_target(self, target: pygame.Vector2):
-        self.target = target
-        self.direction = (target - self.pos).normalize()
+        self.target_pos = target
+        # self.direction = (target - self.pos).normalize()
         self.moving = True
 
     def move(self, dt, animation = True, tail_movement = False):
@@ -110,20 +111,101 @@ class Snake(pygame.sprite.AbstractGroup):
             x = (init_length - i) * constant.TILE_SIZE
             SnakeBlock((x, y), self)
         
-        print(self.sprites()[0])
+        self.sprites()[-1].tail_movement = True
+
+        self.sprites()[0].direction = pygame.Vector2(1, 0)
+        self.last_positons = [block.pos.copy() for block in self.sprites()]
+        self.stamina = 100
+        self.is_boosting = False
+        self.last_time = pygame.time.get_ticks()
+
+    def boost(self):
+        if self.stamina > 0:
+            self.is_boosting = True
+            self.stamina -= 1
+        else:
+            self.is_boosting = False
+    
+    def update(self):
+        blocks = self.sprites()
+        dt = pygame.time.get_ticks() - self.last_time
+        dt = dt / 100.0
+        self.last_time = pygame.time.get_ticks()
+
+        head = blocks[0]
+        tail = blocks[-1]
+        head_move = False
+
+        if not head.moving:
+            self.last_positions = [block.pos.copy() for block in blocks]
+            head_move = head.get_input()
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.stamina > 0:
+            self.is_boosting = True
+            # TODO: magic number
+            self.stamina -= 1
+        else:
+            self.is_boosting = False
+            # TODO: magic number
+            self.stamina = min(100, self.stamina + 0.1)
+
+        # Magic number 
+        speed_multiplier = 2 if self.is_boosting else 1
+
+        animating = head.move(dt * speed_multiplier)
+
+        if animating or head_move:
+            # TODO: làm tạm
+            if head.direction == Vector2(1, 0):
+                head.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), -90
+                )
+            elif head.direction == Vector2(-1, 0):
+                head.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), 90
+                )
+            elif head.direction == Vector2(0, 1):
+                head.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), 180
+                )
+            elif head.direction == Vector2(0, -1):
+                head.image = pygame.image.load(
+                    "game-assets/graphics/png/snake_head.png"
+                )
+            
+            for i in range(1, len(blocks) - 1):
+                curr_block = blocks[i]
+                curr_block.set_target(self.last_positions[i - 1])
+                curr_block.move(dt * speed_multiplier, False)
+
+        tail.set_target(self.last_positions[-2])
+        tail.move(dt * speed_multiplier, tail_movement=True)
+
 
 class LevelTest(State):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.init()
+    
+    def init(self):
         self.snake = Snake()
         self.food = Food()
-        self.food.random_pos()
+        self.food_spawn_time = 5000
         self.food_timer = 0
-        self.food_spawn_time = 5000 # 5 seconds
-
+        self.is_paused = False
         self.add(self.snake, self.food)
     
+    def reset(self):
+        self.remove(self.snake, self.food)
+        self.init()
+
     def update(self):
+        if pygame.key.get_just_pressed()[pygame.K_ESCAPE]:
+            self.game.state_stack[-1].visible = False 
+            self.game.state_stack.append(Pause_menu.Pause_menu(self.game))
+
+        if self.is_paused: return
         self.snake.update()
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
@@ -132,6 +214,22 @@ class LevelTest(State):
                 self.food.random_pos()
                 self.food_timer = 0
                 print("Food spawned")
+
+    def draw_grid(self, surface: pygame.Surface):
+        surface.fill("white")
+        for x in range(0, constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
+            pygame.draw.line(surface, "black", (x, 0), (x, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE))
+        for y in range(0, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
+            pygame.draw.line(surface, "black", (0, y), (constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, y))
+        
+    def draw_stamina(self, surface: pygame.Surface):
+        if self.snake.stamina > 0:
+            pygame.draw.rect(surface, "green", (0, 16, self.snake.stamina//100 * 128, 10))
+    
+    def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
+        self.draw_grid(surface)
+        self.draw_stamina(surface)
+        return super().draw(surface)
     
 
 def main():
