@@ -1,13 +1,11 @@
 from __future__ import annotations
-import ctypes
-import ctypes.wintypes
 import enum
-import os
 import pygame
 from pygame.sprite import Sprite
 import json, base64
 from io import BytesIO
 import time
+import random
 
 from pixil_classdata import PixilType
 
@@ -59,6 +57,22 @@ class SnakeBlockType(enum.Enum):
     FAKE_TAIL = 2
     TAIL = 3
 
+class Food(Sprite):
+    def __init__(self, *groups: pygame.sprite.AbstractGroup) -> None:
+        pygame.sprite.Sprite.__init__(self)
+        self.random_pos()
+        self.image: pygame.Surface = pygame.image.load('game-assets/graphics/png/apple.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft=self.pos)
+        self.visible = True
+
+    def random_pos(self) -> None:
+        self.pos = pygame.Vector2(pygame.Vector2(random.randint(0, SCREEN_WIDTH_TILES - 1) * TILE_SIZE, random.randint(0, SCREEN_HEIGHT_TILES - 1) * TILE_SIZE))
+    
+    def draw(self, surface: pygame.Surface) -> None:
+        if self.visible:
+            self.rect = self.image.get_rect(topleft=self.pos)
+            surface.blit(self.image, self.rect)
+
 class SnakeBlock(Sprite):
     def __init__(self, pos_grid: tuple[int, int], type: SnakeBlockType) -> None:
         pygame.sprite.Sprite.__init__(self)
@@ -67,12 +81,8 @@ class SnakeBlock(Sprite):
         self.target_pos = pygame.math.Vector2(self.rect.center)
         self.pos = pygame.math.Vector2(self.rect.center)
 
-        self.head_texture = Pixil.load(r"game-assets\graphics\pixil\snake_head.pixil", 1)
-        self.body_texture = Pixil.load(r"game-assets\graphics\pixil\snake_body.pixil", 1)
-        self.tail_texture = Pixil.load(r"game-assets\graphics\pixil\snake_body.pixil", 1)
-        
         self.moving = False
-        self.speed = 20
+        self.speed = 2
         self.type = type
         self.direction = pygame.math.Vector2(0,0)
 
@@ -87,19 +97,7 @@ class SnakeBlock(Sprite):
         self.rect.topleft = pos * TILE_SIZE
 
     def get_texture(self) -> pygame.surface.Surface:
-      
-        if self.type == SnakeBlockType.HEAD:
-            self.image.blit(self.head_texture.get_current_frame().convert_alpha(), (0, 0))
-        elif self.type == SnakeBlockType.BODY:
-            self.image.blit(self.body_texture.get_current_frame().convert_alpha(), (0, 0))
-        elif self.type == SnakeBlockType.TAIL:
-            self.image.blit(self.tail_texture.get_current_frame().convert_alpha(), (0, 0))
-        
-        if self.direction == pygame.math.Vector2(0, 0):
-            return self.image
-
-        print(self.direction.angle_to(pygame.math.Vector2(0, -1)))
-        self.image = pygame.transform.rotate(self.image, self.direction.angle_to(pygame.math.Vector2(0, -1)))
+        self.image.fill((255, 139, 38)) 
 
         return self.image
     
@@ -122,6 +120,7 @@ class SnakeBlock(Sprite):
         if self.type == SnakeBlockType.TAIL:
             self.pos = self.pos.move_towards(self.target_pos, self.speed)
             self.image = pygame.surface.Surface((abs(self.target_pos.x - self.pos.x) + TILE_SIZE, abs(self.target_pos.y - self.pos.y) + TILE_SIZE))
+            self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
             self.get_texture()
             return
 
@@ -217,23 +216,6 @@ class Game:
         # self.world = World((self.screen_info.current_w, self.screen_info.current_h))
         self.world = World((self.screen.get_width(),self.screen.get_height()))
     
-    def get_window_pos(self) -> tuple[int, int]:
-        hwnd = pygame.display.get_wm_info()["window"]
-        rect = ctypes.wintypes.RECT()
-        ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rect))
-        return rect.left, rect.top
-
-    def keep_player_center_screen(self) -> None:
-        player_pos = pygame.Vector2(self.world.snake.head.rect.center)
-        player_pos.x -= self.screen.get_width() // 2
-        player_pos.y -= self.screen.get_height() // 2
-
-        self.move_window(int(player_pos.x), int(player_pos.y))
-   
-    def move_window(self, x: int, y: int) -> None:
-        hwnd = pygame.display.get_wm_info()["window"]
-        ctypes.windll.user32.MoveWindow(hwnd, x, y, self.screen.get_width(), self.screen.get_height(), True)
-    
     def run(self) -> None:
         running = True
         while running:
@@ -256,7 +238,7 @@ class Game:
 
         # self.move_window(int(player_pos.x), int(player_pos.y))
 
-        self.screen.blit(self.world, (0, 0), (int(player_pos.x), int(player_pos.y), self.screen.get_width(), self.screen.get_height()))
+        self.screen.blit(self.world, (0, 0), (0, 0, self.screen.get_width(), self.screen.get_height()))
         
 if __name__ == "__main__":
     game = Game()

@@ -60,7 +60,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                     self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
                     d_x = abs(self.target_pos.x - self.pos.x)
                     d_y = abs(self.target_pos.y - self.pos.y)
-                    self.image = pygame.surface.Surface((d_x + (2 if d_x > 0 else 0) + TILE_SIZE, d_y + (2 if d_y > 0 else 0) + TILE_SIZE))
+                    self.image = pygame.surface.Surface((d_x + (1 if d_x > 0.05 else 0) + TILE_SIZE, d_y + (1 if d_y > 0.05 else 0) + TILE_SIZE))
                     self.image.fill((255,139,38))
                     self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
                 else:
