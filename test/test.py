@@ -1,7 +1,7 @@
 from hmac import new
 from operator import truediv
 import random
-from time import sleep
+from time import sleep, time
 import pygame
 import sys
 from pygame.math import Vector2
@@ -11,6 +11,7 @@ WINDOW_SIZE = 640
 BOOST_MULTIPLIER = 2
 STAMINA_RECOVERY_RATE = 0.2
 STAMINA_DECREASE_RATE = 1
+DEATH_DELAY = 2
 
 def check_collision(food, snake_blocks: list[pygame.sprite.GroupSingle]) -> bool:
     all_snake_parts = pygame.sprite.Group()
@@ -60,6 +61,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.moving = False
         self.speed = 32
         self.tail_movement = False
+        self.isOutside = False
 
     def set_target(self, target_pos):
         self.target_pos = Vector2(target_pos)
@@ -112,8 +114,32 @@ class SnakeBlock(pygame.sprite.Sprite):
                 return False
             if self.direction == Vector2(0, -1) and direction == Vector2(0, 1):
                 return False
+            if direction == Vector2(1, 0) and self.pos.x > WINDOW_SIZE - TILE_SIZE:
+                self.isOutside = True
+                self.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), -90
+                )
+                return False
+            if direction == Vector2(0, 1) and self.pos.y > WINDOW_SIZE - TILE_SIZE:
+                self.isOutside = True
+                self.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), 180
+                )
+                return False
+            if direction == Vector2(-1, 0) and self.pos.x < TILE_SIZE:
+                self.isOutside = True
+                self.image = pygame.transform.rotate(
+                    pygame.image.load("game-assets/graphics/png/snake_head.png"), 90
+                )
+                return False
+            if direction == Vector2(0, -1) and self.pos.y < TILE_SIZE:
+                self.isOutside = True
+                self.image = pygame.image.load("game-assets/graphics/png/snake_head.png")
+                return False
+            
             self.direction = direction
             self.set_target(self.pos + direction * TILE_SIZE)
+            self.isOutside = False
             return True
         return False
 
@@ -146,6 +172,8 @@ class Snake:
         # Add stamina attribute
         self.stamina = 100
         self.is_boosting = False
+        self.out_of_bounds_time = None
+        self.is_out_of_bounds = False
 
 
     def boost(self, event):
@@ -170,6 +198,17 @@ class Snake:
         if not head.moving:
             self.last_positions = [block.sprite.pos.copy() for block in self.blocks]
             head_moved = head.get_input()
+
+        if head.isOutside:
+            if not self.is_out_of_bounds:
+                self.is_out_of_bounds = True
+                self.out_of_bounds_time = time()
+            elif self.out_of_bounds_time and time() - self.out_of_bounds_time > DEATH_DELAY:
+                print("Snake died after 2 seconds out of bounds!")
+                sys.exit()
+        else:
+            self.is_out_of_bounds = False
+            self.out_of_bounds_time = None
 
         # Handle stamina and boosting
         keys = pygame.key.get_pressed()
@@ -222,13 +261,6 @@ class Snake:
     def draw(self, surface):
         for block in reversed(self.blocks):
             block.draw(surface)
-
-    def outOfWindow(self):
-        head = self.blocks[0].sprite
-        if head.rect.right > WINDOW_SIZE or head.rect.bottom > WINDOW_SIZE or head.rect.left < 0 or head.rect.top < 0:
-            return True
-        return False
-
 
 class World:
     def __init__(self):
@@ -313,7 +345,7 @@ class Game:
         return False
     
     def check_collisions_snake(self):
-        if check_collision(self.world.snake.blocks[0].sprite, self.world.snake.blocks[2:]) or self.world.snake.outOfWindow():
+        if check_collision(self.world.snake.blocks[0].sprite, self.world.snake.blocks[2:]):
             return True
         return False
 
