@@ -78,9 +78,12 @@ class SnakeBlock(pygame.sprite.Sprite):
                     self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
                     d_x = abs(self.target_pos.x - self.pos.x)
                     d_y = abs(self.target_pos.y - self.pos.y)
-                    self.image = pygame.surface.Surface((d_x + (1 if d_x > 0.05 else 0) + TILE_SIZE, d_y + (1 if d_y > 0.05 else 0) + TILE_SIZE))
+                    self.image = pygame.surface.Surface((d_x + TILE_SIZE, d_y + TILE_SIZE))
                     self.image.fill((255,139,38))
-                    self.rect = self.image.get_rect(center = (self.pos.x + (self.target_pos.x - self.pos.x) / 2, self.pos.y + (self.target_pos.y - self.pos.y) / 2))
+                    if self.target_pos.x > self.pos.x or self.target_pos.y > self.pos.y:
+                         self.rect = self.image.get_rect(bottomright = (int(self.target_pos.x + TILE_SIZE//2), int(self.target_pos.y + TILE_SIZE//2)))
+                    else:
+                         self.rect = self.image.get_rect(topleft = (int(self.target_pos.x - TILE_SIZE//2), int(self.target_pos.y - TILE_SIZE//2)))
                 else:
                     self.pos = self.target_pos
                     self.rect.center = (int(self.pos.x), int(self.pos.y))
@@ -340,7 +343,6 @@ class Game:
             self.world.food_timer = 0
             print("food collied")
             self.world.snake.grow_up()
-            print(list(x.sprite.image for x in self.world.snake.blocks))
             return True
         return False
     
