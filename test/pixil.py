@@ -21,6 +21,7 @@ class Pixil:
                 surface.set_colorkey((0, 0, 0))
                 layers = []
                 for layer in frame['layers']:
+                    if (not layer['active']) : continue
                     buff = BytesIO(base64.b64decode(layer['src'].split(",")[1]))
                     image = pygame.image.load(buff).convert_alpha()
                     image = pygame.transform.scale(image, (int(pixil_file['width']) * scale, int(pixil_file['height']) * scale)).convert_alpha()

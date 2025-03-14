@@ -4,8 +4,9 @@ from time import sleep, time
 import pygame
 import sys
 from pygame.math import Vector2
-from CollectableSprite import Food, Key
+from CollectableSprite import Food, Key, Coin
 from const import TILE_SIZE, WINDOW_SIZE, check_collision, HEAD_IMG, DEATH_DELAY, STAMINA_DECREASE_RATE, STAMINA_RECOVERY_RATE, BOOST_MULTIPLIER
+from TrapSprite import Trap
 
 def cmp_vector2(v1: Vector2, v2: Vector2):
     return v1.x == v2.x and v1.y == v2.y
@@ -112,6 +113,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 class Snake:
     def __init__(self, init_len):
         self.stamina = 100
+        self.coins = 0
         self.blocks: list[pygame.sprite.GroupSingle[SnakeBlock]] = []  # type: ignore
         # bao gồm head và body tail và tail giả
         # một cái có animation, cái còn lại không
@@ -231,6 +233,12 @@ class World:
         self.food = Food()
         self.keys = pygame.sprite.Group()
         self.keys.add(Key())
+        self.coins = pygame.sprite.Group()
+        for _ in range(30):
+            self.coins.add(Coin())
+        self.traps = pygame.sprite.Group()
+        for _ in range(10):
+            self.traps.add(Trap())
         self.food.random_pos(self.snake.blocks)
         self.food_timer = 0
         self.food_spawn_time = 5000  # 5 seconds in milliseconds
@@ -248,9 +256,11 @@ class World:
                 print("New food appeared!")
 
     def draw(self, surface):
-        self.snake.draw(surface)
+        self.traps.draw(surface)
+        self.coins.draw(surface)
         self.food.draw(surface)
         self.keys.draw(surface)
+        self.snake.draw(surface)
 
 
 class Game:
@@ -270,10 +280,10 @@ class Game:
         gap = WINDOW_SIZE // rows
         if display:
             for i in range(rows):
-                pygame.draw.line(display, "grey", (0, i * gap), (WINDOW_SIZE, i * gap))
+                pygame.draw.line(display, "white", (0, i * gap), (WINDOW_SIZE, i * gap))
                 for j in range(rows):
                     pygame.draw.line(
-                        display, "grey", (j * gap, 0), (j * gap, WINDOW_SIZE)
+                        display, "white", (j * gap, 0), (j * gap, WINDOW_SIZE)
                     )
 
     def draw_stamina(self, stamina):
@@ -284,7 +294,7 @@ class Game:
         self.window.blit(image, rect)
 
     def update(self, dt, actual_dt):
-        self.window.fill("white")
+        self.window.fill("gray")
         if self.show_grid:
             self.draw_grid()
         self.draw_stamina(self.world.snake.stamina)
@@ -300,6 +310,10 @@ class Game:
             self.running = False
         
         self.check_collision_key()
+        self.check_collision_coin()
+        self.check_collision_trap()
+        for trap in self.world.traps:
+            trap.update()
 
     def check_collisions_food(self):
         # Check each food for collisions
@@ -320,6 +334,21 @@ class Game:
         for key in self.world.keys:
             if check_collision(key, self.world.snake.blocks[0:1]):
                 key.kill()
+
+    def check_collision_coin(self):
+        for coin in self.world.coins:
+            if check_collision(coin, self.world.snake.blocks[0:1]):
+                self.world.snake.coins += 10
+                print(f"Coin: {self.world.snake.coins}")
+                coin.kill()
+
+    def check_collision_trap(self):
+        for trap in self.world.traps:
+            if check_collision(trap, self.world.snake.blocks[0:1]):
+                if not trap.collisionTime:
+                    trap.collision()
+                if trap.isActive:
+                    print("Sập bẫy rồi con giun.")
 
     def run(self):
         while self.running:

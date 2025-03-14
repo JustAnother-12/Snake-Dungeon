@@ -29,9 +29,21 @@ class Food(pygame.sprite.Sprite):
         if self.visible:
             surface.blit(self.image, self.rect)
 
-class Coin:
-    def __init__(self) -> None:
-        pass
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, *group: pygame.sprite.AbstractGroup) -> None:
+        super().__init__(*group)
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/GOLD_LEVEL.pixil", 1).frames[0].convert_alpha()
+        self.random_pos()
+        self.rect = self.image.get_rect(center = self.pos)
+
+    def random_pos(self):
+        self.pos = Vector2(
+            random.randint(0 + TILE_SIZE//2, WINDOW_SIZE - TILE_SIZE//2),
+            random.randint(0 + TILE_SIZE//2, WINDOW_SIZE - TILE_SIZE//2)
+        )
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
 
 class Key(pygame.sprite.Sprite):
     '''
