@@ -46,7 +46,6 @@ class Food(pygame.sprite.Sprite):
         if self.visible:
             surface.blit(self.image, self.rect)
 
-
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], *groups: pygame.sprite.AbstractGroup):
         super().__init__(*groups)
@@ -116,7 +115,6 @@ class SnakeBlock(pygame.sprite.Sprite):
             self.set_target(self.pos + direction * TILE_SIZE)
             return True
         return False
-
 
 class Snake:
     def __init__(self, init_len):

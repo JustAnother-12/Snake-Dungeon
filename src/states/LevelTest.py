@@ -1,6 +1,4 @@
-
-import random
-from re import I, S
+from typing import Any
 import pygame
 from states import Pause_menu
 from states.state import State
@@ -28,8 +26,8 @@ class Food(pygame.sprite.Sprite):
             surface.blit(self.image, self.rect)
 
 class SnakeBlock(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int], *groups: AbstractGroup) -> None:
-        super().__init__(*groups)
+    def __init__(self, pos: tuple[int, int]) -> None:
+        super().__init__()
         self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.image.fill((255, 139, 38))
@@ -99,64 +97,79 @@ class SnakeBlock(pygame.sprite.Sprite):
         return False
 
 class Snake(pygame.sprite.AbstractGroup):
-    def __init__(self) -> None:
-        AbstractGroup.__init__(self)
-
+    def __init__(self, init_len):
+        super().__init__()
         self.stamina = 100
-        
+        self.blocks: list[SnakeBlock] = []  # type: ignore
+        # bao gồm head và body tail và tail giả
+        # một cái có animation, cái còn lại không
         x = 0
         y = 0
-        init_length = 3
-        for i in range(init_length):
-            x = (init_length - i) * constant.TILE_SIZE
-            SnakeBlock((x, y), self)
-        
-        self.sprites()[-1].tail_movement = True
+        for i in range(init_len):
+            x = (init_len - i) * constant.TILE_SIZE
+            y = 10 * constant.TILE_SIZE
+            block = SnakeBlock((x, y))
+            self.blocks.append(block)
 
-        self.sprites()[0].direction = pygame.Vector2(1, 0)
-        self.last_positons = [block.pos.copy() for block in self.sprites()]
+        self.blocks[0].image = pygame.transform.rotate(
+            pygame.image.load("game-assets/graphics/png/snake_head.png"), -90
+        )
+        self.blocks[-1].tail_movement = True
+
+        # Set initial direction for head
+        self.blocks[0].direction = Vector2(1, 0)
+        self.last_positions = [block.pos.copy() for block in self.blocks]
+
+        # Add stamina attribute
         self.stamina = 100
         self.is_boosting = False
-        self.last_time = pygame.time.get_ticks()
 
-    def boost(self):
-        if self.stamina > 0:
-            self.is_boosting = True
-            self.stamina -= 1
-        else:
-            self.is_boosting = False
+        self.previous_time = pygame.time.get_ticks()
+
+        for block in self.blocks:
+            self.add(block)
+
+
+    def boost(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            for block in self.blocks:
+                block.speed *= 2
+            print("Boost on")
+
+        if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            for block in self.blocks:
+                block.speed //= 2
+            print("Boost off")
     
     def update(self):
-        blocks = self.sprites()
-        dt = pygame.time.get_ticks() - self.last_time
-        dt = dt / 100.0
-        self.last_time = pygame.time.get_ticks()
+        dt = (pygame.time.get_ticks() - self.previous_time) / 100
+        self.previous_time = pygame.time.get_ticks()
 
-        head = blocks[0]
-        tail = blocks[-1]
-        head_move = False
+        # Handle input for head
+        head = self.blocks[0]
+        tail = self.blocks[-1]
+        head_moved = False
 
         if not head.moving:
-            self.last_positions = [block.pos.copy() for block in blocks]
-            head_move = head.get_input()
-        
+            self.last_positions = [block.pos.copy() for block in self.blocks]
+            head_moved = head.get_input()
+
+        # Handle stamina and boosting
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.stamina > 0:
             self.is_boosting = True
-            # TODO: magic number
-            self.stamina -= 1
+            self.stamina -= constant.STAMINA_DECREASE_RATE
         else:
             self.is_boosting = False
-            # TODO: magic number
-            self.stamina = min(100, self.stamina + 0.1)
+            self.stamina = min(100, self.stamina + constant.STAMINA_RECOVERY_RATE)
 
-        # Magic number 
-        speed_multiplier = 2 if self.is_boosting else 1
+        # Adjust speed based on boosting
+        speed_multiplier = constant.BOOST_MULTIPLIER if self.is_boosting else 1
 
+        # Store last positions before movement
         animating = head.move(dt * speed_multiplier)
-
-        if animating or head_move:
-            # TODO: làm tạm
+        # Update head
+        if animating or head_moved:
             if head.direction == Vector2(1, 0):
                 head.image = pygame.transform.rotate(
                     pygame.image.load("game-assets/graphics/png/snake_head.png"), -90
@@ -174,13 +187,28 @@ class Snake(pygame.sprite.AbstractGroup):
                     "game-assets/graphics/png/snake_head.png"
                 )
             
-            for i in range(1, len(blocks) - 1):
-                curr_block = blocks[i]
+            head.image = pygame.transform.scale(head.image, (constant.TILE_SIZE, constant.TILE_SIZE)) # type: ignore
+            # Update body segments to follow
+            for i in range(1, len(self.blocks) - 1):
+                curr_block = self.blocks[i]
                 curr_block.set_target(self.last_positions[i - 1])
                 curr_block.move(dt * speed_multiplier, False)
 
-        tail.set_target(self.last_positions[-2])
-        tail.move(dt * speed_multiplier, tail_movement=True)
+            # Update tail
+            tail.set_target(self.last_positions[-2])
+            tail.move(dt * speed_multiplier, tail_movement=True)
+
+    def grow_up(self):
+        tail = self.blocks[-1]
+        new_tail = SnakeBlock((int(tail.pos.x), int(tail.pos.y)))
+        self.blocks.insert(-1, new_tail)
+        self.add(new_tail)
+
+    def outOfWindow(self):
+        head = self.blocks[0]
+        if head.rect.right > (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE ) or head.rect.bottom > (constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE ) or head.rect.left < 0 or head.rect.top < 0:
+            return True
+        return False
 
 
 class LevelTest(State):
@@ -189,7 +217,7 @@ class LevelTest(State):
         self.init()
     
     def init(self):
-        self.snake = Snake()
+        self.snake = Snake(5)
         self.food = Food()
         self.food_spawn_time = 5000
         self.food_timer = 0
