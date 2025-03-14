@@ -8,32 +8,6 @@ from CollectableSprite import Food, Key, Coin
 from const import TILE_SIZE, WINDOW_SIZE, check_collision, HEAD_IMG, DEATH_DELAY, STAMINA_DECREASE_RATE, STAMINA_RECOVERY_RATE, BOOST_MULTIPLIER
 from TrapSprite import Trap
 
-def cmp_vector2(v1: Vector2, v2: Vector2):
-    return v1.x == v2.x and v1.y == v2.y
-
-class Food(pygame.sprite.Sprite):
-    def __init__(self, *groups: pygame.sprite.AbstractGroup):
-        super().__init__(*groups)
-        self.image: pygame.Surface = pygame.image.load(
-            "game-assets/graphics/png/apple.png"
-        ).convert_alpha()
-        self.rect = self.image.get_rect(topleft=(0,0))
-        # self.random_pos()
-        self.visible = True
-
-    def random_pos(self, snake_blocks):
-        self.pos = Vector2(
-            random.randint(0, WINDOW_SIZE // TILE_SIZE - 1) * TILE_SIZE,
-            random.randint(0, WINDOW_SIZE // TILE_SIZE - 1) * TILE_SIZE,
-        )
-        self.rect = self.image.get_rect(topleft=self.pos)
-        if check_collision(self, snake_blocks):
-            self.random_pos(snake_blocks)
-
-    def draw(self, surface):
-        if self.visible:
-            surface.blit(self.image, self.rect)
-
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], *groups: pygame.sprite.AbstractGroup):
         super().__init__(*groups)
