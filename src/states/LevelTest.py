@@ -98,19 +98,20 @@ class SnakeBlock(pygame.sprite.Sprite):
 
         for _ in directions[::-1]:
             if not _ == self.direction:
-                if self.direction == Vector2(1, 0) and _ != Vector2(-1, 0):
-                    direction = _
-                if self.direction == Vector2(-1, 0) and _ != Vector2(1, 0):
-                    direction = _
-                if self.direction == Vector2(0, 1) and _ != Vector2(0, -1):
-                    direction = _
-                if self.direction == Vector2(0, -1) and _ != Vector2(0, 1):
-                    direction = _
+                direction = _
 
         if len(directions) != 0 and direction == Vector2():
             direction = directions[0] 
 
         if direction.length() > 0:
+            if self.direction == Vector2(1, 0) and direction == Vector2(-1, 0):
+                return False
+            if self.direction == Vector2(-1, 0) and direction == Vector2(1, 0):
+                return False
+            if self.direction == Vector2(0, 1) and direction == Vector2(0, -1):
+                return False
+            if self.direction == Vector2(0, -1) and direction == Vector2(0, 1):
+                return False
             if direction == Vector2(1, 0) and self.pos.x > WINDOW_X - constant.TILE_SIZE:
                 self.isOutside = True
                 self.image = pygame.transform.rotate(
