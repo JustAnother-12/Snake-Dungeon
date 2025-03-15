@@ -17,7 +17,7 @@ class Pause_menu(State):
         self.stats_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 3)*game.TILE_SIZE ,"STATS", "white")
         self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 9)*game.TILE_SIZE ,"MAIN MENU", "white")
 
-        self.add(self.Background_rect,self.restart_button, self.continue_button, self.stats_button, self.main_menu_button)
+        self.add(self.restart_button, self.continue_button, self.stats_button, self.main_menu_button)
 
     def update(self):
         if pygame.key.get_just_pressed()[pygame.K_ESCAPE]:
