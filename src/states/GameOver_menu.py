@@ -12,9 +12,6 @@ class GameOver_menu(State):
         self.Background_texture = pygame.image.load("game-assets/graphics/png/Pause_bg.png").convert_alpha()
         self.Background_rect = self.Background_texture.get_rect(center=((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE))
 
-        self.button_base = game.button_texture_base
-        self.button_glow = game.button_texture_glow
-
         self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 8)*game.TILE_SIZE ,"NEW RUN", "white")
         self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 2)*game.TILE_SIZE ,"MAIN MENU", "white")
 

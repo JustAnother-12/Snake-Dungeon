@@ -13,6 +13,9 @@ class Menu_logo(pygame.sprite.Sprite):
 class Main_menu(State):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.init(game)
+
+    def init(self, game):
         self.music = pygame.mixer.music
         self.music.load('game-assets/audio/Sekiro Shadows Die Twice _ OST Main Menu Theme ♪.wav')
         self.music.set_volume(0.6)
@@ -20,12 +23,14 @@ class Main_menu(State):
 
         self.play_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, "PLAY", "white")
         self.quit_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/1.5)*game.TILE_SIZE, "QUIT", "white")
-        self.Button_List = [self.play_button, self.quit_button]
 
-        # self.Main_menu_img = pygame.image.load("game-assets/graphics/png/Main_Logo.png").convert_alpha()
         self.Main_menu = Menu_logo((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/4)*game.TILE_SIZE)
 
         self.add(self.play_button, self.quit_button, self.Main_menu)
+
+    def reset(self):
+        self.music.stop()
+        self.music.play(-1)
 
     def get_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:

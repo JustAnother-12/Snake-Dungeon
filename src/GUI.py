@@ -18,10 +18,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running, self.playing = True, True
 
-        t = pixil.Pixil.load("game-assets/graphics/pixil/PAUSE_MENU_BTN_BG_SHEET.pixil", 2)
-        self.button_texture_base = t.frames[0]
-        self.button_texture_glow = t.frames[1]
-
         self.state_stack: list[State] = []
         self.load_states()
 
@@ -41,7 +37,6 @@ class Game:
             state.draw(self.screen)
         # self.state_stack[-1].(self.game_canvas)
         pygame.display.flip()
-        # self.clock.tick(60)
         
     def run(self):
         while self.playing:

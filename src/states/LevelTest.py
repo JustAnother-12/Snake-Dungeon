@@ -89,11 +89,11 @@ class SnakeBlock(pygame.sprite.Sprite):
 
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             directions.append(Vector2(0, -1))
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             directions.append(Vector2(0, 1))
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             directions.append(Vector2(-1, 0))
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             directions.append(Vector2(1, 0))
 
         for _ in directions[::-1]:
@@ -284,16 +284,16 @@ class LevelTest(State):
 
         if self.food.visible:
             self.check_collisions_food()
-        if self.check_collisions_snake():
+        if self.check_collisions_snake() or self.snake.isDeath:
             self.game.state_stack[-1].visible = False 
             self.game.state_stack.append(GameOver_menu(self.game))
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("white")
         for x in range(0, constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
-            pygame.draw.line(surface, "black", (x, 0), (x, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE))
+            pygame.draw.line(surface, "gray", (x, 0), (x, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE))
         for y in range(0, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
-            pygame.draw.line(surface, "black", (0, y), (constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, y))
+            pygame.draw.line(surface, "gray", (0, y), (constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, y))
         
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
