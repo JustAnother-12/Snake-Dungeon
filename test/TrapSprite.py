@@ -14,6 +14,11 @@ class Trap(pygame.sprite.Sprite):
         self.isActive = False
         self.collisionTime = None
 
+    def reset(self):
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1).frames[0]
+        self.isActive = False
+        self.collisionTime = None
+
     def random_pos(self):
         self.pos = pygame.Vector2(
             random.randint(0, WINDOW_SIZE//TILE_SIZE - 2) * TILE_SIZE,
@@ -32,7 +37,7 @@ class Trap(pygame.sprite.Sprite):
 
     def update(self):
         if self.collisionTime:
-            if time() - self.collisionTime > 1.5:
-                self.kill()
+            if time() - self.collisionTime > 2:
+                self.reset()
             elif time() - self.collisionTime > 1:
                 self.active()

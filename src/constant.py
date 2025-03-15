@@ -9,6 +9,8 @@ STAMINA_DECREASE_RATE_WHILE_RUNNING = 0.2
 BOOST_MULTIPLIER = 2
 HEAD_IMG = pygame.transform.scale(pygame.image.load("game-assets/graphics/png/snake_head.png"), (TILE_SIZE, TILE_SIZE))
 DEATH_DELAY = 2
+LEFT_RIGHT_BORDER_TILES = 9
+TOP_BOTTOM_BORDER_TILES = 5
 
 # TODO: Add more textures
 # and use them in the game

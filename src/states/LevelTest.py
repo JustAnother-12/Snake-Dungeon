@@ -1,5 +1,6 @@
 import pygame
 from typing import Any, override
+from level_component import Trap, Traps
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -11,9 +12,12 @@ import random
 from logic.Collision import check_collision
 from time import time
 
-
 WINDOW_X = constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE
 WINDOW_Y = constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE
+MAP_LEFT = constant.LEFT_RIGHT_BORDER_TILES * constant.TILE_SIZE
+MAP_RIGHT = MAP_LEFT + WINDOW_X
+MAP_TOP = constant.TOP_BOTTOM_BORDER_TILES * constant.TILE_SIZE
+MAP_BOTTOM = MAP_TOP + WINDOW_Y
 
 class Food(pygame.sprite.Sprite):
     def __init__(self):
@@ -24,8 +28,8 @@ class Food(pygame.sprite.Sprite):
 
     def random_pos(self, snake_blocks):
         self.pos = Vector2(
-            random.randint(0, WINDOW_X // constant.TILE_SIZE - 1) * constant.TILE_SIZE,
-            random.randint(0, WINDOW_Y // constant.TILE_SIZE - 1) * constant.TILE_SIZE,
+            (random.randint(0, constant.SCREEN_WIDTH_TILES - 1) + constant.LEFT_RIGHT_BORDER_TILES) * constant.TILE_SIZE,
+            (random.randint(0, constant.SCREEN_HEIGHT_TILES - 1) + constant.TOP_BOTTOM_BORDER_TILES) * constant.TILE_SIZE,
         )
         self.rect = self.image.get_rect(topleft=self.pos)
         if check_collision(self, snake_blocks):
@@ -89,11 +93,11 @@ class SnakeBlock(pygame.sprite.Sprite):
 
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             directions.append(Vector2(0, -1))
-        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             directions.append(Vector2(0, 1))
-        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             directions.append(Vector2(-1, 0))
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             directions.append(Vector2(1, 0))
 
         for _ in directions[::-1]:
@@ -112,25 +116,25 @@ class SnakeBlock(pygame.sprite.Sprite):
                 return False
             if self.direction == Vector2(0, -1) and direction == Vector2(0, 1):
                 return False
-            if direction == Vector2(1, 0) and self.pos.x > WINDOW_X - constant.TILE_SIZE:
+            if direction == Vector2(1, 0) and self.pos.x > MAP_RIGHT - constant.TILE_SIZE:
                 self.isOutside = True
                 self.image = pygame.transform.rotate(
                     constant.HEAD_IMG, -90
                 )
                 return False
-            if direction == Vector2(0, 1) and self.pos.y > WINDOW_Y - constant.TILE_SIZE:
+            if direction == Vector2(0, 1) and self.pos.y > MAP_BOTTOM - constant.TILE_SIZE:
                 self.isOutside = True
                 self.image = pygame.transform.rotate(
                     constant.HEAD_IMG, 180
                 )
                 return False
-            if direction == Vector2(-1, 0) and self.pos.x < constant.TILE_SIZE:
+            if direction == Vector2(-1, 0) and self.pos.x < MAP_LEFT + constant.TILE_SIZE:
                 self.isOutside = True
                 self.image = pygame.transform.rotate(
                     constant.HEAD_IMG, 90
                 )
                 return False
-            if direction == Vector2(0, -1) and self.pos.y < constant.TILE_SIZE:
+            if direction == Vector2(0, -1) and self.pos.y < MAP_TOP + constant.TILE_SIZE:
                 self.isOutside = True
                 self.image = constant.HEAD_IMG
                 return False
@@ -153,8 +157,8 @@ class Snake(pygame.sprite.AbstractGroup):
         x = 0
         y = 0
         for i in range(init_len):
-            x = (init_len - i) * constant.TILE_SIZE
-            y = constant.SCREEN_HEIGHT_TILES // 2 * constant.TILE_SIZE
+            x = (init_len - i + constant.LEFT_RIGHT_BORDER_TILES) * constant.TILE_SIZE
+            y = (constant.SCREEN_HEIGHT_TILES // 2 + constant.TOP_BOTTOM_BORDER_TILES)* constant.TILE_SIZE
             block = SnakeBlock((x, y))
             self.blocks.append(block)
 
@@ -244,9 +248,14 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def grow_up(self):
         tail = self.blocks[-1]
-        new_tail = SnakeBlock((int(tail.pos.x), int(tail.pos.y)))
+        new_tail = SnakeBlock(tail.rect.topleft)
         self.blocks.insert(-1, new_tail)
         self.add(new_tail)
+
+    def split(self, index):    
+        self.remove(self.blocks[index::])
+        self.blocks = self.blocks[index::]
+
 
 class LevelTest(State):
     def __init__(self, game) -> None:
@@ -256,14 +265,15 @@ class LevelTest(State):
     def init(self):
         self.snake = Snake(5)
         self.food = Food()
+        self.traps = Traps(10)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.add(self.snake, self.food)
+        self.add(self.traps, self.snake, self.food)
     
     def reset(self):
-        self.remove(self.snake, self.food)
+        self.remove(self.traps, self.snake, self.food)
         self.init()
 
     def update(self):
@@ -273,6 +283,7 @@ class LevelTest(State):
 
         if self.is_paused: return
         self.snake.update()
+        self.traps.update()
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
@@ -282,19 +293,22 @@ class LevelTest(State):
                 self.food.random_pos(self.snake.blocks)
                 self.food_timer = 0
                 print("Food spawned")
-
-        if self.food.visible:
+        else:
             self.check_collisions_food()
+
         if self.check_collisions_snake() or self.snake.isDeath:
             self.game.state_stack[-1].visible = False 
             self.game.state_stack.append(GameOver_menu(self.game))
 
+        self.check_collision_trap()
+
     def draw_grid(self, surface: pygame.Surface):
-        surface.fill("white")
-        for x in range(0, constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
-            pygame.draw.line(surface, "gray", (x, 0), (x, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE))
-        for y in range(0, constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE, constant.TILE_SIZE):
-            pygame.draw.line(surface, "gray", (0, y), (constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE, y))
+        surface.fill("black")
+        pygame.draw.rect(surface, (51,54, 71), (MAP_LEFT, MAP_TOP, WINDOW_X, WINDOW_Y))
+        for x in range(MAP_LEFT, MAP_RIGHT + 1, constant.TILE_SIZE):
+            pygame.draw.line(surface, (100, 100, 100), (x, MAP_TOP), (x, MAP_BOTTOM))
+        for y in range(MAP_TOP, MAP_BOTTOM + 1, constant.TILE_SIZE):
+            pygame.draw.line(surface, (100, 100, 100), (MAP_LEFT, y), (MAP_RIGHT, y))
         
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
@@ -321,7 +335,15 @@ class LevelTest(State):
         if check_collision(self.snake.blocks[0], self.snake.blocks[2:]):
             return True
         return False
-    
+
+    def check_collision_trap(self):
+        for trap in self.traps.items:
+            if check_collision(trap, self.snake.blocks):
+                if not trap.collisionTime:
+                    trap.collision()
+                if trap.isActive:
+                    print("Sập bẫy rồi con giun.")
+
     '''
     def check_collision_key(self):
         for key in self.keys:
@@ -334,15 +356,8 @@ class LevelTest(State):
                 self.snake.coins += 10
                 print(f"Coin: {self.snake.coins}")
                 coin.kill()
-
-    def check_collision_trap(self):
-        for trap in self.traps:
-            if check_collision(trap, self.snake.blocks[0:1]):
-                if not trap.collisionTime:
-                    trap.collision()
-                if trap.isActive:
-                    print("Sập bẫy rồi con giun.")
     '''
+    
     
 
 def main():

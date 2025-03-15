@@ -21,10 +21,10 @@ class Main_menu(State):
         self.music.set_volume(0.6)
         self.music.play(-1)
 
-        self.play_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, "PLAY", "white")
-        self.quit_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/1.5)*game.TILE_SIZE, "QUIT", "white")
+        self.play_button = ButtonElement((game.SCREEN_WIDTH_TILES + game.LEFT_RIGHT_BORDER_TILES*2)/2*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES + game.TOP_BOTTOM_BORDER_TILES*2)/2*game.TILE_SIZE, "PLAY", "white")
+        self.quit_button = ButtonElement((game.SCREEN_WIDTH_TILES + game.LEFT_RIGHT_BORDER_TILES*2)/2*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES + game.TOP_BOTTOM_BORDER_TILES*2)/1.5*game.TILE_SIZE, "QUIT", "white")
 
-        self.Main_menu = Menu_logo((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/4)*game.TILE_SIZE)
+        self.Main_menu = Menu_logo((game.SCREEN_WIDTH_TILES + game.LEFT_RIGHT_BORDER_TILES*2)/2*game.TILE_SIZE, (game.SCREEN_WIDTH_TILES + game.LEFT_RIGHT_BORDER_TILES*2)/4*game.TILE_SIZE)
 
         self.add(self.play_button, self.quit_button, self.Main_menu)
 
