@@ -1,0 +1,53 @@
+{
+    "base_stats": [
+      {
+        "id": 0,
+        "name": "SPEED",
+        "description": "increase movement speed",
+        "value": 0
+      },
+      {
+        "id": 1,
+        "name": "LENGTH",
+        "description": "the overall length \nof the body",
+        "value": 0
+      },
+      {
+        "id": 2,
+        "name": "ARMOUR",
+        "description": "Increase I-frame upon hit",
+        "value": 0
+      },
+      {
+        "id": 3,
+        "name": "ENERGY CAPACITY",
+        "description": "increase max energy",
+        "value": 0
+      },
+      {
+        "id": 4,
+        "name": "ENERGY REGEN",
+        "description": "increase energy \nregeneration speed",
+        "value": 0
+      },
+      {
+        "id": 5,
+        "name": "TREASURY",
+        "description": "increase chances \nfor more Chests",
+        "value": 0
+      },
+      {
+        "id": 6,
+        "name": "LUCK",
+        "description": "increase luck for loots",
+        "value": 0
+      },
+      {
+        "id": 7,
+        "name": "FOOD POTENCY",
+        "description": "increase amount of length \nfoods give",
+        "value": 0
+      }
+    ]
+  }
+  
