@@ -12,7 +12,7 @@ class GameOver_menu(State):
     def __init__(self, game) -> None:
         super().__init__(game)
 
-        self.Gamer_over_text = TextElement("GAME OVER", "white", 45, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 8)*game.TILE_SIZE)
+        self.Gamer_over_text = TextElement("GAME OVER", "white", 45, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 8)*game.TILE_SIZE, "center")
         self.black_rect = pygame.Rect(0,0,game.SCREEN_WIDTH_TILES*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES*game.TILE_SIZE)
         self.Background_texture = pygame.Surface((self.black_rect.w,self.black_rect.h))
         self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)

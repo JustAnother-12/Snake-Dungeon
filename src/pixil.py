@@ -25,6 +25,7 @@ class Pixil:
                     buff = BytesIO(base64.b64decode(layer['src'].split(",")[1]))
                     image = pygame.image.load(buff).convert_alpha()
                     image = pygame.transform.scale(image, (int(pixil_file['width']) * scale, int(pixil_file['height']) * scale)).convert_alpha()
+                    image.set_alpha(int(float(layer['opacity'])*255))
                     layers.append((image, (0, 0)))
                 surface.blits(layers)
                 surface.convert_alpha()

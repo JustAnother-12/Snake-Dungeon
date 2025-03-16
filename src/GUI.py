@@ -17,7 +17,7 @@ class Game:
         self.TOP_BOTTOM_BORDER_TILES = constant.TOP_BOTTOM_BORDER_TILES
         self.LEFT_RIGHT_BORDER_TILES = constant.LEFT_RIGHT_BORDER_TILES
         self.TOP_BOTTOM_BORDER_TILES = constant.TOP_BOTTOM_BORDER_TILES
-        self.screen = pygame.display.set_mode(((self.SCREEN_WIDTH_TILES + self.LEFT_RIGHT_BORDER_TILES*2)*self.TILE_SIZE, (self.SCREEN_HEIGHT_TILES+self.TOP_BOTTOM_BORDER_TILES*2)*self.TILE_SIZE))
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH_TILES*self.TILE_SIZE, self.SCREEN_HEIGHT_TILES*self.TILE_SIZE))
         self.clock = pygame.time.Clock()
         self.running, self.playing = True, True
 

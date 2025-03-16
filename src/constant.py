@@ -1,8 +1,8 @@
 import pygame
 
 TILE_SIZE = 16
-SCREEN_WIDTH_TILES = 56
-SCREEN_HEIGHT_TILES = 48
+SCREEN_WIDTH_TILES = 58
+SCREEN_HEIGHT_TILES = 50
 STAMINA_DECREASE_RATE = 0.1
 STAMINA_RECOVERY_RATE = 0.1 
 STAMINA_DECREASE_RATE_WHILE_RUNNING = 0.2
@@ -11,6 +11,7 @@ HEAD_IMG = pygame.transform.scale(pygame.image.load("game-assets/graphics/png/sn
 DEATH_DELAY = 2
 LEFT_RIGHT_BORDER_TILES = 9
 TOP_BOTTOM_BORDER_TILES = 5
+WALL_TILES = 4
 
 # TODO: Add more textures
 # and use them in the game
