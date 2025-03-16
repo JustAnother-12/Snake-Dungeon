@@ -43,7 +43,7 @@ class Game:
         
     def run(self):
         while self.playing:
-            print(self.state_stack, end=" " * 50 + "\r", flush=True)
+            # print(self.state_stack, end=" " * 50 + "\r", flush=True)
             self.get_events()
             self.render()
             self.update()
