@@ -208,7 +208,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.__block_positions = [block.pos.copy() for block in self.blocks]
 
-        for block in self.blocks:
+        for block in self.blocks[::-1]:
             self.add(block)
             
     def check_out_of_bounds(self, block):
