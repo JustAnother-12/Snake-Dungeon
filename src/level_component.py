@@ -3,6 +3,7 @@ from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import constant
 import pixil
 from time import time
+from logic.Collision import check_collision
 import pygame
 
 class Trap(pygame.sprite.Sprite):
@@ -42,31 +43,34 @@ class Trap(pygame.sprite.Sprite):
             elif time() - self.collisionTime > 1:
                 self.active()
 
+
+    def on_collision(self, src):
+        if not self.collisionTime:
+            self.collision()
+        if self.isActive:
+            print("Sập bẫy rồi con giun.")
+
 class Traps(pygame.sprite.AbstractGroup):
     def __init__(self, quantity) -> None:
         super().__init__()
-        self.items: list[Trap] = []
         for _ in range(quantity):
-            self.items.append(Trap())
-
-        for trap in self.items:
-            self.add(trap)
+            self.add(Trap())
 
     def update(self) -> None:
-        for trap in self.items:
+        for trap in self.sprites():
             trap.update()
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self, *group: pygame.sprite.AbstractGroup) -> None:
         super().__init__(*group)
-        self.image = pixil.Pixil.load("game-assets/graphics/pixil/GOLD_LEVEL.pixil", 1).frames[0].convert_alpha()
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/GOLD_LEVEL.pixil", 1).frames[0]
         self.random_pos()
         self.rect = self.image.get_rect(center = self.pos)
 
     def random_pos(self):
         self.pos = pygame.Vector2(
-            random.randint(0 + TILE_SIZE//2, SCREEN_WIDTH_TILES - TILE_SIZE//2),
-            random.randint(0 + TILE_SIZE//2, SCREEN_HEIGHT_TILES - TILE_SIZE//2)
+            random.randint(constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES, (SCREEN_WIDTH_TILES - constant.LEFT_RIGHT_BORDER_TILES - 2 - constant.WALL_TILES)) * TILE_SIZE,
+            random.randint(constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES, (SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - 2 - constant.WALL_TILES)) * TILE_SIZE
         )
 
     def draw(self, surface):
@@ -79,7 +83,7 @@ class Key(pygame.sprite.Sprite):
 
     def __init__(self, *group: pygame.sprite.AbstractGroup) -> None:
         super().__init__(*group)
-        self.image = pixil.Pixil.load("game-assets/graphics/pixil/KEY_SPRITE(1).pixil", 2).frames[0].convert_alpha()
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/KEY_SPRITE(1).pixil", 2).frames[0]
         self.random_pos()
         self.rect = self.image.get_rect(center = self.pos)
 
@@ -118,3 +122,17 @@ class Walls(pygame.sprite.AbstractGroup):
         self.add(Wall((left, bottom), 4, 90))
         self.add(Wall((right, bottom), 4, 180))
         self.add(Wall((right, top), 4, 270))
+
+class CollisionManager:
+    def __init__(self, game) -> None:
+        self.game = game
+
+    def update(self):
+        self.check_collision_trap()
+
+    def check_collision_trap(self):
+        for trap in self.game.traps.sprites():
+            if check_collision(trap, self.game.snake.blocks):
+                trap.on_collision(self.game.snake)
+
+                # self.game.snake.on_collision(trap)
