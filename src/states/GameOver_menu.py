@@ -1,4 +1,5 @@
 from operator import truediv
+from states.Menu import Menu
 from states.state import State
 from gui_element.button_class import ButtonElement
 from gui_element.Sprite_image import ImageElement
@@ -8,7 +9,7 @@ from states.Stats import Stats
 
 import pygame
 
-class GameOver_menu(State):
+class GameOver_menu(Menu):
     def __init__(self, game) -> None:
         super().__init__(game)
 
@@ -19,6 +20,7 @@ class GameOver_menu(State):
 
         self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE ,"NEW RUN", "white")
         self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 8)*game.TILE_SIZE ,"MAIN MENU", "white")
+        self.addBtn([self.restart_button, self.main_menu_button])
 
         self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
 
@@ -26,7 +28,8 @@ class GameOver_menu(State):
         return super().update()
 
     def get_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        super().get_event(event)
+        if (self.game.selectBtnMode == "mouse" and event.type == pygame.MOUSEBUTTONDOWN) or (self.game.selectBtnMode == "key" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
             if self.restart_button.on_click():
                 self.game.state_stack.pop()
                 self.game.state_stack[-1].reset()

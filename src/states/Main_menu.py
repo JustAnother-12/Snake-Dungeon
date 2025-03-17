@@ -1,4 +1,5 @@
 import pygame
+from states.Menu import Menu
 from states.state import State
 from states.LevelTest import LevelTest
 from gui_element.button_class import ButtonElement
@@ -10,7 +11,7 @@ class Menu_logo(pygame.sprite.Sprite):
         self.image = Pixil.load("game-assets/graphics/pixil/MENU_LOGO.pixil", 3).frames[0]
         self.rect = self.image.get_rect(center=(x_pos, y_pos))
 
-class Main_menu(State):
+class Main_menu(Menu):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.init(game)
@@ -23,6 +24,7 @@ class Main_menu(State):
 
         self.play_button = ButtonElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES/2*game.TILE_SIZE, "PLAY", "white")
         self.quit_button = ButtonElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES/1.5*game.TILE_SIZE, "QUIT", "white")
+        self.addBtn([self.play_button, self.quit_button])
 
         self.Main_menu = Menu_logo(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_WIDTH_TILES/4*game.TILE_SIZE)
 
@@ -33,7 +35,8 @@ class Main_menu(State):
         self.music.play(-1)
 
     def get_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        super().get_event(event)
+        if (self.game.selectBtnMode == "mouse" and event.type == pygame.MOUSEBUTTONDOWN) or (self.game.selectBtnMode == "key" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
             if self.play_button.on_click():
                 self.music.fadeout(5000)
                 new_state = LevelTest(self.game)
@@ -41,6 +44,7 @@ class Main_menu(State):
             if self.quit_button.on_click():
                 self.game.running = False
                 self.game.playing = False
+
 
     # def render(self, surface):
     #     surface.fill("black")

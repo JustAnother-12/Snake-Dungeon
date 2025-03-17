@@ -37,14 +37,17 @@ class Stats(State):
         stats_list = self.stats_data['base_stats']
         count = 0
         v_gap = 10.5
-        h_gap = 10
+        h_gap = 16
         for i in range(4):
             for j in range(2):
-                text = TextElement(stats_list[count]['name'], "white", 10, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "center")
-                self.add(text)
+                name = TextElement(stats_list[count]['name'], "white", 10, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
+                self.add(name)
+                # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
+                value = TextElement(str(stats_list[count]['value']), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
+                self.add(value)
                 count+=1
                 h_gap -= 22
-            h_gap = 10
+            h_gap = 16
             v_gap -= 7.5
 
         # add decription text
