@@ -9,7 +9,7 @@
       {
         "id": 1,
         "name": "LENGTH",
-        "description": "the overall length \nof the body",
+        "description": "the overall length of the body",
         "value": 0
       },
       {
@@ -27,13 +27,13 @@
       {
         "id": 4,
         "name": "ENERGY REGEN",
-        "description": "increase energy \nregeneration speed",
+        "description": "increase energy regeneration speed",
         "value": 0
       },
       {
         "id": 5,
         "name": "TREASURY",
-        "description": "increase chances \nfor more Chests",
+        "description": "increase chances for more Chests",
         "value": 0
       },
       {
@@ -45,7 +45,7 @@
       {
         "id": 7,
         "name": "FOOD POTENCY",
-        "description": "increase amount of length \nfoods give",
+        "description": "increase amount of length foods give",
         "value": 0
       }
     ]
