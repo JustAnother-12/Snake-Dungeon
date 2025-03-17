@@ -53,7 +53,7 @@ class Stats(State):
         h_gap = 16
         for i in range(4):
             for j in range(2):
-                text = TextElement(stats_list[count]['description'].upper(), "grey", 8, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
+                text = TextElement(stats_list[count]['description'].upper(), "grey", 8, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft", 200)
                 self.add(text)
                 count+=1
                 h_gap -= 22

@@ -282,7 +282,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_go_out_of_bounds()
         self.handle_speed_boost()
 
-        print(self.speed)
+        # print(self.speed)
         
         for i, block in enumerate(self.blocks):
             block.set_target(self.speed, self.__block_positions[i])
