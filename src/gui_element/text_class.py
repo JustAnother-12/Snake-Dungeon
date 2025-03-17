@@ -40,7 +40,7 @@ class TextElement(pygame.sprite.Sprite):
         else:
             self.rect = self.image.get_rect(midright=(self.x_pos, self.y_pos))
         
-        print(self.text, words)
+        # print(self.text, words)
 
         for i, word in enumerate(words):
             if choice == "midleft":

@@ -329,7 +329,7 @@ class LevelTest(State):
         self.food = Food()
         self.traps = Traps(10)
         self.coins = []
-        for i in range(10):
+        for i in range(5):
             self.coins.append(Coin())
         self.walls = Walls()
         self.hud = HUD()
