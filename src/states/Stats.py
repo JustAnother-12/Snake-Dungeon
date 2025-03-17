@@ -68,6 +68,3 @@ class Stats(State):
             if event.key == pygame.K_ESCAPE:
                 self.exit_state()
                      
-    def render(self, surface):
-        pass
-        # surface.blit(self.Background_texture, self.Background_rect)

@@ -1,6 +1,6 @@
 import pygame
 from typing import Any, override
-from level_component import Trap, Traps, Walls
+from level_component import Traps, Walls, Coin, CollisionManager
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -11,6 +11,7 @@ from pygame.math import Vector2
 import random
 from logic.Collision import check_collision
 from time import time
+from HUD import HUD
 
 MAP_WIDTH = (
     constant.SCREEN_WIDTH_TILES - constant.LEFT_RIGHT_BORDER_TILES * 2 - constant.WALL_TILES * 2
@@ -171,16 +172,15 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def __init__(self, init_len):
         super().__init__()
-
-        self.stamina = 1000
+        self.max_stamina = 10*constant.TILE_SIZE
+        self.stamina = 10*constant.TILE_SIZE
         self.is_speed_boost = False
         self.speed_cool_down = 0
-
         self.isDeath = False
         self.coins = 0
         self.previous_time = pygame.time.get_ticks()
         self.blocks: list[SnakeBlock] = []
-        self.speed = 10
+        self.speed = 32
         self.direction = Vector2(1, 0)
 
         self.__block_positions = []
@@ -309,13 +309,13 @@ class Snake(pygame.sprite.AbstractGroup):
     def handle_speed_boost(self):
         if self.is_speed_boost:
             if self.stamina > 0:
-                self.speed = 20
+                self.speed = 32
                 self.stamina -= 1
             else:
-                self.speed = 10
+                self.speed = 16
         
         else:
-            self.speed = 10
+            self.speed = 16
             if self.stamina < 100:
                 self.stamina += 1
 
@@ -328,12 +328,19 @@ class LevelTest(State):
         self.snake = Snake(5)
         self.food = Food()
         self.traps = Traps(10)
+        self.coins = []
+        for i in range(10):
+            self.coins.append(Coin())
         self.walls = Walls()
+        self.hud = HUD()
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.add(self.walls, self.traps, self.snake, self.food)
+        self.CollisionManager = CollisionManager(self)
+        self.add(self.hud,self.walls, self.traps, self.snake, self.food)
+        for coin in self.coins:
+            self.add(coin)
 
     def reset(self):
         self.remove(self.traps, self.snake, self.food)
@@ -364,7 +371,8 @@ class LevelTest(State):
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
 
-        self.check_collision_trap()
+        # self.check_collision_trap()
+        self.CollisionManager.update()
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")
@@ -386,7 +394,13 @@ class LevelTest(State):
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
             pygame.draw.rect(
-                surface, "green", (0, 16, self.snake.stamina // 100 * 128, 10)
+                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 24)
+            )
+            pygame.draw.rect(
+                surface, (192,237,250), (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 4)
+            )
+        pygame.draw.rect(
+                surface, (133,133,133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE, self.snake.max_stamina // 100 * 128 + 6, 32),4,0,0,10,0,10
             )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
@@ -411,13 +425,13 @@ class LevelTest(State):
             return True
         return False
 
-    def check_collision_trap(self):
-        for trap in self.traps.items:
-            if check_collision(trap, self.snake.blocks):
-                if not trap.collisionTime:
-                    trap.collision()
-                if trap.isActive:
-                    print("Sập bẫy rồi con giun.")
+    # def check_collision_trap(self):
+    #     for trap in self.traps.sprites():
+    #         if check_collision(trap, self.snake.blocks):
+    #             if not trap.collisionTime:
+    #                 trap.collision()
+    #             if trap.isActive:
+    #                 print("Sập bẫy rồi con giun.")
 
     """
     def check_collision_key(self):
