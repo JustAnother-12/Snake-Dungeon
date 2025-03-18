@@ -13,10 +13,17 @@ LEFT_RIGHT_BORDER_TILES = 9
 TOP_BOTTOM_BORDER_TILES = 5
 WALL_TILES = 4
 
+PIXEL_FONT = "game-assets/font/default-pixilart-text.ttf"
+
+
 # TODO: Add more textures
 # and use them in the game
 class Texture:
     button = "game-assets/graphics/pixil/PAUSE_MENU_BTN_BG_SHEET.pixil"
     snake_head= "game-assets/graphics/png/snake_head.png"
+    pasue_menu_bg = "game-assets/graphics/pixil/PAUSED_MENU_BG.pixil"
+    apple = "game-assets/graphics/pixil/apple.pixil"
+
+
     
 

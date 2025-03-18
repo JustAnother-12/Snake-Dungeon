@@ -129,10 +129,18 @@ class CollisionManager:
 
     def update(self):
         self.check_collision_trap()
+        self.check_collision_food()
 
     def check_collision_trap(self):
         for trap in self.game.traps.sprites():
             if check_collision(trap, self.game.snake.blocks):
                 trap.on_collision(self.game.snake)
-
-                # self.game.snake.on_collision(trap)
+    
+    def check_collision_food(self):
+        if not self.game.food.visible: return
+        if check_collision(self.game.food, self.game.snake.blocks[0:1]):
+            self.game.food.visible = False
+            self.game.remove(self.game.food)
+            self.game.food_timer = 0
+            self.game.snake.grow_up()
+            

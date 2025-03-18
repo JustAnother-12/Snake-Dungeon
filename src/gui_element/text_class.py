@@ -1,9 +1,19 @@
 
+import enum
+from typing import Literal
 import pygame
-
+import constant
 
 class TextElement(pygame.sprite.Sprite):
-    def __init__(self, text, color, size, x_pos, y_pos, choice = "midright", width = -1) -> None:
+    def __init__(self, 
+                 text: str, 
+                 color: pygame.typing.ColorLike, 
+                 size: int, 
+                 x_pos: int, 
+                 y_pos: int, 
+                 choice: Literal["midleft", "center", "midright"] = "midleft", 
+                 width = -1
+            ) -> None:
         super().__init__()
         self.text = text
         self.color = color
@@ -13,7 +23,7 @@ class TextElement(pygame.sprite.Sprite):
         self.__render_text(choice, width)
     
     def __render_text(self, choice, width):
-        self.font = pygame.font.Font("game-assets/font/default-pixilart-text.ttf", self.size)
+        self.font = pygame.font.Font(constant.PIXEL_FONT, self.size)
         if width == -1:
             width = self.font.size(self.text)[0]
         words = []
