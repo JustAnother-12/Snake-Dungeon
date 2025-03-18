@@ -1,6 +1,6 @@
 import pygame
 from typing import Any, override
-from level_component import Traps, Walls, Coin, CollisionManager
+from level_component import Chest, Coins, Traps, Walls, Coin, CollisionManager
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -328,22 +328,20 @@ class LevelTest(State):
         self.snake = Snake(5)
         self.food = Food()
         self.traps = Traps(10)
-        self.coins = []
-        for i in range(5):
-            self.coins.append(Coin())
+        self.coins = Coins()
         self.walls = Walls()
-        self.hud = HUD()
+        self.chest = Chest()
+        self.gold = 0
+        self.hud = HUD(self.gold, len(self.snake))
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
         self.CollisionManager = CollisionManager(self)
-        self.add(self.hud,self.walls, self.traps, self.snake, self.food)
-        for coin in self.coins:
-            self.add(coin)
+        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins)
 
     def reset(self):
-        self.remove(self.traps, self.snake, self.food)
+        self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins)
         self.init()
 
     def update(self):
@@ -355,6 +353,7 @@ class LevelTest(State):
             return
         self.snake.update()
         self.traps.update()
+        self.chest.update()
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
@@ -416,7 +415,7 @@ class LevelTest(State):
             self.food_timer = 0
             print("food collied")
             self.snake.grow_up()
-            self.hud.set_lenght(6)
+            self.hud.set_lenght(len(self.snake))
             self.add(self.snake.blocks[-2])
             return True
         return False
