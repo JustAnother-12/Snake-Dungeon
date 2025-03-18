@@ -316,7 +316,7 @@ class Snake(pygame.sprite.AbstractGroup):
         
         else:
             self.speed = 16
-            if self.stamina < 100:
+            if self.stamina < self.max_stamina:
                 self.stamina += 1
 
 class LevelTest(State):
@@ -364,8 +364,8 @@ class LevelTest(State):
                 self.food.random_pos(self.snake.blocks)
                 self.food_timer = 0
                 print("Food spawned")
-        else:
-            self.check_collisions_food()
+        elif self.check_collisions_food():
+            self.hud.set_lenght(len(self.snake.blocks))
 
         if self.check_collisions_snake() or self.snake.isDeath:
             self.game.state_stack[-1].visible = False
@@ -394,13 +394,13 @@ class LevelTest(State):
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
             pygame.draw.rect(
-                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 24)
+                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 24)
             )
             pygame.draw.rect(
-                surface, (192,237,250), (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 4)
+                surface, (192,237,250), (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 4)
             )
         pygame.draw.rect(
-                surface, (133,133,133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE, self.snake.max_stamina // 100 * 128 + 6, 32),4,0,0,10,0,10
+                surface, (133,133,133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE, self.snake.max_stamina * 128 // 100 + 6, 32), 4, 0, 0, 10, 0, 10
             )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
@@ -416,6 +416,7 @@ class LevelTest(State):
             self.food_timer = 0
             print("food collied")
             self.snake.grow_up()
+            self.hud.set_lenght(6)
             self.add(self.snake.blocks[-2])
             return True
         return False

@@ -21,16 +21,27 @@ class ButtonElement(pygame.sprite.Sprite):
         for i in range(len(self.images.frames)):
             self.images.frames[i].blit(self.text, self.text_rect)
 
+        self.isSelected = -1 
+        '''
+        isSelected:
+            -1: Cho phép dùng chuột
+             0: Không được chọn
+             1: Được chọn
+        '''
+
     def update(self)-> None:
-        if self.checkForInputs(pygame.mouse.get_pos()):
+        if self.checkForInputs(pygame.mouse.get_pos()) or self.isSelected == 1:
             self.image = self.images.frames[1]
         else:
             self.image = self.images.frames[0]
 
     def checkForInputs(self, mouse_pos) -> bool:
         if mouse_pos[0] in range(self.rect.left, self.rect.right) and mouse_pos[1] in range(self.rect.top, self.rect.bottom):
-            return True
+            return self.isSelected == -1
         return False
     
     def on_click(self) -> bool:
-        return self.checkForInputs(pygame.mouse.get_pos())
+        return self.checkForInputs(pygame.mouse.get_pos()) or self.isSelected == 1
+    
+    def set_selected(self, mode):
+        self.isSelected = mode

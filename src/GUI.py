@@ -1,6 +1,5 @@
 import pygame
 import sys
-import pixil
 from states import Main_menu
 from states.state import State
 import constant
@@ -20,6 +19,7 @@ class Game:
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH_TILES*self.TILE_SIZE, self.SCREEN_HEIGHT_TILES*self.TILE_SIZE))
         self.clock = pygame.time.Clock()
         self.running, self.playing = True, True
+        self.selectBtnMode = "mouse"
 
         self.state_stack: list[State] = []
         self.load_states()
