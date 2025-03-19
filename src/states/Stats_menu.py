@@ -8,13 +8,13 @@ from pixil import Pixil
 class base_stats_value:
     def __init__(self) -> None:
         self.speed = 0
-        self.length = 0
         self.armour = 0
         self.energy_cap = 0
         self.energy_regen = 0
         self.treasury = 0
         self.luck = 0
         self.food_potent = 0
+
 
 class Stats_menu(State):
     def __init__(self, game) -> None:
@@ -54,7 +54,7 @@ class Stats_menu(State):
                 name = TextElement(stats_list[count]['name'], "white", 10, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
                 self.add(name)
                 # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
-                value = TextElement(str(stats_list[count]['value']), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
+                value = TextElement(str(0), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
                 self.add(value)
                 count+=1
                 h_gap -= 22
@@ -74,8 +74,21 @@ class Stats_menu(State):
             h_gap = 16
             v_gap -= 7.5
 
-    def update(self):
-        pass
+    def update(self,game):
+        # add name text
+        stats_list = self.stats_data['base_stats']
+        count = 0
+        v_gap = 10.5
+        h_gap = 16
+        for i in range(4):
+            for j in range(2):
+                # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
+                value = TextElement(str(0), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
+                self.add(value)
+                count+=1
+                h_gap -= 22
+            h_gap = 16
+            v_gap -= 7.5
 
     def get_event(self, event):
         if event.type == pygame.KEYDOWN:

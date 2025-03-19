@@ -2,10 +2,11 @@ from __future__ import annotations
 import os
 import pygame
 from typing import Any, override
-from level_component import Chest, Coins, Traps, Wall, Walls, Coin, Bombs
+from level_component import Chest, Coins, Keys, Traps, Wall, Walls, Bombs
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
+from states.Stats_menu import base_stats_value
 from pixil import Pixil
 from pygame.sprite import AbstractGroup
 import constant
@@ -181,8 +182,11 @@ class Snake(pygame.sprite.AbstractGroup):
         self.coins = 0
         self.previous_time = pygame.time.get_ticks()
         self.blocks: list[SnakeBlock] = []
-        self.speed = 32
+        self.base_speed = 16
+        self.gold = 0
+        self.keys = 0
         self.direction = Vector2(1, 0)
+        self.base_stats = base_stats_value()
 
         self.__block_positions = []
         self.__last_direction = Vector2(0, 0)
@@ -289,10 +293,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_go_out_of_bounds()
         self.handle_speed_boost()
         self.handle_collision()
-
-        print(self.__block_positions, end=" " * 50 + "\r", flush=True) 
+        # print(self.__block_positions, end=" " * 50 + "\r", flush=True) 
         for i, block in enumerate(self.blocks):
-            block.set_target(self.speed, self.__block_positions[i])
+            block.set_target(self.base_speed, self.__block_positions[i])
             block.move(dt, 
                 animation=(i == 0),
                 tail_movement=(i == len(self.blocks) - 1)
@@ -317,12 +320,12 @@ class Snake(pygame.sprite.AbstractGroup):
     def handle_speed_boost(self):
         if self.is_speed_boost:
             if self.stamina > 0:
-                self.speed = 32
+                self.base_speed = 32
                 self.stamina -= 1
             else:
-                self.speed = 16
+                self.base_speed = 16
         else:
-            self.speed = 16
+            self.base_speed = 16
             if self.stamina < self.max_stamina:
                 self.stamina += 1
     
@@ -355,17 +358,18 @@ class LevelTest(State):
         self.snake = Snake(self, 5)
         self.food = Food()
         self.traps = Traps(self, 10)
+        self.keys = Keys(self,2)
         self.coins = Coins(self)
         self.walls = Walls()
         self.chest = Chest(self)
+        self.chest.isLocked = True
         self.bombs = Bombs(self, 5)
-        self.gold = 0
-        self.hud = HUD(self.gold, len(self.snake))
+        self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
+        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs, self.keys)
 
     def reset(self):
         self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
@@ -380,10 +384,11 @@ class LevelTest(State):
             return
         self.snake.update()
         self.traps.update()
+        self.keys.update()
         self.chest.update()
         self.bombs.update()
         self.coins.update()
-        self.hud.update(self.gold, len(self.snake.blocks))
+        self.hud.update(self.snake.gold, len(self.snake.blocks), self.snake.keys)
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()

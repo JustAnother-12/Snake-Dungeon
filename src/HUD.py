@@ -6,7 +6,7 @@ import constant
 
 
 class HUD(pygame.sprite.Group):
-    def __init__(self, coin, length) -> None:
+    def __init__(self, coin, length, keys) -> None:
         super().__init__()
         self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON_ALT.pixil", 1).frames[0]
         self.Player_Icon_rect = ImageElement(4*constant.TILE_SIZE, 3.5*constant.TILE_SIZE, self.Player_Icon)
@@ -19,7 +19,11 @@ class HUD(pygame.sprite.Group):
         self.Length_Icon_rect = ImageElement(2*constant.TILE_SIZE, 13*constant.TILE_SIZE, self.Length_Icon)
         self.length_text = TextElement(str(length), "white", 15, 4*constant.TILE_SIZE, int(13.8*constant.TILE_SIZE), "midleft")
 
-        self.add(self.Player_Icon_rect, self.Gold_Icon_rect, self.Length_Icon_rect, self.Gold_text, self.length_text)
+        self.Key_Icon = Pixil.load("game-assets/graphics/pixil/KEY_SPRITE.pixil", 4).frames[0]
+        self.Key_Icon_rect = ImageElement(2*constant.TILE_SIZE, 18*constant.TILE_SIZE, self.Key_Icon)
+        self.Key_text = TextElement(str(keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
+
+        self.add(self.Player_Icon_rect, self.Gold_Icon_rect, self.Length_Icon_rect, self.Gold_text, self.length_text, self.Key_Icon_rect, self.Key_text)
 
     def set_gold(self, num):
         for grp in self.Gold_text.groups():
@@ -35,6 +39,14 @@ class HUD(pygame.sprite.Group):
         for grp in self.Length_Icon_rect.groups():
             grp.add(self.length_text) # type: ignore
 
-    def update(self, coin, len):
+    def set_key(self, keys):
+        for grp in self.Key_text.groups():
+            grp.remove(self.Key_text) # type: ignore
+        self.Key_text = TextElement(str(keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
+        for grp in self.Key_Icon_rect.groups():
+            grp.add(self.Key_text) #type: ignore
+
+    def update(self, coin, len, keys):
         self.set_gold(coin)
         self.set_length(len)
+        self.set_key(keys)
