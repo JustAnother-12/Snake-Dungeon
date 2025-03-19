@@ -3,13 +3,13 @@ from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import constant
 import pixil
 from time import time
-from logic.help import check_collision
 import pygame
 
 
+
+
 class Trap(pygame.sprite.Sprite):
-    from states import LevelTest
-    def __init__(self, lever: LevelTest.LevelTest) -> None:
+    def __init__(self, lever) -> None:
         super().__init__()
         self.level = lever
         self.random_pos()
@@ -64,6 +64,9 @@ class Trap(pygame.sprite.Sprite):
         ).frames[1]
 
     def update(self):
+        if self.__is_collision_with_snake() and not self.isActive:
+            self.collision()
+            
         if not self.collisionTime == None:
             if time() - self.collisionTime > 1.5:
                 self.reset()
@@ -71,7 +74,7 @@ class Trap(pygame.sprite.Sprite):
                 self.active()
     
     def __is_collision_with_snake(self):
-        return self.rect.collideo
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks) # type: ignore
 
     # def on_collision(self, src):
     #     if not self.collisionTime:
@@ -81,10 +84,10 @@ class Trap(pygame.sprite.Sprite):
 
 
 class Traps(pygame.sprite.AbstractGroup):
-    def __init__(self, quantity) -> None:
+    def __init__(self, quantity, lever) -> None:
         super().__init__()
         for _ in range(quantity):
-            self.add(Trap())
+            self.add(Trap(lever))
 
     def update(self) -> None:
         for trap in self.sprites():
