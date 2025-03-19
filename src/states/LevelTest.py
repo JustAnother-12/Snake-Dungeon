@@ -247,7 +247,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.__block_positions.insert(0, new_head_pos)
         
-        if self.__is_collide_with_wall():
+        if self.__is_collide_with_wall() or self.__is_collide_with_self():
             self.__block_positions.pop(0)
             if not self.__will_go_out_of_bounds:
                 print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
@@ -328,7 +328,7 @@ class Snake(pygame.sprite.AbstractGroup):
     
     def __is_collide_with_self(self):
         for block in self.blocks[1:]:
-            if self.blocks[0].rect.colliderect(block.rect):
+            if block.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)):
                 return True
         return False
     
