@@ -2,14 +2,15 @@ import json, pygame, base64
 from io import BytesIO
 
 class Pixil:
-    def __init__(self, frames: list[pygame.Surface], frames_delay_ms: list[int], original_size: tuple[int, int], size: tuple[int, int]) -> None:
+    def __init__(self, frames: list[pygame.Surface], frames_delay_ms: list[int], original_size: tuple[int, int], size: tuple[int, int], padding: int = 0) -> None:
         self.frames = frames
         self.frames_delay_ms = frames_delay_ms
         self.original_size = original_size
         self.size = size
+        self.padding = padding
 
     @classmethod
-    def load(cls, path: str, scale: int):
+    def load(cls, path: str, scale: int, padding: int = 0):
         with open(path) as file:
             # pixil_file = PixilType.from_dict(json.loads(file.read()))
             pixil_file = json.loads(file.read())
@@ -17,7 +18,7 @@ class Pixil:
             frames: list[pygame.Surface] = [] * len(frames_raw)
             frames_delay: list[int] = [] * len(frames_raw)
             for frame in frames_raw:
-                surface = pygame.Surface((int(pixil_file['width']) * scale, int(pixil_file['height']) * scale), pygame.SRCALPHA)
+                surface = pygame.Surface((int(pixil_file['width']) * scale + padding*2, int(pixil_file['height']) * scale + padding*2), pygame.SRCALPHA)
                 surface.set_colorkey((0, 0, 0))
                 layers = []
                 for layer in frame['layers']:
@@ -26,14 +27,14 @@ class Pixil:
                     image = pygame.image.load(buff).convert_alpha()
                     image = pygame.transform.scale(image, (int(pixil_file['width']) * scale, int(pixil_file['height']) * scale)).convert_alpha()
                     image.set_alpha(int(float(layer['opacity'])*255))
-                    layers.append((image, (0, 0)))
+                    layers.append((image, (padding, padding)))
                 surface.blits(layers)
                 surface.convert_alpha()
 
                 frames.append(surface)
                 frames_delay.append(frame['speed'])
             
-            return cls(frames, frames_delay, (pixil_file['width'], pixil_file['height']), (pixil_file['width'] * scale, pixil_file['height'] * scale))
+            return cls(frames, frames_delay, (pixil_file['width'], pixil_file['height']), (pixil_file['width'] * scale, pixil_file['height'] * scale), padding)
         
 # if __name__ == '__main__':
 #     pixil = Pixil.load('game-assets/graphics/pixil/apple.pixil', 2)

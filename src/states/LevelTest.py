@@ -1,7 +1,7 @@
 import os
 import pygame
 from typing import Any, override
-from level_component import Traps, Walls, Coin, CollisionManager
+from level_component import Chest, Coins, Traps, Walls, Coin, CollisionManager
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -318,7 +318,7 @@ class Snake(pygame.sprite.AbstractGroup):
         
         else:
             self.speed = 16
-            if self.stamina < 100:
+            if self.stamina < self.max_stamina:
                 self.stamina += 1
 
 class LevelTest(State):
@@ -331,22 +331,20 @@ class LevelTest(State):
         self.snake = Snake(5)
         self.food = Food()
         self.traps = Traps(10)
-        self.coins = []
-        for i in range(5):
-            self.coins.append(Coin())
+        self.coins = Coins()
         self.walls = Walls()
-        self.hud = HUD()
+        self.chest = Chest()
+        self.gold = 0
+        self.hud = HUD(self.gold, len(self.snake))
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
         self.CollisionManager = CollisionManager(self)
-        self.add(self.hud,self.walls, self.traps, self.snake, self.food)
-        for coin in self.coins:
-            self.add(coin)
+        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins)
 
     def reset(self):
-        self.remove(self.traps, self.snake, self.food)
+        self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins)
         self.init()
 
     def update(self):
@@ -358,6 +356,7 @@ class LevelTest(State):
             return
         self.snake.update()
         self.traps.update()
+        self.chest.update()
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
@@ -394,13 +393,13 @@ class LevelTest(State):
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
             pygame.draw.rect(
-                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 24)
+                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 24)
             )
             pygame.draw.rect(
-                surface, (192,237,250), (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina // 100 * 128, 4)
+                surface, (192,237,250), (6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 4)
             )
         pygame.draw.rect(
-                surface, (133,133,133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE, self.snake.max_stamina // 100 * 128 + 6, 32),4,0,0,10,0,10
+                surface, (133,133,133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE, self.snake.max_stamina * 128 // 100 + 6, 32), 4, 0, 0, 10, 0, 10
             )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
