@@ -15,10 +15,3 @@ class Level(State):
             if event.key == pygame.K_ESCAPE:
                 new_state = Pause_menu(self.game)
                 new_state.enter_state()
-
-    # def render(self, surface):
-    #     surface.fill("gray")
-    #     self.game.draw_text("game", "white", 30, surface, (self.game.SCREEN_WIDTH_TILES/2)*self.game.TILE_SIZE, (self.game.SCREEN_HEIGHT_TILES/2)*self.game.TILE_SIZE)
-    #     self.rect.x +=1
-        
-    #     pygame.draw.rect(surface,"white", self.rect)

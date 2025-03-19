@@ -1,3 +1,4 @@
+import constant
 from states.Menu import Menu
 from states.state import State
 from gui_element.button_class import ButtonElement
@@ -15,7 +16,7 @@ class Pause_menu(Menu):
 
         self.Paused_text = TextElement("PAUSED", "white", 35, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 15)*game.TILE_SIZE, "center")
 
-        self.Background_texture = Pixil.load("game-assets/graphics/pixil/PAUSED_MENU_BG.pixil", 2).frames[0]
+        self.Background_texture = Pixil.load(constant.Texture.pasue_menu_bg, 2).frames[0]
         self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
 
         self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 9)*game.TILE_SIZE ,"NEW RUN", "white")

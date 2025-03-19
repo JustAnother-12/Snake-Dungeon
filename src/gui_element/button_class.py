@@ -6,6 +6,7 @@ import constant
 import pixil
 pygame.init()
 text_font = pygame.font.Font("game-assets/font/default-pixilart-text.ttf", 30)
+
 class ButtonElement(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, text_input, text_color) -> None:
         super().__init__()

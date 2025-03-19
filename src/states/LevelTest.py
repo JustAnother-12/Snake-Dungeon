@@ -1,6 +1,8 @@
+from __future__ import annotations
+import os
 import pygame
 from typing import Any, override
-from level_component import Bombs, Chest, Coins, Traps, Walls, Coin, CollisionManager
+from level_component import Chest, Coins, Traps, Wall, Walls, Coin, Bombs
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -9,7 +11,7 @@ from pygame.sprite import AbstractGroup
 import constant
 from pygame.math import Vector2
 import random
-from logic.Collision import check_collision
+from logic.help import check_collision
 from time import time
 from HUD import HUD
 
@@ -28,7 +30,7 @@ class Food(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image: pygame.Surface = pygame.transform.scale(
-            Pixil.load("game-assets/graphics/pixil/apple.pixil", 1).frames[0],
+            Pixil.load(constant.Texture.apple, 1).frames[0],
             (constant.TILE_SIZE, constant.TILE_SIZE),
         )
         self.rect = self.image.get_rect(topleft=(0, 0))
@@ -72,11 +74,11 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.image.fill((255, 139, 38))
-        self.target_pos = pygame.Vector2(self.rect.center)
-        self.pos = pygame.Vector2(self.rect.center)
-        self.speed = 0
-        self.__last_target = pygame.Vector2(self.rect.center)
+        self.target_pos = pygame.Vector2(self.rect.topleft)
+        self.pos = pygame.Vector2(self.rect.topleft)
+        self.__last_target = pygame.Vector2(self.rect.topleft)
 
+        self.speed = 0
         self.moving = False
         self.isOutside = False
         self.__is_head = False
@@ -120,12 +122,12 @@ class SnakeBlock(pygame.sprite.Sprite):
         
         if self.pos.distance_to(self.target_pos) <= 0:
             self.pos = self.target_pos
-            self.rect.center = (int(self.pos.x), int(self.pos.y))
+            self.rect.topleft = (int(self.pos.x), int(self.pos.y))
             self.moving = False
 
         if animation and not tail_movement:
             self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
-            self.rect.center = (int(self.pos.x), int(self.pos.y))
+            self.rect.topleft = (int(self.pos.x), int(self.pos.y))
             
         elif tail_movement:
             self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
@@ -140,26 +142,24 @@ class SnakeBlock(pygame.sprite.Sprite):
                     bottomright=(
                         int(
                             self.target_pos.x
-                            + constant.TILE_SIZE // 2
-                            + constant.TILE_SIZE % 2
+                            + constant.TILE_SIZE
                         ),
                         int(
                             self.target_pos.y
-                            + constant.TILE_SIZE // 2
-                            + constant.TILE_SIZE % 2
+                            + constant.TILE_SIZE
                         ),
                     )
                 )
             else:
                 self.rect = self.image.get_rect(
                     topleft=(
-                        int(self.target_pos.x - constant.TILE_SIZE // 2),
-                        int(self.target_pos.y - constant.TILE_SIZE // 2),
+                        int(self.target_pos.x),
+                        int(self.target_pos.y),
                     )
                 )
         else:
             self.pos = self.target_pos
-            self.rect.center = (int(self.pos.x), int(self.pos.y))
+            self.rect.topleft = (int(self.pos.x), int(self.pos.y))
             self.moving = False
         
         return True
@@ -170,8 +170,9 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake(pygame.sprite.AbstractGroup):
 
-    def __init__(self, init_len):
+    def __init__(self, lever: LevelTest, init_len):
         super().__init__()
+        self.lever = lever
         self.max_stamina = 10*constant.TILE_SIZE
         self.stamina = 10*constant.TILE_SIZE
         self.is_speed_boost = False
@@ -185,6 +186,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.__block_positions = []
         self.__last_direction = Vector2(0, 0)
+
         self.__will_go_out_of_bounds = False
         # thời gian mà đầu con rắn ra khỏi bound
         self.__out_of_bounds_time = None
@@ -193,6 +195,7 @@ class Snake(pygame.sprite.AbstractGroup):
     
     def __len__(self):
         return len(self.blocks)
+    
     
     def __init_snake_blocks(self, init_len):
         x = 0
@@ -210,13 +213,6 @@ class Snake(pygame.sprite.AbstractGroup):
 
         for block in self.blocks[::-1]:
             self.add(block)
-            
-    def check_out_of_bounds(self, block):
-        if block.x < MAP_LEFT or block.x > MAP_RIGHT:
-            return True
-        if block.y < MAP_TOP or block.y > MAP_BOTTOM:
-            return True
-        return False
         
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -248,8 +244,11 @@ class Snake(pygame.sprite.AbstractGroup):
 
         head_pos = self.__block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
+
+        self.__block_positions.insert(0, new_head_pos)
         
-        if self.check_out_of_bounds(new_head_pos):
+        if self.__is_collide_with_wall():
+            self.__block_positions.pop(0)
             if not self.__will_go_out_of_bounds:
                 print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
                 self.__out_of_bounds_time = time()
@@ -259,11 +258,20 @@ class Snake(pygame.sprite.AbstractGroup):
         
         self.__will_go_out_of_bounds = False
         
-        self.__block_positions.insert(0, new_head_pos)
         if len(self.__block_positions) > len(self.blocks):
             self.__block_positions.pop()
         
         self.__last_direction = self.direction
+    
+    def handle_collision(self):
+        # if self.__is_collide_with_self():
+        #     self.isDeath = True
+
+        if self.__is_collide_with_food():
+            self.grow_up()
+            self.lever.food.visible = False
+            self.lever.remove(self.lever.food)
+            self.lever.food_timer = 0
 
     def handle_go_out_of_bounds(self):
         if self.__will_go_out_of_bounds:
@@ -273,7 +281,6 @@ class Snake(pygame.sprite.AbstractGroup):
             self.__out_of_bounds_time = None
 
     def update(self):
-        # print(self.__block_positions, end=" " * 50 + "\r", flush=True)
         dt = (pygame.time.get_ticks() - self.previous_time) / 100
         self.previous_time = pygame.time.get_ticks()
 
@@ -281,9 +288,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_movement()
         self.handle_go_out_of_bounds()
         self.handle_speed_boost()
+        self.handle_collision()
 
-        # print(self.speed)
-        
+        print(self.__block_positions, end=" " * 50 + "\r", flush=True) 
         for i, block in enumerate(self.blocks):
             block.set_target(self.speed, self.__block_positions[i])
             block.move(dt, 
@@ -297,10 +304,11 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def grow_up(self):
         tail = self.blocks[-1]
-        new_tail = SnakeBlock(tail.rect.topleft)
-        self.blocks.insert(-1, new_tail)
-        self.__block_positions.append(new_tail.pos.copy())
-        self.add(new_tail)
+        newBlock = SnakeBlock(tail.rect.topleft)
+        self.blocks.insert(-1, newBlock)
+        self.__block_positions.append(newBlock.pos.copy())
+        for i in self.blocks[0].groups():
+            i.add(newBlock) # type: ignore
 
     def split(self, index):
         self.remove(self.blocks[index::])
@@ -313,11 +321,29 @@ class Snake(pygame.sprite.AbstractGroup):
                 self.stamina -= 1
             else:
                 self.speed = 16
-        
         else:
             self.speed = 16
             if self.stamina < self.max_stamina:
                 self.stamina += 1
+    
+    def __is_collide_with_self(self):
+        for block in self.blocks[1:]:
+            if self.blocks[0].rect.colliderect(block.rect):
+                return True
+        return False
+    
+    def __is_collide_with_wall(self):
+        for wall in self.lever.walls:
+            wall: Wall
+            if wall.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)) : # type: ignore
+                return True
+        return False
+    
+    def __is_collide_with_food(self):
+        food = self.lever.food
+        if self.blocks[0].rect.colliderect(food.rect) and food.visible: # type: ignore
+            return True
+        return False
 
 class LevelTest(State):
     def __init__(self, game) -> None:
@@ -325,20 +351,20 @@ class LevelTest(State):
         self.init()
 
     def init(self):
-        self.snake = Snake(5)
+        self.remove(self.sprites())
+        self.snake = Snake(self, 5)
         self.food = Food()
-        self.traps = Traps(10)
-        self.coins = Coins()
+        self.traps = Traps(self, 10)
+        self.coins = Coins(self)
         self.walls = Walls()
-        self.chest = Chest()
-        self.bombs = Bombs(5)
+        self.chest = Chest(self)
+        self.bombs = Bombs(self, 5)
         self.gold = 0
         self.hud = HUD(self.gold, len(self.snake))
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.CollisionManager = CollisionManager(self)
         self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
 
     def reset(self):
@@ -356,6 +382,7 @@ class LevelTest(State):
         self.traps.update()
         self.chest.update()
         self.bombs.update()
+        self.coins.update()
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
@@ -365,15 +392,10 @@ class LevelTest(State):
                 self.food.random_pos(self.snake.blocks)
                 self.food_timer = 0
                 print("Food spawned")
-        elif self.check_collisions_food():
-            self.hud.set_lenght(len(self.snake.blocks))
-
-        if self.check_collisions_snake() or self.snake.isDeath:
+        
+        if self.snake.isDeath:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
-
-        # self.check_collision_trap()
-        self.CollisionManager.update()
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")
@@ -407,47 +429,8 @@ class LevelTest(State):
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
         self.draw_grid(surface)
         self.draw_stamina(surface)
+
         return super().draw(surface)
-
-    def check_collisions_food(self):
-        # Check each food for collisions
-        if check_collision(self.food, self.snake.blocks[0:1]):
-            self.food.visible = False
-            self.remove(self.food)
-            self.food_timer = 0
-            print("food collied")
-            self.snake.grow_up()
-            self.hud.set_lenght(len(self.snake))
-            self.add(self.snake.blocks[-2])
-            return True
-        return False
-
-    def check_collisions_snake(self):
-        if check_collision(self.snake.blocks[0], self.snake.blocks[2:]):
-            return True
-        return False
-
-    # def check_collision_trap(self):
-    #     for trap in self.traps.sprites():
-    #         if check_collision(trap, self.snake.blocks):
-    #             if not trap.collisionTime:
-    #                 trap.collision()
-    #             if trap.isActive:
-    #                 print("Sập bẫy rồi con giun.")
-
-    """
-    def check_collision_key(self):
-        for key in self.keys:
-            if check_collision(key, self.snake.blocks[0:1]):
-                key.kill()
-
-    def check_collision_coin(self):
-        for coin in self.coins:
-            if check_collision(coin, self.snake.blocks[0:1]):
-                self.snake.coins += 10
-                print(f"Coin: {self.snake.coins}")
-                coin.kill()
-    """
 
 
 def main():

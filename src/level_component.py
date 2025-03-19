@@ -3,13 +3,15 @@ from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import constant
 import pixil
 from time import time
-from logic.Collision import check_collision
 import pygame
 
 
+
+
 class Trap(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self, level) -> None:
         super().__init__()
+        self.level = level
         self.random_pos()
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
@@ -52,7 +54,7 @@ class Trap(pygame.sprite.Sprite):
         self.isActive = False
         self.collisionTime = None
 
-    def collision(self):
+    def on_collision(self):
         self.collisionTime = time()
 
     def active(self):
@@ -62,24 +64,30 @@ class Trap(pygame.sprite.Sprite):
         ).frames[1]
 
     def update(self):
+        if self.__is_collision_with_snake() and not self.isActive:
+            self.on_collision()
+            
         if not self.collisionTime == None:
             if time() - self.collisionTime > 1.5:
                 self.reset()
             elif time() - self.collisionTime > 1:
                 self.active()
+    
+    def __is_collision_with_snake(self):
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks) # type: ignore
 
-    def on_collision(self, src):
-        if not self.collisionTime:
-            self.collision()
-        if self.isActive:
-            print("Sập bẫy rồi con giun.")
+    # def on_collision(self, src):
+    #     if not self.collisionTime:
+    #         self.collision()
+    #     if self.isActive:
+    #         print("Sập bẫy rồi con giun.")
 
 
 class Traps(pygame.sprite.AbstractGroup):
-    def __init__(self, quantity) -> None:
+    def __init__(self, level, quantity) -> None:
         super().__init__()
         for _ in range(quantity):
-            self.add(Trap())
+            self.add(Trap(level))
 
     def update(self) -> None:
         for trap in self.sprites():
@@ -87,8 +95,9 @@ class Traps(pygame.sprite.AbstractGroup):
 
 
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, area: pygame.Rect | None = None) -> None:
+    def __init__(self,  level, area: pygame.Rect | None = None) -> None:
         super().__init__()
+        self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/GOLD_LEVEL.pixil", 1
         ).frames[0]
@@ -153,29 +162,40 @@ class Coin(pygame.sprite.Sprite):
                 or y > (SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - constant.WALL_TILES) * TILE_SIZE - 4
             ):
                 self.random_pos(area)
+    def update(self):
+        if self.__is_collision_with_snake():
+            self.on_collision()
 
-    def on_collision(self, src):
+    def __is_collision_with_snake(self):
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+    
+    def on_collision(self):
         self.kill()
-        src.gold += 10
-        src.hud.set_gold(src.gold)
+        self.level.gold += 10
+        self.level.hud.set_gold(self.level.gold)
 
 
 class Coins(pygame.sprite.AbstractGroup):
-    def __init__(self, quantity: int = 0) -> None:
+    def __init__(self, level, quantity: int = 0) -> None:
         super().__init__()
+        self.level = level
         for _ in range(quantity):
-            self.add(Coin())
+            self.add(Coin(self.level))
 
-    def add_coin(self, quantity, src):
+    def add_coin(self, quantity):
         for _ in range(quantity):
-            self.add(Coin(src.chest.rect))
+            self.add(Coin(self.level, self.level.chest.rect))
+        self.level.add(self.sprites())
 
-        src.add(self.sprites())
+    def update(self):
+        for coin in self.sprites():
+            coin.update()
 
 
 class Chest(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self, level) -> None:
         super().__init__()
+        self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
         ).frames[0]
@@ -208,16 +228,21 @@ class Chest(pygame.sprite.Sprite):
         )
 
     def update(self) -> None:
+        if self.__is_collision_with_snake():
+            self.on_collision()
         if self.isOpened:
             self.image = pixil.Pixil.load(
                 "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
             ).frames[2]
 
-    def on_collision(self, src):
+    def __is_collision_with_snake(self):
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+
+    def on_collision(self):
         if not self.isOpened:
             self.isOpened = True
             print("Open chest")
-            src.coins.add_coin(random.randint(7, 15), src)
+            self.level.coins.add_coin(random.randint(7, 15))
 
 
 class Key(pygame.sprite.Sprite):
@@ -283,8 +308,9 @@ class Walls(pygame.sprite.AbstractGroup):
         self.add(Wall((right, top), 4, 270))
 
 class Bomb(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self, level) -> None:
         super().__init__()
+        self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/BOMB_SHEET.pixil", 1
         ).frames[0]
@@ -317,7 +343,12 @@ class Bomb(pygame.sprite.Sprite):
             * TILE_SIZE,
         )
 
+    def __is_collision_with_snake(self):
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+
     def update(self):
+        if self.__is_collision_with_snake():
+            self.on_collision()
         if self.activeTime != None:
             if time() - self.activeTime < 1:
                 self.image = pixil.Pixil.load(
@@ -329,47 +360,53 @@ class Bomb(pygame.sprite.Sprite):
         elif time() - self.timeAppear > 3:
             self.activeTime = time()
 
-    def on_collision(self, src):
+    def on_collision(self):
         if not self.activeTime:
             self.activeTime = time()
 
 class Bombs(pygame.sprite.AbstractGroup):
-    def __init__(self, quantity) -> None:
+    def __init__(self, level, quantity = 0) -> None:
         super().__init__()
+        self.level = level
         for _ in range(quantity):
-            self.add(Bomb())
+            self.add(Bomb(self.level))
         
     def update(self):
         for bomb in self.sprites():
             bomb.update()
 
-class CollisionManager:
-    def __init__(self, game) -> None:
-        self.game = game
+# class CollisionManager:
+#     def __init__(self, game) -> None:
+#         self.game = game
+# class CollisionManager:
+#     def __init__(self, game) -> None:
+#         from states import LevelTest
+#         self.level: LevelTest.LevelTest = game
 
-    def update(self):
-        self.check_collision_trap()
-        self.check_collision_coin()
-        self.check_collision_chest()
-        self.check_collision_bomb()
+#     def update(self):
+#         self.check_collision_trap()
+#         self.check_collision_food()
 
-    def check_collision_trap(self):
-        for trap in self.game.traps.sprites():
-            if check_collision(trap, self.game.snake.blocks):
-                trap.on_collision(self.game.snake)
-
-                # self.game.snake.on_collision(trap)
-
-    def check_collision_coin(self):
-        for coin in self.game.coins.sprites():
-            if check_collision(coin, self.game.snake.blocks):
-                coin.on_collision(self.game)
-
-    def check_collision_chest(self):
-        if check_collision(self.game.chest, self.game.snake.blocks):
-            self.game.chest.on_collision(self.game)
-
-    def check_collision_bomb(self):
-        for bomb in self.game.bombs.sprites():
-            if check_collision(bomb, self.game.snake.blocks):
-                bomb.on_collision(self.game)
+#     def check_collision_trap(self):
+#         for trap in self.lever.traps.sprites():
+#             if check_collision(trap, self.lever.snake.blocks):
+#                 trap.on_collision(self.lever.snake)
+    
+#     def check_collision_food(self):
+#         if not self.lever.food.visible: return
+#         if check_collision(self.lever.food, self.lever.snake.blocks[0:1]):
+#             self.lever.food.visible = False
+#             self.lever.remove(self.lever.food)
+#             self.lever.food_timer = 0
+#             self.lever.snake.grow_up()
+    
+#     def check_collisions_snake(self):
+#         pass
+#         # if check_collision(self.lever.snake.blocks[0], self.lever.snake.blocks[2:]):
+#         #     pass
+    
+#     def check_collision_wall(self):
+#         pass
+#         # if check_collision(self.lever.snake.blocks[0], self.lever.walls):
+#         #     pass
+            
