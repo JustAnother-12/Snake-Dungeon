@@ -5,7 +5,18 @@ from gui_element.Sprite_image import ImageElement
 from gui_element.text_class import TextElement
 from pixil import Pixil
 
-class Stats(State):
+class base_stats_value:
+    def __init__(self) -> None:
+        self.speed = 0
+        self.length = 0
+        self.armour = 0
+        self.energy_cap = 0
+        self.energy_regen = 0
+        self.treasury = 0
+        self.luck = 0
+        self.food_potent = 0
+
+class Stats_menu(State):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.Stats_text = TextElement("STATS", "white", 45, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 18)*game.TILE_SIZE, "center")

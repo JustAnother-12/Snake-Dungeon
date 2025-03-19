@@ -1,5 +1,6 @@
+from email.mime import image
 import random
-from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
+from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE
 import constant
 import pixil
 from time import time
@@ -171,7 +172,7 @@ class Coin(pygame.sprite.Sprite):
     
     def on_collision(self):
         self.kill()
-        self.level.gold += 10
+        self.level.gold += COIN_VALUE
         self.level.hud.set_gold(self.level.gold)
 
 
@@ -202,6 +203,8 @@ class Chest(pygame.sprite.Sprite):
         self.random_pos()
         self.rect = self.image.get_rect(center=self.pos)
         self.isOpened = False
+        self.collision_time = None
+        self.alpha = 255
 
     def random_pos(self):
         self.pos = pygame.Vector2(
@@ -234,6 +237,15 @@ class Chest(pygame.sprite.Sprite):
             self.image = pixil.Pixil.load(
                 "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
             ).frames[2]
+        if not self.collision_time == None:
+            if(time() - self.collision_time > 2):
+                if not self.image == None:
+                    self.alpha = max(0,self.alpha-5)
+                    self.image = self.image.copy()
+                    self.image.fill((255, 255, 255, self.alpha), special_flags=pygame.BLEND_RGBA_MULT)
+                    if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
+                        self.kill()
+
 
     def __is_collision_with_snake(self):
         return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
@@ -243,6 +255,7 @@ class Chest(pygame.sprite.Sprite):
             self.isOpened = True
             print("Open chest")
             self.level.coins.add_coin(random.randint(7, 15))
+            self.collision_time = time()
 
 
 class Key(pygame.sprite.Sprite):

@@ -12,6 +12,7 @@ DEATH_DELAY = 1
 LEFT_RIGHT_BORDER_TILES = 9
 TOP_BOTTOM_BORDER_TILES = 5
 WALL_TILES = 4
+COIN_VALUE = 10
 
 PIXEL_FONT = "game-assets/font/default-pixilart-text.ttf"
 

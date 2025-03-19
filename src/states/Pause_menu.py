@@ -4,7 +4,7 @@ from states.state import State
 from gui_element.button_class import ButtonElement
 from gui_element.Sprite_image import ImageElement
 from gui_element.text_class import TextElement
-from states.Stats import Stats
+from states.Stats_menu import Stats_menu
 from pixil import Pixil
 
 
@@ -46,7 +46,7 @@ class Pause_menu(Menu):
                 self.game.state_stack[-1].visible = True
 
             if self.stats_button.on_click():
-                new_state = Stats(self.game)
+                new_state = Stats_menu(self.game)
                 self.game.state_stack.pop()
                 new_state.enter_state()
                 self.game.state_stack[-1].visible = True

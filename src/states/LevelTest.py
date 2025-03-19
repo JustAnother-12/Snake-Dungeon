@@ -170,9 +170,9 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake(pygame.sprite.AbstractGroup):
 
-    def __init__(self, lever: LevelTest, init_len):
+    def __init__(self, level: LevelTest, init_len):
         super().__init__()
-        self.lever = lever
+        self.level = level
         self.max_stamina = 10*constant.TILE_SIZE
         self.stamina = 10*constant.TILE_SIZE
         self.is_speed_boost = False
@@ -269,9 +269,9 @@ class Snake(pygame.sprite.AbstractGroup):
 
         if self.__is_collide_with_food():
             self.grow_up()
-            self.lever.food.visible = False
-            self.lever.remove(self.lever.food)
-            self.lever.food_timer = 0
+            self.level.food.visible = False
+            self.level.remove(self.level.food)
+            self.level.food_timer = 0
 
     def handle_go_out_of_bounds(self):
         if self.__will_go_out_of_bounds:
@@ -333,14 +333,14 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
     
     def __is_collide_with_wall(self):
-        for wall in self.lever.walls:
+        for wall in self.level.walls:
             wall: Wall
             if wall.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)) : # type: ignore
                 return True
         return False
     
     def __is_collide_with_food(self):
-        food = self.lever.food
+        food = self.level.food
         if self.blocks[0].rect.colliderect(food.rect) and food.visible: # type: ignore
             return True
         return False
@@ -383,6 +383,7 @@ class LevelTest(State):
         self.chest.update()
         self.bombs.update()
         self.coins.update()
+        self.hud.update(self.gold, len(self.snake.blocks))
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
