@@ -9,7 +9,6 @@ class Game:
         pygame.init()
         pygame.mixer.pre_init(44100,-16,2,512)
         pygame.mixer.init()
-
         self.TILE_SIZE = constant.TILE_SIZE
         self.SCREEN_WIDTH_TILES = constant.SCREEN_WIDTH_TILES
         self.SCREEN_HEIGHT_TILES = constant.SCREEN_HEIGHT_TILES

@@ -1,6 +1,6 @@
 import pygame
 from typing import Any, override
-from level_component import Chest, Coins, Traps, Walls, Coin, CollisionManager
+from level_component import Bombs, Chest, Coins, Traps, Walls, Coin, CollisionManager
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -331,6 +331,7 @@ class LevelTest(State):
         self.coins = Coins()
         self.walls = Walls()
         self.chest = Chest()
+        self.bombs = Bombs(5)
         self.gold = 0
         self.hud = HUD(self.gold, len(self.snake))
         self.food.random_pos(self.snake.blocks)
@@ -338,10 +339,10 @@ class LevelTest(State):
         self.food_timer = 0
         self.is_paused = False
         self.CollisionManager = CollisionManager(self)
-        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins)
+        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
 
     def reset(self):
-        self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins)
+        self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
         self.init()
 
     def update(self):
@@ -354,6 +355,7 @@ class LevelTest(State):
         self.snake.update()
         self.traps.update()
         self.chest.update()
+        self.bombs.update()
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()

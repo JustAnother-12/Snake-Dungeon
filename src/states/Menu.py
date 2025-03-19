@@ -26,6 +26,8 @@ class Menu(State):
                 self.change_selected_btn(True)
 
     def update(self):
+        if self.game.selectBtnMode == "key":
+            self.change_selected_btn()
         return super().update()
     
     def move_by_key(self):
@@ -34,8 +36,6 @@ class Menu(State):
             self.indexOfSelectedBtn = (self.indexOfSelectedBtn + 1) % len(self.buttons)
         if keys[pygame.K_UP]:
             self.indexOfSelectedBtn = (self.indexOfSelectedBtn - 1) % len(self.buttons)
-        self.change_selected_btn()
-
 
     def get_event(self, event):
         self.change_mode()

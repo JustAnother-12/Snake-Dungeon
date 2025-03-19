@@ -282,6 +282,66 @@ class Walls(pygame.sprite.AbstractGroup):
         self.add(Wall((right, bottom), 4, 180))
         self.add(Wall((right, top), 4, 270))
 
+class Bomb(pygame.sprite.Sprite):
+    def __init__(self) -> None:
+        super().__init__()
+        self.image = pixil.Pixil.load(
+            "game-assets/graphics/pixil/BOMB_SHEET.pixil", 1
+        ).frames[0]
+        self.random_pos()
+        self.rect = self.image.get_rect(topleft=self.pos)
+        self.activeTime = None
+        self.timeAppear = time()
+
+    def random_pos(self):
+        self.pos = pygame.Vector2(
+            random.randint(
+                constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
+                (
+                    SCREEN_WIDTH_TILES
+                    - constant.LEFT_RIGHT_BORDER_TILES
+                    - 1
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+            random.randint(
+                constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
+                (
+                    SCREEN_HEIGHT_TILES
+                    - constant.TOP_BOTTOM_BORDER_TILES
+                    - 1
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+        )
+
+    def update(self):
+        if self.activeTime != None:
+            if time() - self.activeTime < 1:
+                self.image = pixil.Pixil.load(
+                    "game-assets/graphics/pixil/EXPLOSION_ANIMATION.pixil", 1
+                ).frames[int((time() - self.activeTime) * 7)]
+                self.rect = self.image.get_rect(topleft=self.pos- pygame.Vector2(TILE_SIZE, TILE_SIZE))
+            else:
+                self.kill()
+        elif time() - self.timeAppear > 3:
+            self.activeTime = time()
+
+    def on_collision(self, src):
+        if not self.activeTime:
+            self.activeTime = time()
+
+class Bombs(pygame.sprite.AbstractGroup):
+    def __init__(self, quantity) -> None:
+        super().__init__()
+        for _ in range(quantity):
+            self.add(Bomb())
+        
+    def update(self):
+        for bomb in self.sprites():
+            bomb.update()
 
 class CollisionManager:
     def __init__(self, game) -> None:
@@ -291,6 +351,7 @@ class CollisionManager:
         self.check_collision_trap()
         self.check_collision_coin()
         self.check_collision_chest()
+        self.check_collision_bomb()
 
     def check_collision_trap(self):
         for trap in self.game.traps.sprites():
@@ -307,3 +368,8 @@ class CollisionManager:
     def check_collision_chest(self):
         if check_collision(self.game.chest, self.game.snake.blocks):
             self.game.chest.on_collision(self.game)
+
+    def check_collision_bomb(self):
+        for bomb in self.game.bombs.sprites():
+            if check_collision(bomb, self.game.snake.blocks):
+                bomb.on_collision(self.game)
