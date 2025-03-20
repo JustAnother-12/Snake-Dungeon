@@ -1,4 +1,3 @@
-from email.mime import image
 import random
 from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE
 from gui_element.text_class import TextElement;
@@ -46,9 +45,6 @@ class Trap(pygame.sprite.Sprite):
             * TILE_SIZE,
         )
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
-
     def reset(self):
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
@@ -57,14 +53,15 @@ class Trap(pygame.sprite.Sprite):
         self.collisionTime = None
 
     def on_collision(self):
-        self.collisionTime = time()
+        if self.collisionTime == None:
+            self.collisionTime = time()
 
     def active(self):
         self.isActive = True
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
         ).frames[1]
-
+    
     def update(self):
         if self.__is_collision_with_snake() and not self.isActive:
             self.on_collision()
@@ -72,7 +69,7 @@ class Trap(pygame.sprite.Sprite):
         if not self.collisionTime == None:
             if time() - self.collisionTime > 1.5:
                 self.reset()
-            elif time() - self.collisionTime > 1:
+            elif time() - self.collisionTime > 0.5:
                 self.active()
     
     def __is_collision_with_snake(self):
@@ -183,9 +180,9 @@ class Coins(pygame.sprite.AbstractGroup):
         for _ in range(quantity):
             self.add(Coin(self.level))
 
-    def add_coin(self, quantity):
+    def add_coin(self, quantity, source):
         for _ in range(quantity):
-            self.add(Coin(self.level, self.level.chest.rect))
+            self.add(Coin(self.level, source.rect))
         self.level.add(self.sprites())
 
     def update(self):
@@ -268,7 +265,7 @@ class Chest(pygame.sprite.Sprite):
     def OpenChest(self):
         self.isClosed = False
         print("Open chest")
-        self.level.coins.add_coin(random.randint(7, 15))
+        self.level.coins.add_coin(random.randint(7, 15), self)
         self.collision_time = time()
 
     def on_collision(self):
@@ -283,7 +280,15 @@ class Chest(pygame.sprite.Sprite):
                     self.level.add(self.LockedText)
                     self.TextTime = time()
 
+class Chests(pygame.sprite.AbstractGroup):
+    def __init__(self, level, quantity) -> None:
+        super().__init__()
+        for _ in range(quantity):
+            self.add(Chest(level))
 
+    def update(self) -> None:
+        for chest in self.sprites():
+            chest.update()
 
 class Key(pygame.sprite.Sprite):
     """
@@ -454,6 +459,59 @@ class Bombs(pygame.sprite.AbstractGroup):
     def update(self):
         for bomb in self.sprites():
             bomb.update()
+
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.level = level
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/OBSTACLE_TILE.pixil", 2).frames[0]
+        self.random_pos()
+        self.rect = self.image.get_rect(topleft=self.pos)
+
+    def random_pos(self):
+        self.pos = pygame.Vector2(
+            random.randint(
+                constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
+                (
+                    SCREEN_WIDTH_TILES
+                    - constant.LEFT_RIGHT_BORDER_TILES
+                    - 2
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+            random.randint(
+                constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
+                (
+                    SCREEN_HEIGHT_TILES
+                    - constant.TOP_BOTTOM_BORDER_TILES
+                    - 2
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+        )
+
+    # def update(self):
+    #     if self.__is_collision_with_snake():
+    #         self.on_collision()
+    
+    # def __is_collision_with_snake(self):
+    #     return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+    
+    # def on_collision(self):
+    #     return True
+
+class Obstacle_group(pygame.sprite.AbstractGroup):
+    def __init__(self, level, quantity) -> None:
+        super().__init__()
+        self.level = level
+        for _ in range(quantity):
+            self.add(Obstacle(self.level))
+
+    # def update(self):
+    #     for obstacle in self.sprites():
+    #         obstacle.update()
 
 # class CollisionManager:
 #     def __init__(self, game) -> None:

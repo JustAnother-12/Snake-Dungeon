@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 import pygame
 from typing import Any, override
-from level_component import Chest, Coins, Keys, Traps, Wall, Walls, Bombs
+from level_component import Chest, Chests, Coins, Keys, Obstacle, Traps, Wall, Walls, Bombs, Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -194,7 +194,6 @@ class Snake(pygame.sprite.AbstractGroup):
         self.__will_go_out_of_bounds = False
         # thời gian mà đầu con rắn ra khỏi bound
         self.__out_of_bounds_time = None
-
         self.__init_snake_blocks(init_len)
     
     def __len__(self):
@@ -251,7 +250,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.__block_positions.insert(0, new_head_pos)
         
-        if self.__is_collide_with_wall() or self.__is_collide_with_self():
+        if self.__is_collide_with_wall() or self.__is_collide_with_self() or self.__is_collide_with_Obstacle():
             self.__block_positions.pop(0)
             if not self.__will_go_out_of_bounds:
                 print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
@@ -328,6 +327,13 @@ class Snake(pygame.sprite.AbstractGroup):
             self.base_speed = 16
             if self.stamina < self.max_stamina:
                 self.stamina += 1
+
+    def __is_collide_with_Obstacle(self):
+        for obstacle in self.level.obstacles:
+            obstacle:Obstacle
+            if obstacle.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)): # type: ignore
+                return True
+        return False
     
     def __is_collide_with_self(self):
         for block in self.blocks[1:]:
@@ -361,17 +367,18 @@ class LevelTest(State):
         self.keys = Keys(self,2)
         self.coins = Coins(self)
         self.walls = Walls()
-        self.chest = Chest(self)
+        self.obstacles = Obstacle_group(self, 3)
+        self.chests = Chests(self, 3)
         self.bombs = Bombs(self, 5)
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.add(self.hud,self.walls, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs, self.keys)
+        self.add(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
 
     def reset(self):
-        self.remove(self.hud, self.traps, self.snake, self.food, self.chest, self.coins, self.bombs)
+        # self.remove(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
         self.init()
 
     def update(self):
@@ -384,7 +391,7 @@ class LevelTest(State):
         self.snake.update()
         self.traps.update()
         self.keys.update()
-        self.chest.update()
+        self.chests.update()
         self.bombs.update()
         self.coins.update()
         self.hud.update(self.snake.gold, len(self.snake.blocks), self.snake.keys)
