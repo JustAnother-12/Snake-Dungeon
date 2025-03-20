@@ -194,14 +194,15 @@ class Coins(pygame.sprite.AbstractGroup):
 
 
 class Chest(pygame.sprite.Sprite):
-    def __init__(self, level) -> None:
+    def __init__(self, level, isLocked = None) -> None:
         super().__init__()
         self.level = level
+        self.isLocked = isLocked if isLocked != None else random.choice([True, False])
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
-        ).frames[0]
+        ).frames[int(self.isLocked)]
+        print(self.isLocked)
         self.random_pos()
-        self.isLocked = False
         self.rect = self.image.get_rect(center=self.pos)
         self.isClosed = True
         self.collision_time = None
@@ -237,10 +238,6 @@ class Chest(pygame.sprite.Sprite):
         if self.TextTime != None:
             if time() - self.TextTime > 2:
                 self.LockedText.kill()
-        if self.isLocked:
-            self.image = pixil.Pixil.load(
-                "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
-            ).frames[1]
         if self.__is_collision_with_snake():
             self.on_collision()
         if not self.isClosed:

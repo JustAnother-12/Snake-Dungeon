@@ -362,7 +362,6 @@ class LevelTest(State):
         self.coins = Coins(self)
         self.walls = Walls()
         self.chest = Chest(self)
-        self.chest.isLocked = True
         self.bombs = Bombs(self, 5)
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
