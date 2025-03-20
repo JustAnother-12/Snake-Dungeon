@@ -1,8 +1,9 @@
 from __future__ import annotations
+from operator import pos
 import os
 import pygame
 from typing import Any, override
-from level_component import Chest, Chests, Coins, Keys, Obstacle, Traps, Wall, Walls, Bombs, Obstacle_group
+from level_component import Chest, Chests, Coins, Keys, Obstacle, Trap, Traps, Wall, Walls, Bombs, Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -83,6 +84,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.moving = False
         self.isOutside = False
         self.__is_head = False
+        self.timeSevered: float | None = None 
     
     @property
     def is_head(self):
@@ -267,8 +269,12 @@ class Snake(pygame.sprite.AbstractGroup):
         self.__last_direction = self.direction
     
     def handle_collision(self):
-        # if self.__is_collide_with_self():
-        #     self.isDeath = True
+        pos_collide = self.__pos_collide_with_active_trap()
+        if pos_collide is not None:
+            if pos_collide < 2:
+                self.isDeath = True
+            else:
+                self.split(pos_collide)
 
         if self.__is_collide_with_food():
             self.grow_up()
@@ -287,6 +293,7 @@ class Snake(pygame.sprite.AbstractGroup):
         dt = (pygame.time.get_ticks() - self.previous_time) / 100
         self.previous_time = pygame.time.get_ticks()
 
+        self.remove_severed_tail()
         self.handle_input()
         self.handle_movement()
         self.handle_go_out_of_bounds()
@@ -304,6 +311,12 @@ class Snake(pygame.sprite.AbstractGroup):
         t = super().draw(surface)
         return t
 
+    def remove_severed_tail(self):
+        for block in self.sprites():
+            if block not in self.blocks:
+                if block.timeSevered and time() - block.timeSevered > 1:
+                    block.kill()
+
     def grow_up(self):
         tail = self.blocks[-1]
         newBlock = SnakeBlock(tail.rect.topleft)
@@ -313,8 +326,11 @@ class Snake(pygame.sprite.AbstractGroup):
             i.add(newBlock) # type: ignore
 
     def split(self, index):
-        self.remove(self.blocks[index::])
-        self.blocks = self.blocks[index::]
+        for i in range(index, len(self.blocks)):
+            if self.blocks[i].timeSevered == None:
+                self.blocks[i].timeSevered = time()
+        self.blocks = self.blocks[:index]
+            
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
@@ -344,15 +360,23 @@ class Snake(pygame.sprite.AbstractGroup):
     def __is_collide_with_wall(self):
         for wall in self.level.walls:
             wall: Wall
-            if wall.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)) : # type: ignore
+            if wall.rect and wall.rect.colliderect((self.__block_positions[0][0], self.__block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)):
                 return True
         return False
     
     def __is_collide_with_food(self):
         food = self.level.food
-        if self.blocks[0].rect.colliderect(food.rect) and food.visible: # type: ignore
+        if food.rect and self.blocks[0].rect.colliderect(food.rect) and food.visible:
             return True
         return False
+    
+    def __pos_collide_with_active_trap(self):
+        for i in range(len(self.blocks)):
+            block = self.blocks[i]
+            if pygame.sprite.spritecollideany(block, self.level.traps, lambda x, y: x.rect.colliderect(y.rect) and getattr(y, "isActive", False)):
+                return i
+        return None
+            
 
 class LevelTest(State):
     def __init__(self, game) -> None:

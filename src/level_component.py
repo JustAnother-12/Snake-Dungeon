@@ -69,7 +69,7 @@ class Trap(pygame.sprite.Sprite):
         if not self.collisionTime == None:
             if time() - self.collisionTime > 1.5:
                 self.reset()
-            elif time() - self.collisionTime > 0.5:
+            elif time() - self.collisionTime > 1:
                 self.active()
     
     def __is_collision_with_snake(self):
@@ -260,7 +260,7 @@ class Chest(pygame.sprite.Sprite):
 
 
     def __is_collision_with_snake(self):
-        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+        return self.rect and self.rect.colliderect(self.level.snake.blocks[0].rect)
     
     def OpenChest(self):
         self.isClosed = False
