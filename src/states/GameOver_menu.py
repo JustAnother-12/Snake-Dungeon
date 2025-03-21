@@ -15,13 +15,14 @@ class GameOver_menu(Menu):
         self.Gamer_over_text = TextElement("GAME OVER", "white", 45, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 8)*game.TILE_SIZE, "center")
         self.black_rect = pygame.Rect(0,0,game.SCREEN_WIDTH_TILES*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES*game.TILE_SIZE)
         self.Background_texture = pygame.Surface((self.black_rect.w,self.black_rect.h))
-        self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
+        # self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
 
         self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE ,"NEW RUN", "white")
         self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 8)*game.TILE_SIZE ,"MAIN MENU", "white")
         self.addBtn([self.restart_button, self.main_menu_button])
 
-        self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
+        # self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
+        self.add(self.Gamer_over_text, self.restart_button, self.main_menu_button)
 
     def update(self):
         return super().update()

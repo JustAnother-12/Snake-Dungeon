@@ -14,7 +14,7 @@ import constant
 from pygame.math import Vector2
 import random
 from logic.help import check_collision
-from time import time
+from time import time, sleep
 from HUD import HUD
 
 MAP_WIDTH = (
@@ -168,7 +168,6 @@ class SnakeBlock(pygame.sprite.Sprite):
         return True
     
     def update(self, *args: Any, **kwargs: Any) -> None:
-
         return super().update(*args, **kwargs)
 
 class Snake(pygame.sprite.AbstractGroup):
@@ -269,12 +268,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self.__last_direction = self.direction
     
     def handle_collision(self):
-        pos_collide = self.__pos_collide_with_active_trap()
-        if pos_collide is not None:
-            if pos_collide < 2:
-                self.isDeath = True
-            else:
-                self.split(pos_collide)
+        self.__collide_with_active_trap()
+        self.__collide_with_bomb()
 
         if self.__is_collide_with_food():
             self.grow_up()
@@ -314,7 +309,7 @@ class Snake(pygame.sprite.AbstractGroup):
     def remove_severed_tail(self):
         for block in self.sprites():
             if block not in self.blocks:
-                if block.timeSevered and time() - block.timeSevered > 1:
+                if block.timeSevered and time() - block.timeSevered > 2:
                     block.kill()
 
     def grow_up(self):
@@ -370,12 +365,33 @@ class Snake(pygame.sprite.AbstractGroup):
             return True
         return False
     
-    def __pos_collide_with_active_trap(self):
+    def __collide_with_active_trap(self):
+        pos = None
         for i in range(len(self.blocks)):
             block = self.blocks[i]
             if pygame.sprite.spritecollideany(block, self.level.traps, lambda x, y: x.rect.colliderect(y.rect) and getattr(y, "isActive", False)):
-                return i
-        return None
+                pos = i
+                break
+        if pos != None:
+            if pos < constant.MIN_LEN:
+                self.isDeath = True
+            else:   
+                self.split(pos)
+
+    def __collide_with_bomb(self):
+        pos = None
+        for i in range(len(self.blocks)):
+            block = self.blocks[i]
+            if pygame.sprite.spritecollideany(block, self.level.bombs, lambda x, y: x.rect.colliderect(y.rect) and time() - getattr(y, "activeTime", time()) > 0.6):
+                block.kill()
+                pos = i if pos == None else pos
+        if pos != None:
+            if pos < constant.MIN_LEN:
+                self.isDeath = True
+            else:
+                self.split(pos)
+
+        
             
 
 class LevelTest(State):

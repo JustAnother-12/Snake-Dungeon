@@ -442,8 +442,8 @@ class Bomb(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect(topleft=self.pos- pygame.Vector2(TILE_SIZE, TILE_SIZE))
             else:
                 self.kill()
-        elif time() - self.timeAppear > 3:
-            self.activeTime = time()
+        # elif time() - self.timeAppear > 3:
+        #     self.activeTime = time()
 
     def on_collision(self):
         if not self.activeTime:
