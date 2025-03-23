@@ -3,7 +3,7 @@ from operator import pos
 import os
 import pygame
 from typing import Any, override
-from level_component import Chest, Chests, Coins, Keys, Obstacle, Trap, Traps, Wall, Walls, Bombs, Obstacle_group
+from level_component import Chest, Chests, Coins, Keys, Obstacle, Pot_group, Trap, Traps, Wall, Walls, Bombs, Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -410,12 +410,13 @@ class LevelTest(State):
         self.obstacles = Obstacle_group(self, 3)
         self.chests = Chests(self, 3)
         self.bombs = Bombs(self, 5)
+        self.pots = Pot_group(self, 20)
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
         self.food_timer = 0
         self.is_paused = False
-        self.add(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
+        self.add(self.hud,self.walls, self.traps,self.obstacles, self.food, self.chests,self.pots, self.coins, self.bombs, self.keys, self.snake)
 
     def reset(self):
         # self.remove(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
@@ -432,6 +433,7 @@ class LevelTest(State):
         self.traps.update()
         self.keys.update()
         self.chests.update()
+        self.pots.update()
         self.bombs.update()
         self.coins.update()
         self.hud.update(self.snake.gold, len(self.snake.blocks), self.snake.keys)
