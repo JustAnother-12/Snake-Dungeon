@@ -14,6 +14,7 @@ TOP_BOTTOM_BORDER_TILES = 5
 WALL_TILES = 4
 COIN_VALUE = 10
 MIN_LEN = 3
+FLOOR_TILE_SIZE = 32
 
 PIXEL_FONT = "game-assets/font/default-pixilart-text.ttf"
 

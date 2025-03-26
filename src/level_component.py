@@ -94,16 +94,16 @@ class Traps(pygame.sprite.AbstractGroup):
 
 
 class Coin(pygame.sprite.Sprite):
-    def __init__(self,  level, area: pygame.Rect | None = None) -> None:
+    def __init__(self,  level, area: pygame.Rect | None = None, r = 2) -> None:
         super().__init__()
         self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/GOLD_LEVEL.pixil", 1
         ).frames[0]
-        self.random_pos(area)
+        self.random_pos(area, r)
         self.rect = self.image.get_rect(center=self.pos)
 
-    def random_pos(self, area: pygame.Rect | None):
+    def random_pos(self, area: pygame.Rect | None, r = 2):
         if not area:
             self.pos = pygame.Vector2(
                 random.randint(
@@ -111,7 +111,6 @@ class Coin(pygame.sprite.Sprite):
                     (
                         SCREEN_WIDTH_TILES
                         - constant.LEFT_RIGHT_BORDER_TILES
-                        - 2
                         - constant.WALL_TILES
                     ),
                 )
@@ -121,35 +120,35 @@ class Coin(pygame.sprite.Sprite):
                     (
                         SCREEN_HEIGHT_TILES
                         - constant.TOP_BOTTOM_BORDER_TILES
-                        - 2
                         - constant.WALL_TILES
                     ),
                 )
                 * TILE_SIZE,
             )
         else:
+            R = int(r * constant.TILE_SIZE)
             x = random.randint(
-                area.centerx - constant.TILE_SIZE * 3,
-                area.centerx + constant.TILE_SIZE * 3,
+                area.centerx - R - area.width // 2,
+                area.centerx + R + area.width // 2,
             )
             if (
-                x < area.centerx - constant.TILE_SIZE
-                or x > area.centerx + constant.TILE_SIZE
+                x < area.centerx - area.width // 2
+                or x > area.centerx + area.width // 2
             ):
                 y = random.randint(
-                    area.centery - constant.TILE_SIZE * 3,
-                    area.centery + constant.TILE_SIZE * 3,
+                    area.centery - R - area.height // 2,
+                    area.centery + R + area.height // 2,
                 )
             else:
                 y = random.choice(
                     [
                         random.randint(
-                            area.centery - constant.TILE_SIZE * 3,
-                            area.centery - constant.TILE_SIZE,
+                            area.centery - R - area.height // 2,
+                            area.centery - area.height // 2,
                         ),
                         random.randint(
-                            area.centery + constant.TILE_SIZE,
-                            area.centery + constant.TILE_SIZE * 3,
+                            area.centery + area.height // 2,
+                            area.centery + R + area.height // 2,
                         ),
                     ]
                 )
@@ -161,6 +160,7 @@ class Coin(pygame.sprite.Sprite):
                 or y > (SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - constant.WALL_TILES) * TILE_SIZE - 4
             ):
                 self.random_pos(area)
+
     def update(self):
         if self.__is_collision_with_snake():
             self.on_collision()
@@ -180,9 +180,9 @@ class Coins(pygame.sprite.AbstractGroup):
         for _ in range(quantity):
             self.add(Coin(self.level))
 
-    def add_coin(self, quantity, source):
+    def add_coin(self, quantity, source, r = 2):
         for _ in range(quantity):
-            self.add(Coin(self.level, source.rect))
+            self.add(Coin(self.level, source.rect, r))
         self.level.add(self.sprites())
 
     def update(self):
@@ -198,7 +198,6 @@ class Chest(pygame.sprite.Sprite):
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
         ).frames[int(self.isLocked)]
-        print(self.isLocked)
         self.random_pos()
         self.rect = self.image.get_rect(center=self.pos)
         self.isClosed = True
@@ -449,7 +448,7 @@ class Bomb(pygame.sprite.Sprite):
         if not self.activeTime:
             self.activeTime = time()
 
-class Bombs(pygame.sprite.AbstractGroup):
+class Bomb_group(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity = 0) -> None:
         super().__init__()
         self.level = level
@@ -512,6 +511,83 @@ class Obstacle_group(pygame.sprite.AbstractGroup):
     # def update(self):
     #     for obstacle in self.sprites():
     #         obstacle.update()
+
+class Pot(pygame.sprite.Sprite):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.level = level
+        self.image = pixil.Pixil.load("game-assets/graphics/pixil/POTS_SPRITE_SHEET.pixil", 1).frames[random.randint(0,3)]
+
+        self.random_pos()
+        self.rect = self.image.get_rect(topleft = self.pos)
+        self.collision_time = None
+        self.alpha = 255
+        self.isClosed = True
+
+
+    def random_pos(self):
+        self.pos = pygame.Vector2(
+            random.randint(
+                constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
+                (
+                    SCREEN_WIDTH_TILES
+                    - constant.LEFT_RIGHT_BORDER_TILES
+                    - 3
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+            random.randint(
+                constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
+                (
+                    SCREEN_HEIGHT_TILES
+                    - constant.TOP_BOTTOM_BORDER_TILES
+                    - 3
+                    - constant.WALL_TILES
+                ),
+            )
+            * TILE_SIZE,
+        )
+
+    def update(self):
+        if self.__is_collision_with_snake():
+            self.on_collision()
+        if not self.isClosed:
+            self.image = pixil.Pixil.load("game-assets/graphics/pixil/POTS_SPRITE_SHEET.pixil", 1).frames[4]
+        if not self.collision_time == None:
+            if(time() - self.collision_time > 2):
+                if not self.image == None:
+                    self.alpha = max(0,self.alpha-5)
+                    self.image = self.image.copy()
+                    self.image.fill((255, 255, 255, self.alpha), special_flags=pygame.BLEND_RGBA_MULT)
+                    if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
+                        self.kill()
+
+    def __is_collision_with_snake(self):
+        return self.rect and self.rect.colliderect(self.level.snake.blocks[0].rect)
+    
+    def open(self):
+        self.isClosed = False
+        print("Break pot!")
+        self.level.coins.add_coin(random.randint(1, 3), self, 1)
+        if self.collision_time == None:
+            self.collision_time = time()
+
+    def on_collision(self):
+        if self.isClosed:
+            self.open()
+
+class Pot_group(pygame.sprite.AbstractGroup):
+    def __init__(self, level, quantity) -> None:
+        super().__init__()
+        self.level = level
+        for _ in range(quantity):
+            self.add(Pot(self.level))
+
+    def update(self):
+        for pot in self.sprites():
+            pot.update()
+
 
 # class CollisionManager:
 #     def __init__(self, game) -> None:

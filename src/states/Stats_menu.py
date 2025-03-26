@@ -3,6 +3,7 @@ import json
 from states.state import State
 from gui_element.Sprite_image import ImageElement
 from gui_element.text_class import TextElement
+from gui_element.description_class import DecriptionElement
 from pixil import Pixil
 
 class base_stats_value:
@@ -28,16 +29,19 @@ class Stats_menu(State):
             self.stats_data = json.load(fopen)
 
         self.stats_icons = Pixil.load("game-assets/graphics/pixil/STATS_ICON_SHEET.pixil", 3).frames
-        self.addIcons(game)
+        self.addIcons()
 
-    def addIcons(self, game):
+    def addIcons(self):
         # add icons
         count =0
         v_gap = 8.2
         h_gap = 19
         for i in range(4):
             for j in range(2):
-                icon_rect = ImageElement((game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, self.stats_icons[count])
+                icon_rect = ImageElement((self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
+                                         (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                                         self.stats_icons[count]
+                                         )
                 self.add(icon_rect)
                 count+=1
                 h_gap -= 22
@@ -51,10 +55,22 @@ class Stats_menu(State):
         h_gap = 16
         for i in range(4):
             for j in range(2):
-                name = TextElement(stats_list[count]['name'], "white", 10, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
+                name = TextElement(stats_list[count]['name'], 
+                                   "white", 
+                                   10, 
+                                   (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
+                                   (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                                   "midleft"
+                                   )
                 self.add(name)
                 # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
-                value = TextElement(str(0), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
+                value = TextElement(str(0), 
+                                    "yellow", 
+                                    13, 
+                                    (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 
+                                    (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                                    "midright"
+                                    )
                 self.add(value)
                 count+=1
                 h_gap -= 22
@@ -67,14 +83,28 @@ class Stats_menu(State):
         h_gap = 16
         for i in range(4):
             for j in range(2):
-                text = TextElement(stats_list[count]['description'].upper(), "grey", 8, (game.SCREEN_WIDTH_TILES/2 - h_gap)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft", 200)
+                text = DecriptionElement(stats_list[count]['description'].upper(), 
+                                   "grey", 
+                                   8, 
+                                   (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
+                                   (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE + 8, 
+                                   200,
+                                   56,
+                                   (57,62,77),
+                                   5,
+                                   4,
+                                   2,
+                                   "midleft",
+                                   1,
+                                   (108,115,135)
+                                   )
                 self.add(text)
                 count+=1
                 h_gap -= 22
             h_gap = 16
             v_gap -= 7.5
 
-    def update(self,game):
+    def update(self):
         # add name text
         stats_list = self.stats_data['base_stats']
         count = 0
@@ -83,7 +113,13 @@ class Stats_menu(State):
         for i in range(4):
             for j in range(2):
                 # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
-                value = TextElement(str(0), "yellow", 13, (game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midright")
+                value = TextElement(str(0), 
+                                    "yellow", 
+                                    13, 
+                                    (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 
+                                    (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                                    "midright"
+                                    )
                 self.add(value)
                 count+=1
                 h_gap -= 22
