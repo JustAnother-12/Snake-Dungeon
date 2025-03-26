@@ -9,7 +9,7 @@
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${cwd}/src/GUI.py",
             "console": "integratedTerminal",
             "justMyCode": false
         }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import pygame
+from Player import Snake
 from level_component import Chests, Coins, Keys, Pot_group, Traps, Walls, Bomb_group, Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
@@ -30,7 +31,7 @@ class Food(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image: pygame.Surface = pygame.transform.scale(
-            Pixil.load(constant.Texture.apple, 1).frames[0],
+            Pixil.load(constant.Texture.apple, 1).frames[0],  # type: ignore
             (constant.TILE_SIZE, constant.TILE_SIZE),
         )
         self.rect = self.image.get_rect(topleft=(0, 0))
@@ -68,51 +69,6 @@ class Food(pygame.sprite.Sprite):
             surface.blit(self.image, self.rect)
 
 
-class Item:
-    def __init__(self, texture: str):
-        super().__init__()
-        self.image = Pixil.load(texture, 1).frames[0]
-        self.active = True
-        self.stack = 1
-        self.max_stack = 1
-
-    def use(self, snake: Snake):
-        pass
-
-    def check_input(self, keys) -> bool:
-        return False
-
-    def on_add(self):
-        pass
-
-    def on_remove(self):
-        pass
-
-
-class ItemController:
-    def __init__(self, level: LevelTest):
-        super().__init__()
-        self.level = level
-        self.items = []
-
-    def update(self):
-        keys = pygame.key.get_just_pressed()
-        for item in self.items:
-            item: Item
-            if item.active and item.check_input(keys):
-                item.use(self.level.snake)
-                item.stack -= 1
-                if item.stack == 0:
-                    item.active = False
-                    item.on_remove()
-
-    def add(self, item: Item):
-        self.items.append(item)
-
-    def remove(self, item: Item):
-        self.items.remove(item)
-
-
 class LevelTest(State):
     def __init__(self, game) -> None:
         super().__init__(game)
@@ -131,7 +87,6 @@ class LevelTest(State):
         self.chests = Chests(self, 3)
         self.bombs = Bomb_group(self, 5)
         self.pots = Pot_group(self, 20)
-        self.itemController = ItemController(self)
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000
@@ -158,7 +113,6 @@ class LevelTest(State):
         self.pots.update()
         self.bombs.update()
         self.coins.update()
-        self.itemController.update()
         self.hud.update(self.snake.gold, len(
             self.snake.blocks), self.snake.keys)
 
