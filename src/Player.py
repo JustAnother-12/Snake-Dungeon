@@ -38,24 +38,38 @@ class Item:
                 snake.run_time_overriding[fun_name][pos].append(value)
             except:
                 pass
-        pass
 
     def on_remove(self, snake: Snake):
-        # members = inspect.getmembers(self)
-        # 
-        pass
+        """Xóa các ghi đè runtime của item khỏi rắn khi item bị loại bỏ"""
+        for name, value in inspect.getmembers(self):
+            value: object
+            try:
+                fun_name = value.__getattribute__('fun_name')
+                pos = value.__getattribute__('pos')
+                if fun_name in snake.run_time_overriding and pos in snake.run_time_overriding[fun_name]:
+                    if value in snake.run_time_overriding[fun_name][pos]:
+                        snake.run_time_overriding[fun_name][pos].remove(value)
+            except:
+                pass
 
-    def after(self, args, kwargs):
-        pass
-    
     @staticmethod
-    def RuntimeOverriding(fun_name: str, pos: Literal['before', 'after', 'return']):
-        def decoratior(func):
-            func.fun_name = fun_name
-            func.pos = pos
+    def runtime_overriding(function_name: str, position: Literal['before', 'after', 'return']):
+        '''
+        Decorator để ghi đè các phương thức của lớp Snake trong thời gian chạy.
+        
+        Tham số:
+            function_name: Tên của phương thức cần ghi đè
+            position: Thời điểm áp dụng ghi đè:
+                - 'before': Thực thi trước phương thức gốc
+                - 'after': Thực thi sau khi phương thức gốc chạy xong
+                - 'return': Ghi đè hoàn toàn giá trị trả về
+        '''
+        def decorator(func):
+            func.fun_name = function_name
+            func.pos = position
             return func
 
-        return decoratior
+        return decorator
 
 class TestItem(Item):
     def __init__(self):
@@ -67,7 +81,7 @@ class TestItem(Item):
     #     return args, kwargs
 
     # tên của hàm privice nên nó hơi khác
-    @Item.RuntimeOverriding('_Snake__is_collide_with_food', 'return')
+    @Item.runtime_overriding('_Snake__is_collide_with_food', 'return')
     def magne(self, snake, *args, **kwargs):
         print('calll')
         return False
