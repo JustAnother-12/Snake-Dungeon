@@ -36,7 +36,7 @@ class Item:
                         'return': [],
                     }
                 snake.run_time_overriding[fun_name][pos].append(value)
-            except AttributeError:
+            except:
                 pass
 
     def on_remove(self, snake: Snake):
