@@ -1,5 +1,6 @@
 import pygame
 import json
+from Stats import Stats
 from states.state import State
 from gui_element.Sprite_image import ImageElement
 from gui_element.text_class import TextElement
@@ -24,10 +25,6 @@ class Stats_menu(State):
         self.Background_texture = Pixil.load("game-assets/graphics/pixil/STATS_MENU_BG_BTN.pixil", 8).frames[0]
         self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
         self.add(self.Background_rect, self.Stats_text)
-
-        with open("data/stats.json", "r") as fopen:
-            self.stats_data = json.load(fopen)
-
         self.stats_icons = Pixil.load("game-assets/graphics/pixil/STATS_ICON_SHEET.pixil", 3).frames
         self.addIcons()
 
@@ -49,82 +46,58 @@ class Stats_menu(State):
             v_gap-=7.5
 
         # add name text
-        stats_list = self.stats_data['base_stats']
         count = 0
         v_gap = 10.5
         h_gap = 16
-        for i in range(4):
-            for j in range(2):
-                name = TextElement(stats_list[count]['name'], 
-                                   "white", 
-                                   10, 
-                                   (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
-                                   (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
-                                   "midleft"
-                                   )
-                self.add(name)
-                # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
-                value = TextElement(str(0), 
-                                    "yellow", 
-                                    13, 
-                                    (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 
-                                    (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
-                                    "midright"
-                                    )
-                self.add(value)
-                count+=1
-                h_gap -= 22
-            h_gap = 16
-            v_gap -= 7.5
+        for key, value in Stats.stats.items():
+            name = TextElement(key, 
+                               "white", 
+                               10, 
+                               (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
+                               (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                               "midleft"
+                               )
+            self.add(name)
+            value = TextElement(str(value["value"]), 
+                                "yellow", 
+                                13, 
+                                (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 
+                                (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
+                                "midright"
+                                )
+            self.add(value)
+            h_gap -= 22
+            if count % 2 != 0:
+                h_gap = 16
+                v_gap -= 7.5
+            count += 1
 
         # add decription text
         count = 0
         v_gap = 8
         h_gap = 16
-        for i in range(4):
-            for j in range(2):
-                text = DecriptionElement(stats_list[count]['description'].upper(), 
-                                   "grey", 
-                                   8, 
-                                   (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
-                                   (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE + 8, 
-                                   200,
-                                   56,
-                                   (57,62,77),
-                                   5,
-                                   4,
-                                   2,
-                                   "midleft",
-                                   1,
-                                   (108,115,135)
-                                   )
-                self.add(text)
-                count+=1
-                h_gap -= 22
-            h_gap = 16
-            v_gap -= 7.5
-
-    def update(self):
-        # add name text
-        stats_list = self.stats_data['base_stats']
-        count = 0
-        v_gap = 10.5
-        h_gap = 16
-        for i in range(4):
-            for j in range(2):
-                # value = TextElement(str(stats_list[count]['value']), "yellow", 10, name.rect.right + 10 if name.rect else 0, (game.SCREEN_HEIGHT_TILES/2 - v_gap)*game.TILE_SIZE, "midleft")
-                value = TextElement(str(0), 
-                                    "yellow", 
-                                    13, 
-                                    (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 
-                                    (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE, 
-                                    "midright"
-                                    )
-                self.add(value)
-                count+=1
-                h_gap -= 22
-            h_gap = 16
-            v_gap -= 7.5
+        for key, value in Stats.stats.items():
+            text = DecriptionElement(value["description"].upper(), 
+                               "grey", 
+                               8, 
+                               (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 
+                               (self.game.SCREEN_HEIGHT_TILES/2 - v_gap)*self.game.TILE_SIZE + 8, 
+                               200,
+                               56,
+                               (57,62,77),
+                               5,
+                               4,
+                               2,
+                               "midleft",
+                               1,
+                               (108,115,135)
+                               )
+            self.add(text)
+            h_gap -= 22
+            if count % 2 != 0:
+                h_gap = 16
+                v_gap -= 7.5
+            count += 1
 
     def get_event(self, event):
         if event.type == pygame.KEYDOWN:

@@ -38,3 +38,4 @@ class GameOver_menu(Menu):
             if self.main_menu_button.on_click():
                 while len(self.game.state_stack) > 1:
                     self.game.state_stack.pop()
+                self.game.state_stack[-1].reset()
