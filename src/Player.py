@@ -36,7 +36,7 @@ class Item:
                         'return': [],
                     }
                 snake.run_time_overriding[fun_name][pos].append(value)
-            except:
+            except AttributeError:
                 pass
 
     def on_remove(self, snake: Snake):
@@ -52,6 +52,7 @@ class Item:
             except:
                 pass
 
+    # NOTE: 
     @staticmethod
     def runtime_overriding(function_name: str, position: Literal['before', 'after', 'return']):
         '''
@@ -62,7 +63,7 @@ class Item:
             position: Thời điểm áp dụng ghi đè:
                 - 'before': Thực thi trước phương thức gốc
                 - 'after': Thực thi sau khi phương thức gốc chạy xong
-                - 'return': Ghi đè hoàn toàn giá trị trả về
+                - 'return': Ghi đè hoàn toàn logic hàm
         '''
         def decorator(func):
             func.fun_name = function_name
@@ -74,16 +75,16 @@ class Item:
 class TestItem(Item):
     def __init__(self):
         super().__init__()
-    
-    # @Item.RuntimeOverriding('update', 'before')
-    # def before_update(self, snake, *args, **kwargs):
-    #     print(args, kwargs)
-    #     return args, kwargs
 
     # tên của hàm privice nên nó hơi khác
     @Item.runtime_overriding('_Snake__is_collide_with_food', 'return')
-    def magne(self, snake, *args, **kwargs):
-        print('calll')
+    def magnet(self, snake, *args, **kwargs):
+        rect : pygame.rect.Rect = snake.blocks[0].rect
+        copy_rect = rect.copy()
+        copy_rect = copy_rect.scale_by(3, 3)
+        food = snake.level.food
+        if food.rect and copy_rect.colliderect(food.rect) and food.visible:
+            return True
         return False
 
 
@@ -216,6 +217,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.add_item(TestItem())
     
+    # NOTE: Intercept method calls to apply runtime overrides
     def __getattribute__(self, name: str) -> Any:
         try:
             # Use object.__getattribute__ to avoid infinite recursion
