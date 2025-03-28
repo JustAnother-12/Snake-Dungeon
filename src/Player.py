@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import member
 import functools
 from gettext import install
+from operator import le
 from pdb import run
 import random
 from re import I
@@ -13,9 +14,10 @@ from pygame.math import Vector2
 from Stats import Stats
 from pixil import Pixil
 from states.Stats_menu import base_stats_value
-from level_component import Wall, Obstacle
 import constant
 import inspect
+from level_components.Obstacle import Obstacle
+from level_components.Wall import Wall
 
 
 class Item:
@@ -369,11 +371,12 @@ class Snake(pygame.sprite.AbstractGroup):
         self._last_direction = self.direction
 
     def handle_collision(self):
+        
         self._collide_with_active_trap()
         self._collide_with_bomb()
 
         if self.__is_collide_with_food():
-            self.grow_up(2)
+            self.grow_up(1)
 
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
@@ -485,7 +488,11 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def __is_collide_with_food(self):
-        return pygame.sprite.spritecollideany(self.blocks[0], self.level.foods) != None
+        list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
+        if list:
+            list.kill()
+            return True
+        return False
 
     def _collide_with_active_trap(self):
         pos = None
@@ -510,7 +517,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 block,
                 self.level.bombs,
                 lambda x, y: x.rect.colliderect(y.rect)
-                and time() - float(getattr(y, "activeTime", "inf")) > 0.6,
+                and time() - float(getattr(y, "activeTime", "inf") or "inf") > 0.6,
             ):
                 block.kill()
                 pos = i if pos == None else pos

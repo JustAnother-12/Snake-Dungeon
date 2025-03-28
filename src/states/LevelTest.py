@@ -17,7 +17,7 @@ import constant
 from logic.help import check_collision
 from HUD import HUD
 from region_generator import RegionGenerator
-from level_component import Food, Food_Group
+from level_components.Food import Food_Group
 
 class LevelTest(State):
     def __init__(self, game) -> None:

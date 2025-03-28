@@ -17,8 +17,8 @@ class Pot(pygame.sprite.Sprite):
         self.alpha = 255
         self.isClosed = True
         self.lootpool = LootPool()
-        self.lootpool.add_item(LootItem.COIN, 0)
-        self.lootpool.add_item(LootItem.FOOD, 10)
+        self.lootpool.add_item(LootItem.COIN, 8)
+        self.lootpool.add_item(LootItem.FOOD, 2)
 
     def update(self):
         if self.__is_collision_with_snake():

@@ -1,5 +1,4 @@
 import random
-from Loot import LootItem, LootPool
 from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import constant
 import pixil
@@ -74,16 +73,6 @@ class Food(pygame.sprite.Sprite):
                 or y > (SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - constant.WALL_TILES) * TILE_SIZE - 4
             ):
                 self.random_pos(area)
-
-    def update(self):
-        if self.__is_collision_with_snake():
-            self.on_collision()
-
-    def __is_collision_with_snake(self):
-        return not pygame.sprite.spritecollideany(self, self.level.snake.blocks) is None
-    
-    def on_collision(self):
-        self.kill()
 
 
 class Food_Group(pygame.sprite.AbstractGroup):
