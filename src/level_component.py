@@ -22,12 +22,9 @@ def mark_area(x, y, size, grid):
             grid[x + i][y + j] = 1
 
 regions = [pixil.get_coords_from_pixil("game-assets/region/trap_squareborder.pixil", (180,180,180)), 
-           pixil.get_coords_from_pixil("game-assets/region/trap_frame_L_border.pixil", (180,180,180)), 
-           pixil.get_coords_from_pixil("game-assets/region/trap_4dots.pixil", (180,180,180))
+           pixil.get_coords_from_pixil("game-assets/region/frame_L_border.pixil", (180,180,180)), 
+           pixil.get_coords_from_pixil("game-assets/region/4dots.pixil", (180,180,180))
            ]
-
-pots_pos = []
-obstacles_pos = []
 
 
 # print(traps_pos)

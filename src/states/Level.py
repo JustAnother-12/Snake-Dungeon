@@ -1,7 +1,6 @@
 from states.state import State
 from states.Pause_menu import Pause_menu
 import pygame
-from generators.region_generator import generate_frame_L_region, generate_L_shaped_region, generate_square_border_region, Generate_rectangle_region
 
 # Trap_possible_regions = [generate_square_border_region(10,10,6,2),
 #                         generate_square_border_region(7,7,4,2),

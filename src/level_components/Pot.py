@@ -6,41 +6,41 @@ from time import time
 import pygame
 
 class Pot(pygame.sprite.Sprite):
-    def __init__(self, level) -> None:
+    def __init__(self, level, pos) -> None:
         super().__init__()
         self.level = level
         self.image = pixil.Pixil.load("game-assets/graphics/pixil/POTS_SPRITE_SHEET.pixil", 1).frames[random.randint(0,3)]
 
-        self.random_pos()
+        self.pos = pos
         self.rect = self.image.get_rect(topleft = self.pos)
         self.collision_time = None
         self.alpha = 255
         self.isClosed = True
 
 
-    def random_pos(self):
-        self.pos = pygame.Vector2(
-            random.randint(
-                constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
-                (
-                    SCREEN_WIDTH_TILES
-                    - constant.LEFT_RIGHT_BORDER_TILES
-                    - 3
-                    - constant.WALL_TILES
-                ),
-            )
-            * TILE_SIZE,
-            random.randint(
-                constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
-                (
-                    SCREEN_HEIGHT_TILES
-                    - constant.TOP_BOTTOM_BORDER_TILES
-                    - 3
-                    - constant.WALL_TILES
-                ),
-            )
-            * TILE_SIZE,
-        )
+    # def random_pos(self):
+    #     self.pos = pygame.Vector2(
+    #         random.randint(
+    #             constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
+    #             (
+    #                 SCREEN_WIDTH_TILES
+    #                 - constant.LEFT_RIGHT_BORDER_TILES
+    #                 - 3
+    #                 - constant.WALL_TILES
+    #             ),
+    #         )
+    #         * TILE_SIZE,
+    #         random.randint(
+    #             constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
+    #             (
+    #                 SCREEN_HEIGHT_TILES
+    #                 - constant.TOP_BOTTOM_BORDER_TILES
+    #                 - 3
+    #                 - constant.WALL_TILES
+    #             ),
+    #         )
+    #         * TILE_SIZE,
+    #     )
 
     def update(self):
         if self.__is_collision_with_snake():
@@ -71,11 +71,12 @@ class Pot(pygame.sprite.Sprite):
             self.open()
 
 class Pot_group(pygame.sprite.AbstractGroup):
-    def __init__(self, level, quantity) -> None:
+    def __init__(self, level, pots_pos) -> None:
         super().__init__()
         self.level = level
-        for _ in range(quantity):
-            self.add(Pot(self.level))
+        self.pots_pos = pots_pos
+        for x, y in self.pots_pos:
+            self.add(Pot(self.level, (x,y)))
 
     def update(self):
         for pot in self.sprites():

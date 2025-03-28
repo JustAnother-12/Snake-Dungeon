@@ -2,8 +2,15 @@ from __future__ import annotations
 import pygame
 from Player import Snake
 from Stats import Stats
-from level_component import Chests, Coins, Keys, Pot_group, Walls, Bomb_group, Obstacle_group
+# from level_component import Chests, Coins, Keys, Pot_group, Walls, Bomb_group, Obstacle_group
 from level_components.Trap import Traps
+from level_components.Chest import Chests
+from level_components.Coin import Coins
+from level_components.Key import Keys
+from level_components.Pot import Pot_group
+from level_components.Wall import Walls
+from level_components.Bomb import Bomb_group
+from level_components.Obstacle import Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -12,6 +19,7 @@ import constant
 import random
 from logic.help import check_collision
 from HUD import HUD
+from region_generator import RegionGenerator
 
 
 class Food(pygame.sprite.Sprite):
@@ -62,19 +70,20 @@ class LevelTest(State):
         self.init()
 
     def init(self):
-        self.grid = [[0 for _ in range(constant.FLOOR_TILE_SIZE)] for _ in range(constant.FLOOR_TILE_SIZE)]
         from Player import Snake
         self.remove(self.sprites())
         self.snake = Snake(self, 5)
         self.food = Food()
-        self.traps = Traps(self)
+
+        self.region_generator = RegionGenerator()
+        self.traps = Traps(self,self.region_generator.traps_initpos)
+        self.chests = Chests(self, self.region_generator.chests_initpos)
+        self.pots = Pot_group(self, self.region_generator.pots_initpos)
+        self.obstacles = Obstacle_group(self, self.region_generator.obstacles_initpos)
         self.keys = Keys(self, 2)
         self.coins = Coins(self)
         self.walls = Walls()
-        self.obstacles = Obstacle_group(self, 3)
-        self.chests = Chests(self, 3)
-        self.bombs = Bomb_group(self, 5)
-        self.pots = Pot_group(self, 20)
+        self.bombs = Bomb_group(self, 5) 
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.food.random_pos(self.snake.blocks)
         self.food_spawn_time = 5000

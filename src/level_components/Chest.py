@@ -7,44 +7,44 @@ from time import time
 import pygame
 
 class Chest(pygame.sprite.Sprite):
-    def __init__(self, level, isLocked = None) -> None:
+    def __init__(self, level, pos, isLocked = None) -> None:
         super().__init__()
         self.level = level
         self.isLocked = isLocked if isLocked != None else random.choice([True, False])
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
         ).frames[int(self.isLocked)]
-        self.random_pos()
-        self.rect = self.image.get_rect(center=self.pos)
+        self.pos = pos
+        self.rect = self.image.get_rect(topleft=self.pos)
         self.isClosed = True
         self.collision_time = None
         self.alpha = 255
-        self.LockedText = TextElement("LOCKED!", "White", 8, int(self.pos[0]) - TILE_SIZE - 8, int(self.pos[1]) - 2*TILE_SIZE, "midleft")
+        self.LockedText = TextElement("LOCKED!", "White", 8, int(self.pos[0])+8, int(self.pos[1]), "midleft")
         self.TextTime = None
 
-    def random_pos(self):
-        self.pos = pygame.Vector2(
-            random.randint(
-                constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
-                (
-                    SCREEN_WIDTH_TILES
-                    - constant.LEFT_RIGHT_BORDER_TILES
-                    - 3
-                    - constant.WALL_TILES
-                ),
-            )
-            * TILE_SIZE,
-            random.randint(
-                constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
-                (
-                    SCREEN_HEIGHT_TILES
-                    - constant.TOP_BOTTOM_BORDER_TILES
-                    - 3
-                    - constant.WALL_TILES
-                ),
-            )
-            * TILE_SIZE,
-        )
+    # def random_pos(self):
+    #     self.pos = pygame.Vector2(
+    #         random.randint(
+    #             constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
+    #             (
+    #                 SCREEN_WIDTH_TILES
+    #                 - constant.LEFT_RIGHT_BORDER_TILES
+    #                 - 3
+    #                 - constant.WALL_TILES
+    #             ),
+    #         )
+    #         * TILE_SIZE,
+    #         random.randint(
+    #             constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
+    #             (
+    #                 SCREEN_HEIGHT_TILES
+    #                 - constant.TOP_BOTTOM_BORDER_TILES
+    #                 - 3
+    #                 - constant.WALL_TILES
+    #             ),
+    #         )
+    #         * TILE_SIZE,
+    #     )
 
     def update(self) -> None:
         if self.TextTime != None:
@@ -96,10 +96,10 @@ class Chest(pygame.sprite.Sprite):
                     self.TextTime = time()
 
 class Chests(pygame.sprite.AbstractGroup):
-    def __init__(self, level, quantity) -> None:
+    def __init__(self, level, chests_pos) -> None:
         super().__init__()
-        for _ in range(quantity):
-            self.add(Chest(level))
+        for x,y in chests_pos:
+            self.add(Chest(level, (x,y-TILE_SIZE)))
 
     def update(self) -> None:
         for chest in self.sprites():
