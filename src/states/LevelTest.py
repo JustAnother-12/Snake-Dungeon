@@ -1,8 +1,7 @@
 from __future__ import annotations
 import pygame
-from Player import Snake
 from Stats import Stats
-from level_component import Chests, Coins, Keys, Pot_group, Traps, Walls, Bomb_group, Obstacle_group
+from level_component import Chests, Coins, Food_Group, Keys, Pot_group, Traps, Walls, Bomb_group, Obstacle_group, Food_Group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
@@ -28,58 +27,16 @@ MAP_TOP = (constant.TOP_BOTTOM_BORDER_TILES +
 MAP_BOTTOM = MAP_TOP + MAP_HEIGHT
 
 
-class Food(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image: pygame.Surface = pygame.transform.scale(
-            Pixil.load(constant.Texture.apple, 1).frames[0],  # type: ignore
-            (constant.TILE_SIZE, constant.TILE_SIZE),
-        )
-        self.rect = self.image.get_rect(topleft=(0, 0))
-        self.visible = True
-
-    def random_pos(self, snake_blocks):
-        self.pos = pygame.Vector2(
-            (
-                random.randint(
-                    constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
-                    constant.SCREEN_WIDTH_TILES
-                    - constant.LEFT_RIGHT_BORDER_TILES
-                    - 2
-                    - constant.WALL_TILES,
-                )
-                * constant.TILE_SIZE
-            ),
-            (
-                random.randint(
-                    constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
-                    constant.SCREEN_HEIGHT_TILES
-                    - constant.TOP_BOTTOM_BORDER_TILES
-                    - 2
-                    - constant.WALL_TILES,
-                )
-                * constant.TILE_SIZE
-            ),
-        )
-        self.rect = self.image.get_rect(topleft=self.pos)
-        if check_collision(self, snake_blocks):
-            self.random_pos(snake_blocks)
-
-    def draw(self, surface):
-        if self.visible:
-            surface.blit(self.image, self.rect)
-
-
 class LevelTest(State):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.init()
 
     def init(self):
-        from Player import Snake
+        from Player import Snake, GreenSnake, OrangeSnake, GraySnake
         self.remove(self.sprites())
-        self.snake = Snake(self, 5)
-        self.food = Food()
+        self.snake = GraySnake(self, 5)
+        self.foods = Food_Group(self)
         self.traps = Traps(self, 10)
         self.keys = Keys(self, 2)
         self.coins = Coins(self)
@@ -89,12 +46,9 @@ class LevelTest(State):
         self.bombs = Bomb_group(self, 5)
         self.pots = Pot_group(self, 20)
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
-        self.food.random_pos(self.snake.blocks)
-        self.food_spawn_time = 5000
-        self.food_timer = 0
         self.is_paused = False
         self.add(self.hud, self.walls, self.traps, self.obstacles,
-                 self.food, self.chests, self.pots, self.coins, self.bombs, self.keys, self.snake)
+                 self.foods, self.chests, self.pots, self.coins, self.bombs, self.keys, self.snake)
 
     def reset(self):
         # self.remove(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
@@ -114,19 +68,11 @@ class LevelTest(State):
         self.pots.update()
         self.bombs.update()
         self.coins.update()
+        self.foods.update()
         self.hud.update(self.snake.gold, len(
             self.snake.blocks), self.snake.keys)
         
         Stats.setValue("LENGTH", len(self.snake.blocks))
-
-        if not self.food.visible:
-            self.food_timer += self.game.clock.get_time()
-            if self.food_timer > self.food_spawn_time:
-                self.food.visible = True
-                self.add(self.food)
-                self.food.random_pos(self.snake.blocks)
-                self.food_timer = 0
-                print("Food spawned")
 
         if self.snake.isDeath:
             self.game.state_stack[-1].visible = False
