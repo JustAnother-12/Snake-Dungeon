@@ -1,11 +1,12 @@
 from __future__ import annotations
 import pygame
 from Player import Snake
-from level_component import Chests, Coins, Keys, Pot_group, Traps, Walls, Bomb_group, Obstacle_group
+from level_component import Chests, Coins, Keys, Pot_group, Walls, Bomb_group, Obstacle_group
+from level_components.Trap import Traps
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
-from pixil import Pixil, get_coords_from_pixil
+from pixil import Pixil
 import constant
 import random
 from logic.help import check_collision
