@@ -1,6 +1,7 @@
 from __future__ import annotations
 import pygame
 from Player import Snake
+from Stats import Stats
 from level_component import Chests, Coins, Keys, Pot_group, Walls, Bomb_group, Obstacle_group
 from level_components.Trap import Traps
 from states.GameOver_menu import GameOver_menu
@@ -90,7 +91,7 @@ class LevelTest(State):
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Pause_menu(self.game))
 
-        if self.is_paused:
+        if self.is_paused or self.snake.isDeath:
             return
         self.snake.update()
         self.traps.update()
@@ -101,6 +102,8 @@ class LevelTest(State):
         self.coins.update()
         self.hud.update(self.snake.gold, len(
             self.snake.blocks), self.snake.keys)
+        
+        Stats.setValue("LENGTH", len(self.snake.blocks))
 
         if not self.food.visible:
             self.food_timer += self.game.clock.get_time()
