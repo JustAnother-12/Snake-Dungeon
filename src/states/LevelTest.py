@@ -5,26 +5,11 @@ from level_component import Chests, Coins, Keys, Pot_group, Traps, Walls, Bomb_g
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
-from pixil import Pixil
+from pixil import Pixil, get_coords_from_pixil
 import constant
 import random
 from logic.help import check_collision
 from HUD import HUD
-
-MAP_WIDTH = (
-    constant.SCREEN_WIDTH_TILES -
-    constant.LEFT_RIGHT_BORDER_TILES * 2 - constant.WALL_TILES * 2
-) * constant.TILE_SIZE
-MAP_HEIGHT = (
-    constant.SCREEN_HEIGHT_TILES -
-    constant.TOP_BOTTOM_BORDER_TILES * 2 - constant.WALL_TILES * 2
-) * constant.TILE_SIZE
-MAP_LEFT = (constant.LEFT_RIGHT_BORDER_TILES +
-            constant.WALL_TILES) * constant.TILE_SIZE
-MAP_RIGHT = MAP_LEFT + MAP_WIDTH
-MAP_TOP = (constant.TOP_BOTTOM_BORDER_TILES +
-           constant.WALL_TILES) * constant.TILE_SIZE
-MAP_BOTTOM = MAP_TOP + MAP_HEIGHT
 
 
 class Food(pygame.sprite.Sprite):
@@ -75,11 +60,12 @@ class LevelTest(State):
         self.init()
 
     def init(self):
+        self.grid = [[0 for _ in range(constant.FLOOR_TILE_SIZE)] for _ in range(constant.FLOOR_TILE_SIZE)]
         from Player import Snake
         self.remove(self.sprites())
         self.snake = Snake(self, 5)
         self.food = Food()
-        self.traps = Traps(self, 10)
+        self.traps = Traps(self)
         self.keys = Keys(self, 2)
         self.coins = Coins(self)
         self.walls = Walls()
@@ -96,7 +82,6 @@ class LevelTest(State):
                  self.food, self.chests, self.pots, self.coins, self.bombs, self.keys, self.snake)
 
     def reset(self):
-        # self.remove(self.hud,self.walls, self.traps,self.obstacles, self.snake, self.food, self.chests, self.coins, self.bombs, self.keys)
         self.init()
 
     def update(self):
@@ -135,18 +120,18 @@ class LevelTest(State):
             surface,
             (51, 54, 71),
             (
-                MAP_LEFT,
-                MAP_TOP,
-                MAP_WIDTH,
-                MAP_HEIGHT,
+                constant.MAP_LEFT,
+                constant.MAP_TOP,
+                constant.MAP_WIDTH,
+                constant.MAP_HEIGHT,
             ),
         )
-        for x in range(MAP_LEFT, MAP_RIGHT + 1, constant.TILE_SIZE):
+        for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
             pygame.draw.line(surface, (100, 100, 100),
-                             (x, MAP_TOP), (x, MAP_BOTTOM))
-        for y in range(MAP_TOP, MAP_BOTTOM + 1, constant.TILE_SIZE):
+                             (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
+        for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
             pygame.draw.line(surface, (100, 100, 100),
-                             (MAP_LEFT, y), (MAP_RIGHT, y))
+                             (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
