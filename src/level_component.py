@@ -1,6 +1,6 @@
 import random
 from Loot import LootItem, LootPool
-from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE
+from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE, LEFT_RIGHT_BORDER_TILES, TOP_BOTTOM_BORDER_TILES
 from gui_element.text_class import TextElement;
 import constant
 import pixil
@@ -556,7 +556,7 @@ class Pot(pygame.sprite.Sprite):
         self.isClosed = True
         self.lootpool = LootPool()
         self.lootpool.add_item(LootItem.COIN, 8)
-        self.lootpool.add_item(LootItem.FOOD, 2)
+        self.lootpool.add_item(LootItem.FOOD, 10)
 
 
     def random_pos(self):
@@ -606,6 +606,7 @@ class Pot(pygame.sprite.Sprite):
         if item == LootItem.COIN:
             self.level.coins.add_coin(random.randint(1, 3), self, 1)
         elif item == LootItem.FOOD:
+            print("MOOON")
             self.level.foods.add_food(self)
         if self.collision_time == None:
             self.collision_time = time()

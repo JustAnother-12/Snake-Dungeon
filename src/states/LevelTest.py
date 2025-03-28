@@ -13,27 +13,11 @@ from level_components.Obstacle import Obstacle_group
 from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
-from pixil import Pixil
 import constant
-import random
 from logic.help import check_collision
 from HUD import HUD
-
-MAP_WIDTH = (
-    constant.SCREEN_WIDTH_TILES -
-    constant.LEFT_RIGHT_BORDER_TILES * 2 - constant.WALL_TILES * 2
-) * constant.TILE_SIZE
-MAP_HEIGHT = (
-    constant.SCREEN_HEIGHT_TILES -
-    constant.TOP_BOTTOM_BORDER_TILES * 2 - constant.WALL_TILES * 2
-) * constant.TILE_SIZE
-MAP_LEFT = (constant.LEFT_RIGHT_BORDER_TILES +
-            constant.WALL_TILES) * constant.TILE_SIZE
-MAP_RIGHT = MAP_LEFT + MAP_WIDTH
-MAP_TOP = (constant.TOP_BOTTOM_BORDER_TILES +
-           constant.WALL_TILES) * constant.TILE_SIZE
-MAP_BOTTOM = MAP_TOP + MAP_HEIGHT
-
+from region_generator import RegionGenerator
+from level_component import Food, Food_Group
 
 class LevelTest(State):
     def __init__(self, game) -> None:
@@ -44,7 +28,7 @@ class LevelTest(State):
         from Player import Snake, GreenSnake, OrangeSnake, GraySnake
         self.remove(self.sprites())
         self.snake = Snake(self, 5)
-        self.food = Food()
+        self.foods = Food_Group(self)
 
         self.region_generator = RegionGenerator()
         self.traps = Traps(self,self.region_generator.traps_initpos)
