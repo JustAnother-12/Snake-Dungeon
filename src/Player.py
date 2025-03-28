@@ -5,6 +5,7 @@ from gettext import install
 from pdb import run
 import random
 from re import I
+from turtle import st
 from typing import Any, Literal
 import pygame
 from time import time
@@ -85,24 +86,26 @@ class TestItem(Item):
     def __init__(self):
         super().__init__()
 
-    # tên của hàm privice nên nó hơi khác
-    @Item.runtime_overriding("_Snake__is_collide_with_food", "return")
-    def magnet(self, snake, *args, **kwargs):
-        rect: pygame.rect.Rect = snake.blocks[0].rect
-        copy_rect = rect.copy()
-        copy_rect = copy_rect.scale_by(3, 3)
-        food = snake.level.food
-        if food.rect and copy_rect.colliderect(food.rect) and food.visible:
-            return True
-        return False
-
+    # NOTE: tên của hàm privice nên nó hơi khác
+    # @Item.runtime_overriding("_Snake__is_collide_with_food", "return")
+    # def magnet(self, snake, *args, **kwargs):
+    #     rect: pygame.rect.Rect = snake.blocks[0].rect
+    #     copy_rect = rect.copy()
+    #     copy_rect = copy_rect.scale_by(3, 3)
+    #     for food in snake.level.foods:
+    #         if food.rect and copy_rect.colliderect(food.rect):
+    #             food.kill()
+    #             return True
+    #     return False
+        
 
 class SnakeBlock(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int]) -> None:
+    def __init__(self, pos: tuple[int, int], color: pygame.Color) -> None:
         super().__init__()
         self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
-        self.image.fill((255, 139, 38))
+        self.color = color
+        self.image.fill(self.color)
         self.target_pos = pygame.Vector2(self.rect.topleft)
         self.pos = pygame.Vector2(self.rect.topleft)
         self._last_target = pygame.Vector2(self.rect.topleft)
@@ -121,20 +124,21 @@ class SnakeBlock(pygame.sprite.Sprite):
     def is_head(self, value):
         self.__is_head = value
         if value:
-            self.image = pygame.transform.rotate(constant.HEAD_IMG, -90)
+            # self.image = pygame.transform.rotate(Snake.headImg, -90)
+            pass
 
-    def rotate(self, direction):
+    def rotate(self, direction, img):
         if not self.is_head:
             return
         direction = direction.normalize()
         if direction == Vector2(1, 0):
-            self.image = pygame.transform.rotate(constant.HEAD_IMG, -90)
+            self.image = pygame.transform.rotate(img, -90)
         elif direction == Vector2(-1, 0):
-            self.image = pygame.transform.rotate(constant.HEAD_IMG, 90)
+            self.image = pygame.transform.rotate(img, 90)
         elif direction == Vector2(0, 1):
-            self.image = pygame.transform.rotate(constant.HEAD_IMG, 180)
+            self.image = pygame.transform.rotate(img, 180)
         elif direction == Vector2(0, -1):
-            self.image = constant.HEAD_IMG
+            self.image = img
 
     def set_target(self, speed, target: pygame.Vector2):
         if self.target_pos != target:
@@ -155,15 +159,29 @@ class SnakeBlock(pygame.sprite.Sprite):
 
         if not isTurn:
             self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
-            self.rect.topleft = (int(self.pos.x), int(self.pos.y))
+            if not self.is_head:
+                self.image = pygame.surface.Surface(
+                    (
+                        constant.TILE_SIZE + int(self.target_pos.x != self.pos.x), #NOTE: pos bị lệch khoảng nhỏ nên cần thêm 1
+                        constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
+                    )
+                )
+                self.image.fill(self.color)
+            self.rect.topleft = (
+                int(self.pos.x),
+                int(self.pos.y),
+            )
         else:
             self.pos = self.pos.move_towards(self.target_pos, self.speed * dt)
             d_x = abs(self.target_pos.x - self.pos.x)
             d_y = abs(self.target_pos.y - self.pos.y)
             self.image = pygame.surface.Surface(
-                (d_x + constant.TILE_SIZE, d_y + constant.TILE_SIZE)
+                (
+                    d_x + constant.TILE_SIZE + int(self.target_pos.x != self.pos.x),
+                    d_y + constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
+                )
             )
-            self.image.fill((255, 139, 38))
+            self.image.fill(self.color)
             if self.target_pos.x > self.pos.x or self.target_pos.y > self.pos.y:
                 self.rect = self.image.get_rect(
                     bottomright=(
@@ -189,7 +207,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake(pygame.sprite.AbstractGroup):
     from states import LevelTest
-
+    
     def __init__(self, level: "LevelTest.LevelTest", init_len):
         super().__init__()
         self.run_time_overriding = {}
@@ -208,7 +226,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self.direction = Vector2(1, 0)
         self.base_stats = base_stats_value()
         self.items: list[Item] = []
-
+        self.color = getattr(self, "color", pygame.Color(255, 139, 38))
+        self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         self._block_positions = []
         self._last_direction = Vector2(0, 0)
 
@@ -266,7 +285,7 @@ class Snake(pygame.sprite.AbstractGroup):
         for i in range(init_len):
             x = (constant.SCREEN_WIDTH_TILES // 2 - i) * constant.TILE_SIZE
             y = (constant.SCREEN_HEIGHT_TILES // 2) * constant.TILE_SIZE
-            block = SnakeBlock((x, y))
+            block = SnakeBlock((x, y), self.color)
             self.blocks.append(block)
 
         # self.blocks[0].image = pygame.transform.rotate(constant.HEAD_IMG, -90)
@@ -355,9 +374,6 @@ class Snake(pygame.sprite.AbstractGroup):
 
         if self.__is_collide_with_food():
             self.grow_up(2)
-            self.level.food.visible = False
-            self.level.remove(self.level.food)
-            self.level.food_timer = 0
 
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
@@ -381,18 +397,20 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()
+        self.handle_skills(dt)
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
             block.set_target(
                 self.base_speed + Stats.getValue("SPEED"), self._block_positions[i]  # NOTE: test stats (speed)
             )
             if i == 0:
-                block.rotate(self.direction)
+                block.rotate(self.direction, self.headImg)
             block.move(
                 dt / 100,
                 i != 0
-                and block.target_pos - block.pos
-                != self.blocks[i - 1].pos - block.target_pos,
+                and block.target_pos - block._last_target
+                != self.blocks[i - 1].target_pos
+                - self.blocks[i - 1]._last_target,
             )
 
     def handle_severed_blocks(self):
@@ -407,7 +425,7 @@ class Snake(pygame.sprite.AbstractGroup):
     def grow_up(self, length=1):
         tail = self.blocks[-1]
         for i in range(length):
-            newBlock = SnakeBlock(tail.rect.topleft)
+            newBlock = SnakeBlock(tail.rect.topleft, self.color)
             self.blocks.insert(-1, newBlock)
             self._block_positions.append(newBlock.pos.copy())
             for i in self.blocks[0].groups():
@@ -418,6 +436,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if self.blocks[i].timeSevered == None:
                 self.blocks[i].timeSevered = time()
         self.blocks = self.blocks[:index]
+        self._block_positions = self._block_positions[:index]
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
@@ -466,10 +485,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def __is_collide_with_food(self):
-        food = self.level.food
-        if food.rect and self.blocks[0].rect.colliderect(food.rect) and food.visible:
-            return True
-        return False
+        return pygame.sprite.spritecollideany(self.blocks[0], self.level.foods) != None
 
     def _collide_with_active_trap(self):
         pos = None
@@ -501,17 +517,22 @@ class Snake(pygame.sprite.AbstractGroup):
         if pos != None:
             self.split(pos)
 
+    def handle_skills(self, dt):
+        pass
+
 
 class GreenSnake(Snake):
     from states import LevelTest
 
     def __init__(self, level: "LevelTest.LevelTest", init_len):
+        self.color = pygame.Color("#0abf2b")
+        self.headImg = Pixil.load("game-assets/graphics/pixil/SNAKE_HEAD.pixil", 1).frames[1]
         super().__init__(level, init_len)
 
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time > constant.DEATH_DELAY:
+                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY:
                     block = self.blocks.pop()
                     block.kill()
                     self._out_of_bounds_time = None
@@ -520,3 +541,30 @@ class GreenSnake(Snake):
                     self._out_of_bounds_time += dt
         else:
             self._out_of_bounds_time = None
+
+class OrangeSnake(Snake):
+    from states import LevelTest
+
+    def __init__(self, level: "LevelTest.LevelTest", init_len):
+        self.color = pygame.Color("#d3d3d3")
+        self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
+        super().__init__(level, init_len)
+
+class GraySnake(Snake):
+    from states import LevelTest
+
+    def __init__(self, level: "LevelTest.LevelTest", init_len):
+        self.color = pygame.Color("#d3d3d3")
+        self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[2]
+        super().__init__(level, init_len)
+
+    def handle_skills(self, dt):
+        self.skillCooldown = getattr(self, "skillCooldown", 5000)
+        self.skillCooldown += dt
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_e] and self.skillCooldown > 5000:
+            self.skillCooldown = 0
+            block = self.blocks.pop()
+            self._block_positions.pop()
+            self.level.coins.add_coin(random.randint(10, 15), block, 1)
+            block.kill()

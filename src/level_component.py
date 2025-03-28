@@ -1,5 +1,6 @@
 import random
-from constant import LEFT_RIGHT_BORDER_TILES, SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE, TOP_BOTTOM_BORDER_TILES
+from Loot import LootItem, LootPool
+from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE, COIN_VALUE
 from gui_element.text_class import TextElement;
 import constant
 import pixil
@@ -206,11 +207,9 @@ class Coin(pygame.sprite.Sprite):
 
 
 class Coins(pygame.sprite.AbstractGroup):
-    def __init__(self, level, quantity: int = 0) -> None:
+    def __init__(self, level) -> None:
         super().__init__()
         self.level = level
-        for _ in range(quantity):
-            self.add(Coin(self.level))
 
     def add_coin(self, quantity, source, r = 2):
         for _ in range(quantity):
@@ -555,6 +554,9 @@ class Pot(pygame.sprite.Sprite):
         self.collision_time = None
         self.alpha = 255
         self.isClosed = True
+        self.lootpool = LootPool()
+        self.lootpool.add_item(LootItem.COIN, 8)
+        self.lootpool.add_item(LootItem.FOOD, 2)
 
 
     def random_pos(self):
@@ -600,8 +602,11 @@ class Pot(pygame.sprite.Sprite):
     
     def open(self):
         self.isClosed = False
-        print("Break pot!")
-        self.level.coins.add_coin(random.randint(1, 3), self, 1)
+        item = self.lootpool.get_item()
+        if item == LootItem.COIN:
+            self.level.coins.add_coin(random.randint(1, 3), self, 1)
+        elif item == LootItem.FOOD:
+            self.level.foods.add_food(self)
         if self.collision_time == None:
             self.collision_time = time()
 
@@ -620,39 +625,97 @@ class Pot_group(pygame.sprite.AbstractGroup):
         for pot in self.sprites():
             pot.update()
 
+class Food(pygame.sprite.Sprite):
 
-# class CollisionManager:
-#     def __init__(self, game) -> None:
-#         self.game = game
-# class CollisionManager:
-#     def __init__(self, game) -> None:
-#         from states import LevelTest
-#         self.level: LevelTest.LevelTest = game
+    def __init__(self, level, area: pygame.Rect | None, r = 2) -> None:
+        super().__init__()
+        self.image: pygame.Surface = pygame.transform.scale(
+            pixil.Pixil.load(constant.Texture.apple, 1).frames[0],  # type: ignore
+            (constant.TILE_SIZE, constant.TILE_SIZE),
+        )
+        self.level = level
+        self.random_pos(area, r)
+        self.rect = self.image.get_rect(topleft=self.pos)
 
-#     def update(self):
-#         self.check_collision_trap()
-#         self.check_collision_food()
+    def random_pos(self, area: pygame.Rect | None, r = 2):
+        if not area:
+            self.pos = pygame.Vector2(
+                random.randint(
+                    constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
+                    (
+                        SCREEN_WIDTH_TILES
+                        - constant.LEFT_RIGHT_BORDER_TILES
+                        - constant.WALL_TILES
+                    ),
+                )
+                * TILE_SIZE,
+                random.randint(
+                    constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
+                    (
+                        SCREEN_HEIGHT_TILES
+                        - constant.TOP_BOTTOM_BORDER_TILES
+                        - constant.WALL_TILES
+                    ),
+                )
+                * TILE_SIZE,
+            )
+        else:
+            R = int(r * constant.TILE_SIZE)
+            x = random.randint(
+                area.centerx - R - area.width // 2,
+                area.centerx + R + area.width // 2,
+            )
+            if (
+                x < area.centerx - area.width // 2
+                or x > area.centerx + area.width // 2
+            ):
+                y = random.randint(
+                    area.centery - R - area.height // 2,
+                    area.centery + R + area.height // 2,
+                )
+            else:
+                y = random.choice(
+                    [
+                        random.randint(
+                            area.centery - R - area.height // 2,
+                            area.centery - area.height // 2,
+                        ),
+                        random.randint(
+                            area.centery + area.height // 2,
+                            area.centery + R + area.height // 2,
+                        ),
+                    ]
+                )
+            self.pos = pygame.Vector2(x, y)
+            if (
+                x < (constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES) * TILE_SIZE + 4
+                or x > (SCREEN_WIDTH_TILES - constant.LEFT_RIGHT_BORDER_TILES - constant.WALL_TILES) * TILE_SIZE - 4
+                or y < (constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES) * TILE_SIZE + 4
+                or y > (SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - constant.WALL_TILES) * TILE_SIZE - 4
+            ):
+                self.random_pos(area)
 
-#     def check_collision_trap(self):
-#         for trap in self.lever.traps.sprites():
-#             if check_collision(trap, self.lever.snake.blocks):
-#                 trap.on_collision(self.lever.snake)
+    def update(self):
+        if self.__is_collision_with_snake():
+            self.on_collision()
+
+    def __is_collision_with_snake(self):
+        return not pygame.sprite.spritecollideany(self, self.level.snake.blocks) is None
     
-#     def check_collision_food(self):
-#         if not self.lever.food.visible: return
-#         if check_collision(self.lever.food, self.lever.snake.blocks[0:1]):
-#             self.lever.food.visible = False
-#             self.lever.remove(self.lever.food)
-#             self.lever.food_timer = 0
-#             self.lever.snake.grow_up()
-    
-#     def check_collisions_snake(self):
-#         pass
-#         # if check_collision(self.lever.snake.blocks[0], self.lever.snake.blocks[2:]):
-#         #     pass
-    
-#     def check_collision_wall(self):
-#         pass
-#         # if check_collision(self.lever.snake.blocks[0], self.lever.walls):
-#         #     pass
-            
+    def on_collision(self):
+        self.kill()
+
+
+class Food_Group(pygame.sprite.AbstractGroup):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.level = level
+
+    def update(self):
+        for food in self.sprites():
+            food.update()
+
+    def add_food(self, source, quantity = 1, r = 2):
+        for _ in range(quantity):
+            self.add(Food(self.level, source.rect, r))
+        self.level.add(self.sprites())
