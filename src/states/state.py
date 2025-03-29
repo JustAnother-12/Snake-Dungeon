@@ -1,7 +1,7 @@
 import pygame
 
 
-class State(pygame.sprite.Group):
+class State(pygame.sprite.LayeredUpdates):
     def __init__(self, game) -> None:
         super().__init__()
         self.game = game

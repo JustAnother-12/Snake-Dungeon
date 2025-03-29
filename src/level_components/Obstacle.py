@@ -49,6 +49,7 @@ class Obstacle(pygame.sprite.Sprite):
 class Obstacle_group(pygame.sprite.AbstractGroup):
     def __init__(self, level, obstacles_pos) -> None:
         super().__init__()
+        self.empty()
         self.obstacles_pos = obstacles_pos
         for x,y in self.obstacles_pos:
             self.add(Obstacle(level, (x,y)))

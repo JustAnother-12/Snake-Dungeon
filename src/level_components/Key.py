@@ -56,6 +56,7 @@ class Key(pygame.sprite.Sprite):
 class Keys(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity) -> None:
         super().__init__()
+        self.empty()
         for _ in range(quantity):
             self.add(Key(level))
 

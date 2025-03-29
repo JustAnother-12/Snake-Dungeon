@@ -210,9 +210,10 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    from states import LevelTest
+    # from states import LevelTest
+    from Level import Level
     
-    def __init__(self, level: "LevelTest.LevelTest", init_len):
+    def __init__(self, level, init_len):
         super().__init__()
         self.run_time_overriding = {}
         self.level = level
@@ -541,7 +542,7 @@ class GreenSnake(Snake):
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY:
+                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY/1.2:
                     block = self.blocks.pop()
                     block.kill()
                     self._out_of_bounds_time = None
