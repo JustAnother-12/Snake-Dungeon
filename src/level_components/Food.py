@@ -78,13 +78,14 @@ class Food(pygame.sprite.Sprite):
 class Food_Group(pygame.sprite.AbstractGroup):
     def __init__(self, level) -> None:
         super().__init__()
+        self.empty()
         self.level = level
 
     def update(self):
         for food in self.sprites():
             food.update()
 
-    def add_food(self, source, quantity = 1, r = 2):
+    def add_food(self, source, quantity = 1, r = 1):
         for _ in range(quantity):
             self.add(Food(self.level, source.rect, r))
         self.level.add(self.sprites())

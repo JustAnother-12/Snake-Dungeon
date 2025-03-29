@@ -65,6 +65,7 @@ class Bomb(pygame.sprite.Sprite):
 class Bomb_group(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity = 0) -> None:
         super().__init__()
+        self.empty()
         self.level = level
         for _ in range(quantity):
             self.add(Bomb(self.level))

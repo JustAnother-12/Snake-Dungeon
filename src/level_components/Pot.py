@@ -17,8 +17,9 @@ class Pot(pygame.sprite.Sprite):
         self.alpha = 255
         self.isClosed = True
         self.lootpool = LootPool()
-        self.lootpool.add_item(LootItem.COIN, 8)
-        self.lootpool.add_item(LootItem.FOOD, 2)
+        self.lootpool.add_item(LootItem.COIN, 20)
+        self.lootpool.add_item(LootItem.FOOD, 8)
+        self.lootpool.add_item(LootItem.NONE, 72)
 
     def update(self):
         if self.__is_collision_with_snake():
@@ -35,7 +36,7 @@ class Pot(pygame.sprite.Sprite):
                         self.kill()
 
     def __is_collision_with_snake(self):
-        return self.rect and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and self.level.snake.isDeath and self.rect.colliderect(self.level.snake.blocks[0].rect)
     
     def open(self):
         self.isClosed = False
@@ -54,6 +55,7 @@ class Pot(pygame.sprite.Sprite):
 class Pot_group(pygame.sprite.AbstractGroup):
     def __init__(self, level, pots_pos) -> None:
         super().__init__()
+        self.empty()
         for x,y in pots_pos:
             self.add(Pot(level, (x,y)))
 

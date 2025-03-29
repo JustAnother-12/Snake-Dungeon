@@ -16,6 +16,7 @@ class Wall(pygame.sprite.Sprite):
 class Walls(pygame.sprite.AbstractGroup):
     def __init__(self) -> None:
         super().__init__()
+        self.empty()
         top = TOP_BOTTOM_BORDER_TILES * TILE_SIZE
         left = LEFT_RIGHT_BORDER_TILES * TILE_SIZE
         bottom = (

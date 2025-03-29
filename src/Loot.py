@@ -42,4 +42,5 @@ class Rarity(Enum):
 class LootItem(Enum):
     FOOD = "Food"
     COIN = "Coin"
+    NONE = "Empty"
 

@@ -194,15 +194,17 @@ class SnakeBlock(pygame.sprite.Sprite):
 
     def update(self, snake, type) -> None:
         if self.timeSevered and time() - self.timeSevered > 2:
+            print(time() - self.timeSevered)
             if type == "COIN":
                 snake.level.coins.add_coin(random.randint(10, 15), self, 1)
             self.kill()
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    from states import LevelTest
+    # from states import LevelTest
+    from Level import Level
     
-    def __init__(self, level: "LevelTest.LevelTest", init_len):
+    def __init__(self, level, init_len):
         super().__init__()
         self.run_time_overriding = {}
         self.level = level
@@ -337,6 +339,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if snake_block.moving:
                 return
 
+        if self.isDeath: return
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
@@ -427,11 +430,13 @@ class Snake(pygame.sprite.AbstractGroup):
                 i.add(newBlock)  # type: ignore
 
     def split(self, index):
-        for i in range(index, len(self.blocks)):
-            if self.blocks[i].timeSevered == None:
-                self.blocks[i].timeSevered = time()
+        for block in self.blocks[index:]:
+            if block.timeSevered == None:
+                block.timeSevered = time()
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
+        if len(self.blocks) <= constant.MIN_LEN:
+            self.isDeath = True
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
@@ -480,6 +485,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def __is_collide_with_food(self):
+        if self.isDeath: return False
         list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
         if list:
             list.kill()
@@ -531,7 +537,7 @@ class GreenSnake(Snake):
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY:
+                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY/1.2:
                     block = self.blocks.pop()
                     block.kill()
                     self._out_of_bounds_time = None
@@ -563,7 +569,4 @@ class GraySnake(Snake):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_e] and self.skillCooldown > 5000:
             self.skillCooldown = 0
-            block = self.blocks.pop()
-            self._block_positions.pop()
-            self.level.coins.add_coin(random.randint(10, 15), block, 1)
-            block.kill()
+            self.split(-1)
