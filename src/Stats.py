@@ -1,4 +1,7 @@
 
+from enum import Enum
+
+
 class Stats:
     stats = {
         "SPEED": {
