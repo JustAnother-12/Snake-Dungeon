@@ -87,6 +87,7 @@ class Coin(pygame.sprite.Sprite):
 class Coins(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity: int = 0) -> None:
         super().__init__()
+        self.empty()
         self.level = level
         for _ in range(quantity):
             self.add(Coin(self.level))

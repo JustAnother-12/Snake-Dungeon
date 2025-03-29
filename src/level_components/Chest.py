@@ -1,5 +1,5 @@
 import random
-from constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
+from constant import TILE_SIZE
 from gui_element.text_class import TextElement;
 import constant
 import pixil
@@ -98,8 +98,9 @@ class Chest(pygame.sprite.Sprite):
 class Chests(pygame.sprite.AbstractGroup):
     def __init__(self, level, chests_pos) -> None:
         super().__init__()
+        self.empty()
         for x,y in chests_pos:
-            self.add(Chest(level, (x,y-TILE_SIZE)))
+            self.add(Chest(level, (x-TILE_SIZE,y-TILE_SIZE)))
 
     def update(self) -> None:
         for chest in self.sprites():

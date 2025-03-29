@@ -53,7 +53,7 @@ def get_coords_from_pixil(path, target_color):
     coords = []
     for x in range(32):
         for y in range(32):
-            pixel_color = tuple(int(val) for val in image_array[x, y])
+            pixel_color = tuple(int(val) for val in image_array[y, x])
             if target_color != None:
                 if pixel_color == target_color:
                     coords.append((x,y))

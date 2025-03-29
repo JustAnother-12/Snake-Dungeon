@@ -75,6 +75,7 @@ class Trap(pygame.sprite.Sprite):
 class Traps(pygame.sprite.AbstractGroup):
     def __init__(self, level, traps_pos) -> None:
         super().__init__()
+        self.empty()
         self.traps_pos = traps_pos
         
         # if len(self.traps_pos) == 0:

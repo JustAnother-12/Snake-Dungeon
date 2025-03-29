@@ -41,17 +41,27 @@ chest_possible_regions = [pixil.get_coords_from_pixil("game-assets/region/chest_
                           ]
 
 class RegionGenerator:
-    def __init__(self) -> None:
+    def __init__(self, has_trap = None, has_obstacle = None, has_chest = None, has_pot = None) -> None:
         self.grid = [[0 for _ in range(constant.FLOOR_TILE_SIZE)] for _ in range(constant.FLOOR_TILE_SIZE)]
+
+        self.has_trap = has_trap if has_trap != None else random.choice([True,False])
+        self.has_obstacle = has_obstacle if has_obstacle != None else random.choice([True,False])
+        self.has_chest = has_chest if has_chest != None else random.choice([True,False])
+        self.has_pot = has_pot if has_pot != None else random.choice([True,False])
+
         self.pots_initpos = []
         self.obstacles_initpos = []
         self.traps_initpos = []
         self.chests_initpos = []
 
-        self.get_trap_region()
-        self.get_obstacle_region()
-        self.get_pot_region()
-        self.get_chest_region()
+        if self.has_trap:
+            self.get_trap_region()
+        if self.has_obstacle:
+            self.get_obstacle_region()
+        if self.has_pot:
+            self.get_pot_region()
+        if self.has_chest:
+            self.get_chest_region()
         
 
     def region_overlaped(self,x,y):
