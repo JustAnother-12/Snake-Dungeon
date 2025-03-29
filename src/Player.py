@@ -210,8 +210,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    # from states import LevelTest
-    from Level import Level
+    from states import LevelTest
     
     def __init__(self, level, init_len):
         super().__init__()
@@ -235,6 +234,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         self._block_positions = []
         self._last_direction = Vector2(0, 0)
+
+        self.auto_state = True
+        self.manual_state = False
 
         self._will_go_out_of_bounds = False
         # thời gian mà đầu con rắn ra khỏi bound
@@ -331,13 +333,14 @@ class Snake(pygame.sprite.AbstractGroup):
             if (
                 keys[key]
                 and self._last_direction != -direction
-                and self._last_direction != direction
+                and ((self.auto_state and self._last_direction != direction) or not self.auto_state)
                 and (self._block_positions[1] - self._block_positions[0]).normalize()
                 != direction
-            ):
+            ):  
                 self.direction = direction
+                if self.manual_state:
+                    self.handle_movement()
                 break
-
         if keys[pygame.K_SPACE]:
             self.is_speed_boost = True
         else:
@@ -400,7 +403,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self.previous_time = pygame.time.get_ticks()
         self.handle_severed_blocks()
         self.handle_input()
-        self.handle_movement()
+        if self.auto_state:
+            self.handle_movement()
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()

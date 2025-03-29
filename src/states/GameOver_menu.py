@@ -1,8 +1,6 @@
-from operator import truediv
 from states.Menu import Menu
 from states.state import State
 from gui_element.button_class import ButtonElement
-from gui_element.Sprite_image import ImageElement
 from gui_element.text_class import TextElement
 
 
