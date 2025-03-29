@@ -1,8 +1,9 @@
 import pygame
 import sys
-from states import Main_menu
-from states.state import State
-import constant
+import config.constant as constant
+
+from ui.screens.game_menu import MainMenu
+from ui.screens.state import State
 
 class Game:
     def __init__(self):
@@ -51,7 +52,7 @@ class Game:
         sys.exit()
 
     def load_states(self):
-        self.Loading = Main_menu.Main_menu(self)
+        self.Loading = MainMenu(self)
         self.state_stack.append(self.Loading)
 
 if __name__ == '__main__':
