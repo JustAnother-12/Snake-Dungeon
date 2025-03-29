@@ -14,6 +14,7 @@ from states.GameOver_menu import GameOver_menu
 from states.state import State
 from states.Pause_menu import Pause_menu
 from states.RoomCleared import RoomCleared
+from gui_element.text_class import TextElement
 import constant
 from HUD import HUD
 from region_generator import RegionGenerator
@@ -43,18 +44,22 @@ class LevelTest(State):
         self.bombs = Bomb_group(self, 5) 
         self.walls = Walls()
         
+        self.currentRoom = 1
         self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
+        self.roomText = TextElement("ROOM "+str(self.currentRoom),"white", 15, (int(constant.SCREEN_WIDTH_TILES/2))*constant.TILE_SIZE, constant.TILE_SIZE, 'center')
+
         self.is_paused = False
         self.is_finished = False
         self.timer = time() 
-        self.add(self.hud, self.walls, self.traps, self.obstacles,
+        
+        self.add(self.roomText, self.hud, self.walls, self.traps, self.obstacles,
                  self.foods, self.chests, self.pots, self.coins, self.bombs, self.keys, self.snake)
         
-    def reset_level(self):
+    def reset_room(self):
         self.snake.auto_state, self.snake.manual_state = True, False
         self.timer = time()
         self.is_finished = False
-        self.remove(self.foods, self.traps, self.chests, self.pots, self.obstacles, self.keys, self.coins, self.bombs, self.walls, self.snake)
+        self.remove(self.foods, self.traps, self.chests, self.pots, self.obstacles, self.keys, self.coins, self.bombs, self.walls, self.snake, self.roomText)
         self.foods = Food_Group(self)
 
         self.region_generator = RegionGenerator()
@@ -67,7 +72,10 @@ class LevelTest(State):
         self.coins = Coins(self)
         self.bombs = Bomb_group(self, 5) 
         self.walls = Walls()
-        self.add(self.foods, self.traps, self.chests, self.pots, self.obstacles, self.keys, self.coins, self.bombs, self.walls, self.snake)
+
+        self.currentRoom +=1
+        self.roomText = TextElement("ROOM "+str(self.currentRoom),"white", 15, (int(constant.SCREEN_WIDTH_TILES/2))*constant.TILE_SIZE, constant.TILE_SIZE, 'center')
+        self.add(self.roomText,self.foods, self.traps, self.chests, self.pots, self.obstacles, self.keys, self.coins, self.bombs, self.walls, self.snake)
 
     def reset(self):
         self.init()
@@ -79,7 +87,7 @@ class LevelTest(State):
             
         if self.is_finished:
             self.snake.auto_state, self.snake.manual_state = False, True
-            # self.reset_level()
+            # self.reset_room()
         if pygame.key.get_just_pressed()[pygame.K_ESCAPE]:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Pause_menu(self.game))
@@ -101,10 +109,7 @@ class LevelTest(State):
 
         if self.snake.isDeath:
             self.game.state_stack[-1].visible = False
-            self.game.state_stack.append(GameOver_menu(self.game))
-
-    def drawRoomCleared(self):
-        pass
+            self.game.state_stack.append(GameOver_menu(self.game))        
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")
