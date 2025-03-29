@@ -6,6 +6,7 @@ from operator import le
 from pdb import run
 import random
 from re import I
+from traceback import print_tb
 from turtle import st
 from typing import Any, Literal
 import pygame
@@ -202,6 +203,7 @@ class SnakeBlock(pygame.sprite.Sprite):
 
     def update(self, snake, type) -> None:
         if self.timeSevered and time() - self.timeSevered > 2:
+            print(time() - self.timeSevered)
             if type == "COIN":
                 snake.level.coins.add_coin(random.randint(10, 15), self, 1)
             self.kill()
@@ -435,9 +437,9 @@ class Snake(pygame.sprite.AbstractGroup):
                 i.add(newBlock)  # type: ignore
 
     def split(self, index):
-        for i in range(index, len(self.blocks)):
-            if self.blocks[i].timeSevered == None:
-                self.blocks[i].timeSevered = time()
+        for block in self.blocks[index:]:
+            if block.timeSevered == None:
+                block.timeSevered = time()
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
 
@@ -571,7 +573,4 @@ class GraySnake(Snake):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_e] and self.skillCooldown > 5000:
             self.skillCooldown = 0
-            block = self.blocks.pop()
-            self._block_positions.pop()
-            self.level.coins.add_coin(random.randint(10, 15), block, 1)
-            block.kill()
+            self.split(-1)
