@@ -26,7 +26,7 @@ class LevelTest(State):
     def init(self):
         from Player import Snake, GreenSnake, OrangeSnake, GraySnake
         self.remove(self.sprites())
-        self.snake = GreenSnake(self, 5)
+        self.snake = Snake(self, 5)
 
         self.foods = Food_Group(self)
 
