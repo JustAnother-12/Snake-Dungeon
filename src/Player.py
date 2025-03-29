@@ -237,6 +237,9 @@ class Snake(pygame.sprite.LayeredUpdates):
         self._last_direction = Vector2(0, 0)
         self.is_curling = False
 
+        self.auto_state = True
+        self.manual_state = False
+
         self._will_go_out_of_bounds = False
         # thời gian mà đầu con rắn ra khỏi bound
         self._out_of_bounds_time = None
@@ -332,18 +335,19 @@ class Snake(pygame.sprite.LayeredUpdates):
             if (
                 keys[key]
                 and self._last_direction != -direction
-                and (self._last_direction != direction or self.is_curling)
+                and (((self.auto_state and self._last_direction != direction or self.is_curling)) or not self.auto_state)
                 and (
                     self._block_positions[1] - self._block_positions[0] == Vector2(0, 0)
                     or (self._block_positions[1] - self._block_positions[0]).normalize()
                     != direction
                 )
-            ):
+            ):  
                 self.direction = direction
                 self._last_direction = self.direction
                 self.is_curling = False
+                if self.manual_state:
+                    self.handle_movement()
                 break
-
         if keys[pygame.K_SPACE]:
             self.is_speed_boost = True
         else:
@@ -408,7 +412,8 @@ class Snake(pygame.sprite.LayeredUpdates):
         self.previous_time = pygame.time.get_ticks()
         self.handle_severed_blocks()
         self.handle_input()
-        self.handle_movement()
+        if self.auto_state:
+            self.handle_movement()
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()
