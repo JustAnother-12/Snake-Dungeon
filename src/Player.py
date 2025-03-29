@@ -348,6 +348,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if snake_block.moving:
                 return
 
+        if self.isDeath: return
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
@@ -443,6 +444,8 @@ class Snake(pygame.sprite.AbstractGroup):
                 block.timeSevered = time()
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
+        if len(self.blocks) <= constant.MIN_LEN:
+            self.isDeath = True
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
@@ -491,6 +494,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def __is_collide_with_food(self):
+        if self.isDeath: return False
         list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
         if list:
             list.kill()
