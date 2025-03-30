@@ -29,7 +29,7 @@ class LevelTest(State):
     def init(self):
         from Player import Snake, GreenSnake, OrangeSnake, GraySnake
         self.remove(self.sprites())
-        self.snake = Snake(self, 5)
+        self.snake = GreenSnake(self, 5)
 
         self.foods = Food_Group(self)
 
@@ -45,7 +45,7 @@ class LevelTest(State):
         self.walls = Walls()
         
         self.currentRoom = 1
-        self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
+        self.hud = HUD(self.snake.gold, self.snake, self.snake.keys)
         self.roomText = TextElement("ROOM "+str(self.currentRoom),"white", 15, (int(constant.SCREEN_WIDTH_TILES/2))*constant.TILE_SIZE, constant.TILE_SIZE, 'center')
 
         self.is_paused = False
