@@ -72,16 +72,16 @@ class Trap(pygame.sprite.Sprite):
         return pygame.sprite.spritecollideany(self, self.level.snake.blocks) # type: ignore
 
 
-class Traps(pygame.sprite.AbstractGroup):
-    def __init__(self, level, traps_pos) -> None:
-        super().__init__()
-        self.empty()
-        self.traps_pos = traps_pos
+# class TrapGroup(pygame.sprite.AbstractGroup):
+#     def __init__(self, level, traps_pos) -> None:
+#         super().__init__()
+#         self.empty()
+#         self.traps_pos = traps_pos
         
-        # if len(self.traps_pos) == 0:
-        for x,y in self.traps_pos:
-            self.add(Trap(level, (x,y)))
+#         # if len(self.traps_pos) == 0:
+#         for x,y in self.traps_pos:
+#             self.add(Trap(level, (x,y)))
 
-    def update(self) -> None:
-        for trap in self.sprites():
-            trap.update()
+#     def update(self) -> None:
+#         for trap in self.sprites():
+#             trap.update()

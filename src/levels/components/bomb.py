@@ -62,7 +62,7 @@ class Bomb(pygame.sprite.Sprite):
         if not self.activeTime:
             self.activeTime = time()
 
-class Bomb_group(pygame.sprite.AbstractGroup):
+class BombGroup(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity = 0) -> None:
         super().__init__()
         self.empty()

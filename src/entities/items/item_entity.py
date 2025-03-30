@@ -7,19 +7,24 @@ import pygame
 from config import constant
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory
+import levels.level
+from ui.screens.item_info_popup import ItemInfoPopup
 from utils import pixil
 
 
 class ItemEntity(pygame.sprite.Sprite):
     from entities.items.item_type import ItemType
-    def __init__(self, level, item_type: ItemType, area=None, r=2, quantity=1):
+    import levels
+    def __init__(self, level: "levels.level.Level", item_type: ItemType, area=None, r=2, quantity=1):
         super().__init__()
         self.level = level
         self.item_type = item_type
         self.quantity = quantity
-        self.image = pixil.Pixil.load(item_type.texture_path, 1).frames[0]
+        self._image = pixil.Pixil.load(item_type.texture_path, 1).frames[0]
+        self.image = self._image.copy()
         self.random_pos(area, r)
-        self.rect = self.image.get_rect(center=self.pos)
+        self.rect = self.image.get_rect(topleft=self.pos)
+        
         
         # Interaction properties
         self.interaction_radius = constant.TILE_SIZE * 2  # 2 tiles radius
@@ -139,12 +144,12 @@ class ItemEntity(pygame.sprite.Sprite):
         """Update item state"""
         # For INSTANT items, use collision detection
         if self.item_type.category == ItemCategory.INSTANT:
-            if pygame.sprite.spritecollideany(self, self.level.snake.blocks):
+            if pygame.sprite.spritecollideany(self, self.level.snake.blocks): # type: ignore
                 self.on_collision()
                 return
         
         # For other items, check if in interaction range
-        head_pos = self.level.snake.blocks.sprites()[0].rect.center
+        head_pos = self.level.snake.blocks[0].rect.center
         distance = pygame.math.Vector2(head_pos).distance_to(
             pygame.math.Vector2(self.rect.center) # type: ignore
         )
@@ -155,19 +160,20 @@ class ItemEntity(pygame.sprite.Sprite):
         
         # Just entered range - add to interaction manager
         if self.in_range and not was_in_range:
-            self.level.interaction_manager.add_item(self)
+            self.level.interaction_manager.register_interact(self)
             
         # Just left range - remove from interaction manager
         elif not self.in_range and was_in_range:
-            self.level.interaction_manager.remove_item(self)
+            self.level.interaction_manager.remove_register_interact(self)
             
         # Animate highlight effect
         self.pulse_animation = (self.pulse_animation + 0.05) % (2 * 3.14159)
 
-    def draw(self, surface):
-        """Draw item with highlight if in range"""
+        self.update_img()
+
+    def update_img(self):
         # Draw the item itself
-        surface.blit(self.image, self.rect)
+        self.image = self._image.copy()
         
         # Draw highlight effect if in range
         if self.in_range:
@@ -176,17 +182,12 @@ class ItemEntity(pygame.sprite.Sprite):
             self.highlight_effect.set_alpha(alpha) # type: ignore
             
             # Position highlight behind item
-            highlight_rect = self.highlight_effect.get_rect(center=self.rect.center) # type: ignore
-            surface.blit(self.highlight_effect, highlight_rect)
+            highlight_rect = self.highlight_effect.get_rect(center=self._image.get_rect().center) # type: ignore
+            self.image.blit(self.highlight_effect, highlight_rect) # type: ignore
     
     def on_pickup(self):
         """Called when player picks up the item"""
-        item_stack = self.to_item_stack()
-        added = self.level.snake.add_item(item_stack)
-        if added:
-            self.kill()
-            # Play pickup sound
-            pygame.mixer.Sound("game-assets/audio/pickup.wav").play()
-        else:
-            pass
-            # TODO: làm thông báo là 
+        pass
+        # TODO: hiển thị thông popup 
+        self.level.game.state_stack.append(ItemInfoPopup(self.level, self))
+        # print("aloooo")

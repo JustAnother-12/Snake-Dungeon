@@ -1,5 +1,5 @@
 import pygame
-from levels.level_test import LevelTest
+from levels.level import Level
 from ui.elements.button import ButtonElement
 from ui.screens.menu import Menu
 from utils.pixil import Pixil
@@ -36,11 +36,11 @@ class MainMenu(Menu):
     def get_event(self, event):
         super().get_event(event)
         if (self.game.selectBtnMode == "mouse" and event.type == pygame.MOUSEBUTTONDOWN) or (self.game.selectBtnMode == "key" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
-            if self.play_button.on_click():
+            if self.play_button.on_hover():
                 self.music.fadeout(5000)
-                new_state = LevelTest(self.game)
+                new_state = Level(self.game)
                 new_state.enter_state()
-            if self.quit_button.on_click():
+            if self.quit_button.on_hover():
                 self.game.running = False
                 self.game.playing = False
 

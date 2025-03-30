@@ -35,22 +35,22 @@ class Pause_menu(Menu):
     def get_event(self, event):
         super().get_event(event)
         if (self.game.selectBtnMode == "mouse" and event.type == pygame.MOUSEBUTTONDOWN) or (self.game.selectBtnMode == "key" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
-            if self.restart_button.on_click():
+            if self.restart_button.on_hover():
                 self.game.state_stack.pop()
                 self.game.state_stack[-1].reset()
                 self.game.state_stack[-1].visible = True
 
-            if self.continue_button.on_click():
+            if self.continue_button.on_hover():
                 self.game.state_stack.pop()
                 self.game.state_stack[-1].visible = True
 
-            if self.stats_button.on_click():
+            if self.stats_button.on_hover():
                 new_state = Stats_menu(self.game)
                 self.game.state_stack.pop()
                 new_state.enter_state()
                 self.game.state_stack[-1].visible = True
             
-            if self.main_menu_button.on_click():
+            if self.main_menu_button.on_hover():
                 while len(self.game.state_stack) > 1:
                     self.game.state_stack.pop()
                 self.game.state_stack[-1].reset()

@@ -95,7 +95,7 @@ class Chest(pygame.sprite.Sprite):
                     self.level.add(self.LockedText)
                     self.TextTime = time()
 
-class Chests(pygame.sprite.AbstractGroup):
+class ChestGroup(pygame.sprite.AbstractGroup):
     def __init__(self, level, chests_pos) -> None:
         super().__init__()
         self.empty()

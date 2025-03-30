@@ -41,7 +41,7 @@ class ButtonElement(pygame.sprite.Sprite):
             return self.isSelected == -1
         return False
     
-    def on_click(self) -> bool:
+    def on_hover(self) -> bool:
         return self.checkForInputs(pygame.mouse.get_pos()) or self.isSelected == 1
     
     def set_selected(self, mode):

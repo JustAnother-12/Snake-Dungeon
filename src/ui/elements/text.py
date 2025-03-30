@@ -8,7 +8,7 @@ class TextElement(pygame.sprite.Sprite):
     def __init__(self, 
                  text: str, 
                  color: pygame.typing.ColorLike, 
-                 size: int, 
+                 font_size: int, 
                  x_pos: int, 
                  y_pos: int, 
                  choice: Literal["midleft", "center", "midright"] = "midleft", 
@@ -17,7 +17,7 @@ class TextElement(pygame.sprite.Sprite):
         super().__init__()
         self.text = text
         self.color = color
-        self.size = size
+        self.size = font_size
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.__render_text(choice, width)

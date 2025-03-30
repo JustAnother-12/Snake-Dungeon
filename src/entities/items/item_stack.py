@@ -1,18 +1,19 @@
 
 
 import time
+from typing import Any, Callable
 
-from entities.items.item_type import ItemCategory
+from entities.items.item_type import ItemCategory, ItemType
 
+F = Callable[[Any], Any]
 
 class ItemStack:
     """Item Stack - Đại diện cho vật phẩm trong inventory có khả năng ghi đè runtime"""
-    def __init__(self, item_type, quantity=1):
+    def __init__(self, item_type: ItemType, quantity=1):
         self.item_type = item_type
         self.quantity = min(quantity, item_type.max_stack) if item_type.max_stack > 0 else quantity
         self.active = False
         self.last_used_time = 0
-        self.run_time_overriding = {}
 
     def use(self, snake):
         """Sử dụng item"""

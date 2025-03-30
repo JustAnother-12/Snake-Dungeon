@@ -75,7 +75,7 @@ class Food(pygame.sprite.Sprite):
                 self.random_pos(area)
 
 
-class Food_Group(pygame.sprite.AbstractGroup):
+class FoodGroup(pygame.sprite.AbstractGroup):
     def __init__(self, level) -> None:
         super().__init__()
         self.empty()

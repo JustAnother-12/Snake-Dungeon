@@ -28,10 +28,10 @@ class ItemType:
     category: ItemCategory
     rarity: Rarity
     texture_path: str
+    description: str = ""
     max_stack: int = 1
     value: int = 1
-    colldown: float = 0
-    description: str = ""
+    cooldown: float = 0
     price: int = 0
     
     def __eq__(self, value: object) -> bool:

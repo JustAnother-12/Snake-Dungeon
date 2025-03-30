@@ -6,6 +6,9 @@ import pygame
 from time import time
 from pygame.math import Vector2
 
+from entities.items.item_stack import ItemStack
+from entities.items.coin import CoinEntity
+from entities.items.item_type import ItemCategory
 import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
@@ -117,15 +120,16 @@ class SnakeBlock(pygame.sprite.Sprite):
         if self.timeSevered and time() - self.timeSevered > 2:
             print(time() - self.timeSevered)
             if type == "COIN":
-                snake.level.coins.add_coin(random.randint(10, 15), self, 1)
+                # snake.level.coins.add_coin(random.randint(10, 15), self, 1)
+                for _ in range(random.randint(10, 15)):
+                    snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))
             self.kill()
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    # from states import LevelTest
     from levels.level import Level
     
-    def __init__(self, level, init_len):
+    def __init__(self, level: Level, init_len):
         self.run_time_overriding = {}
         super().__init__()
         self.level = level
@@ -142,7 +146,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.keys = 0
         self.direction = Vector2(1, 0)
         self.base_stats = base_stats_value()
-        self.items: list[ItemStack] = []
+        # self.items: list[ItemStack] = []
         self.color = getattr(self, "color", pygame.Color(255, 139, 38))
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         self._block_positions = []
@@ -153,7 +157,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self._out_of_bounds_time = None
         self._init_snake_blocks(init_len)
 
-        # self.add_item(TestItem())
+        self.skill_slot: list[ItemStack | None] = [None, None]
+        self.item_slot: list [ItemStack | None] = [None, None, None]
 
     # NOTE: Intercept method calls to apply runtime overrides
     def __getattribute__(self, name: str) -> Any:
@@ -192,6 +197,27 @@ class Snake(pygame.sprite.AbstractGroup):
         except AttributeError:
             # Handle case where attribute doesn't exist
             raise
+    
+    def add_item(self, item: ItemStack):
+        if item.item_type.category == ItemCategory.EQUIPMENT:
+            for index, value in enumerate(self.skill_slot):
+                if not value is None: continue
+                self.skill_slot[index] = item
+                break
+            return
+        
+        for index, value in enumerate(self.item_slot):
+            if not value is None:
+                continue
+            self.item_slot[index] = item
+            break
+
+    def remove_item(self, item: ItemStack):
+        if item.item_type.category == ItemCategory.EQUIPMENT:
+            self.skill_slot.remove(item)
+            return
+        
+        self.item_slot.remove(item)
 
     def __len__(self):
         return len(self.blocks)
@@ -213,20 +239,9 @@ class Snake(pygame.sprite.AbstractGroup):
         for block in self.blocks[::-1]:
             self.add(block)
 
-    def add_item(self, item: ItemStack):
-        self.items.append(item)
-        item.on_add(self)
-
-    def remove_item(self, item: ItemStack):
-        self.items.remove(item)
-        item.on_remove(self)
-
-    # def update_items(self):
-    #     for item in self.items:
-    #         item.check_input
-
     def handle_input(self):
         keys = pygame.key.get_pressed()
+        just_keys = pygame.key.get_just_pressed()
 
         key_map = {
             pygame.K_LEFT: Vector2(-1, 0),
@@ -254,6 +269,8 @@ class Snake(pygame.sprite.AbstractGroup):
             self.is_speed_boost = True
         else:
             self.is_speed_boost = False
+
+        
 
     def handle_movement(self):
         for snake_block in self.blocks:
@@ -291,8 +308,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self._collide_with_active_trap()
         self._collide_with_bomb()
 
-        if self.__is_collide_with_food():
-            self.grow_up(1)
+        # NOTE: Bây giời cái này ở food rồi 
+        # if self.__is_collide_with_food():
+        #     self.grow_up(1)
 
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
@@ -372,7 +390,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 self.stamina += 1
 
     def _is_collide_with_Obstacle(self):
-        for obstacle in self.level.obstacles:
+        for obstacle in self.level.obstacle_group:
             obstacle: Obstacle
             if obstacle.rect.colliderect((self._block_positions[0][0], self._block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)):  # type: ignore
                 return True
@@ -392,7 +410,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def _is_collide_with_wall(self):
-        for wall in self.level.walls:
+        for wall in self.level.wall_group:
             wall: Wall
             if wall.rect and wall.rect.colliderect(
                 (
@@ -405,13 +423,13 @@ class Snake(pygame.sprite.AbstractGroup):
                 return True
         return False
 
-    def __is_collide_with_food(self):
-        if self.isDeath: return False
-        list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
-        if list:
-            list.kill()
-            return True
-        return False
+    # def __is_collide_with_food(self):
+    #     if self.isDeath: return False
+    #     # list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
+    #     # if list:
+    #     #     list.kill()
+    #     #     return True
+    #     return False
 
     def _collide_with_active_trap(self):
         pos = None
@@ -419,7 +437,7 @@ class Snake(pygame.sprite.AbstractGroup):
             block = self.blocks[i]
             if pygame.sprite.spritecollideany(
                 block,
-                self.level.traps,
+                self.level.trap_group,
                 lambda x, y: x.rect.colliderect(y.rect)
                 and getattr(y, "isActive", False),
             ):
@@ -429,19 +447,21 @@ class Snake(pygame.sprite.AbstractGroup):
             self.split(pos)
 
     def _collide_with_bomb(self):
-        pos = None
-        for i in range(len(self.blocks)):
-            block = self.blocks[i]
-            if pygame.sprite.spritecollideany(
-                block,
-                self.level.bombs,
-                lambda x, y: x.rect.colliderect(y.rect)
-                and time() - float(getattr(y, "activeTime", "inf") or "inf") > 0.6,
-            ):
-                block.kill()
-                pos = i if pos == None else pos
-        if pos != None:
-            self.split(pos)
+        # pos = None
+        # for i in range(len(self.blocks)):
+        #     block = self.blocks[i]
+        #     if pygame.sprite.spritecollideany(
+        #         block,
+        #         self.level.,
+        #         lambda x, y: x.rect.colliderect(y.rect)
+        #         and time() - float(getattr(y, "activeTime", "inf") or "inf") > 0.6,
+        #     ):
+        #         block.kill()
+        #         pos = i if pos == None else pos
+        # if pos != None:
+        #     self.split(pos)
+        pass
+        # TODO: xiu nghĩ: để bomb trong nhóm nào là hợp lý hay tạo một nhóm mới luân
 
     def handle_skills(self, dt):
         pass
@@ -449,8 +469,8 @@ class Snake(pygame.sprite.AbstractGroup):
 
 class GreenSnake(Snake):
 
-    from levels import level_test
-    def __init__(self, level: "level_test.LevelTest", init_len):
+    from levels import level
+    def __init__(self, level: "level.Level", init_len):
         self.color = pygame.Color("#0abf2b")
         self.headImg = Pixil.load("game-assets/graphics/pixil/SNAKE_HEAD.pixil", 1).frames[1]
         super().__init__(level, init_len)
@@ -469,15 +489,15 @@ class GreenSnake(Snake):
             self._out_of_bounds_time = None
 
 class OrangeSnake(Snake):
-    from levels import level_test
-    def __init__(self, level: "level_test.LevelTest", init_len):
+    from levels import level
+    def __init__(self, level: "level.Level", init_len):
         self.color = pygame.Color("#d3d3d3")
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
         super().__init__(level, init_len)
 
 class GraySnake(Snake):
-    from levels import level_test
-    def __init__(self, level: "level_test.LevelTest", init_len):
+    from levels import level
+    def __init__(self, level: "level.Level", init_len):
         self.color = pygame.Color("#d3d3d3")
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[2]
         super().__init__(level, init_len)
