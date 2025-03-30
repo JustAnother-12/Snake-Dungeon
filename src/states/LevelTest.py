@@ -1,4 +1,5 @@
 from __future__ import annotations
+from math import floor
 import pygame
 from Stats import Stats
 from level_components.Trap import Traps
@@ -9,6 +10,7 @@ from level_components.Pot import Pot_group
 from level_components.Wall import Walls
 from level_components.Bomb import Bomb_group
 from level_components.Obstacle import Obstacle_group
+from level_components.floor_tile import Floor, Floor_Tile
 from states import RoomCleared
 from states.GameOver_menu import GameOver_menu
 from states.state import State
@@ -50,9 +52,9 @@ class LevelTest(State):
 
         self.is_paused = False
         self.is_finished = False
-        self.timer = time() 
-        
-        self.add(self.roomText, self.hud, self.walls, self.traps, self.obstacles,
+        self.timer = time()
+        self.floor = Floor()
+        self.add(self.floor, self.hud, self.walls, self.traps, self.obstacles,
                  self.foods, self.chests, self.pots, self.coins, self.bombs, self.keys, self.snake)
         
     def reset_room(self):
@@ -111,24 +113,27 @@ class LevelTest(State):
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))        
 
-    def draw_grid(self, surface: pygame.Surface):
-        surface.fill("black")
-        pygame.draw.rect(
-            surface,
-            (51, 54, 71),
-            (
-                constant.MAP_LEFT,
-                constant.MAP_TOP,
-                constant.MAP_WIDTH,
-                constant.MAP_HEIGHT,
-            ),
-        )
-        for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
-        for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
+    def drawRoomCleared(self):
+        pass
+
+    # def draw_grid(self, surface: pygame.Surface):
+    #     surface.fill("black")
+    #     pygame.draw.rect(
+    #         surface,
+    #         (51, 54, 71),
+    #         (
+    #             constant.MAP_LEFT,
+    #             constant.MAP_TOP,
+    #             constant.MAP_WIDTH,
+    #             constant.MAP_HEIGHT,
+    #         ),
+    #     )
+    #     for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
+    #     for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
     def draw_stamina(self, surface: pygame.Surface):
         if self.snake.stamina > 0:
@@ -146,7 +151,7 @@ class LevelTest(State):
         )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
-        self.draw_grid(surface)
+        # self.draw_grid(surface)
         self.draw_stamina(surface)
 
         return super().draw(surface)
