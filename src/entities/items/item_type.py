@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from unicodedata import category
 
+from utils import pixil
+
 
 class Rarity(Enum):
     COMMON = "Common"
@@ -22,12 +24,18 @@ class ItemCategory(Enum):
     EQUIPMENT = auto()
 
 @dataclass
+class ItemTexture:
+    pixil_path: str
+    frame: int = 0
+    scale: int = 1
+
+@dataclass
 class ItemType:
     id: str
     name: str
     category: ItemCategory
     rarity: Rarity
-    texture_path: str
+    texture: ItemTexture
     description: str = ""
     max_stack: int = 1
     value: int = 1

@@ -2,6 +2,7 @@
 
 import time
 from typing import Any, Callable
+import typing
 
 from entities.items.item_type import ItemCategory, ItemType
 
@@ -54,3 +55,18 @@ class ItemStack:
         return (self.item_type.id == other.item_type.id and 
                 self.item_type.category == ItemCategory.CONSUMABLE and
                 self.quantity < self.item_type.max_stack)
+        
+    def add_runtime_overriding(self, snake, fun_name: str, pos: typing.Literal['after', 'return', 'before'], fun):
+        if fun_name not in snake.run_time_overriding:
+            snake.run_time_overriding[fun_name] = {
+                "after": [],
+                "return" : [],
+                "before" : []
+            }
+        
+        snake.run_time_overriding[fun_name][pos].append(fun)
+    
+    def remove_runtime_overriding(self,snake, fun_name: str, pos: typing.Literal['after', 'return', 'before'], fun):
+        if fun_name in snake.run_time_overriding:
+            if fun in snake.run_time_overriding[fun_name][pos]:
+                snake.run_time_overriding[fun_name][pos].remove( fun)

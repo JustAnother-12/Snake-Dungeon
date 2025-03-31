@@ -6,11 +6,11 @@ import config.constant as constant
 from entities.items.TestItem import ShieldEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
+from entities.items.key import KeyEntity
+from entities.items.speed_boot import SpeedBootEntity
 from levels.components.bomb import BombGroup
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
-from levels.components.food import FoodGroup
-from levels.components.key import Keys
 from levels.components.obstacle import Obstacle, Obstacle_group
 from levels.components.pot import Pot, Pot_group
 from levels.components.trap import Trap
@@ -31,50 +31,43 @@ class Level(State):
 
     def init(self):
         from entities.Player import Snake, GreenSnake, OrangeSnake, GraySnake
+        # Clear previous state
         self.empty()
+        self.remove(self.sprites())
+        
+        # Game state
         self.is_paused = False
         self.is_finished = False
-        self.timer = time() 
-        self.interaction_manager = InteractionManager(self)
-
-        self.remove(self.sprites())
+        self.timer = time()
+        
+        # Main entities
         self.snake = GreenSnake(self, 5)
-        # self.hud = HUD(self.snake.gold, len(self.snake), self.snake.keys)
         self.hud = HUD(self)
+        self.interaction_manager = InteractionManager(self)
+        
+        # Environment groups
         self.wall_group = Walls()
-
-        # self.foods = Food_Group(self)
         self.obstacle_group = pygame.sprite.Group()
         self.trap_group = pygame.sprite.Group()
         self.pot_group = pygame.sprite.Group()
+        
+        # Items
         self.item_group = pygame.sprite.Group()
-
-        # TODO: test
-        for i in range(4):
-            coin = CoinEntity(self)
-            self.item_group.add(coin)
+        # self.item_group.add(ShieldEntity(self))
         
-        for i in range(2):
-            food = FoodEntity(self)
-            self.item_group.add(food)
-        
-        self.item_group.add(ShieldEntity(self))
-
-        # end test
-
+        # Generate level components
         self.generator()
-
+        
+        # Add all components to the level
         self.add(
             Floor(),
+            self.wall_group,
             self.obstacle_group,
             self.trap_group,
             self.pot_group,
-            
-            self.wall_group,
             self.snake,
             self.item_group,
             self.hud,
-            
         )
         
     def generator(self):
@@ -98,6 +91,26 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
+        
+        # tạo item
+        for i in range(10):
+            coin = CoinEntity(self)
+            self.item_group.add(coin)
+        
+        for i in range(10):
+            food = FoodEntity(self)
+            self.item_group.add(food)
+        
+        for i in range(10):
+            key = KeyEntity(self)
+            self.item_group.add(key)
+        
+        for i in range(10):
+            item = ShieldEntity(self)
+            self.item_group.add(item)
+        for i in range(100):
+            self.item_group.add(SpeedBootEntity(self))
+
     def reset(self):
         self.init()
     
@@ -120,7 +133,7 @@ class Level(State):
 
         self.__dev_test()
 
-        if self.snake.isDeath:
+        if self.snake.is_death:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
         

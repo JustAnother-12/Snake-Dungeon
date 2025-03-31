@@ -36,7 +36,7 @@ class Pot(pygame.sprite.Sprite):
                         self.kill()
 
     def __is_collision_with_snake(self):
-        return self.rect and not self.level.snake.isDeath and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and not self.level.snake.is_death and self.rect.colliderect(self.level.snake.blocks[0].rect)
     
     def open(self):
         self.isClosed = False
@@ -44,9 +44,11 @@ class Pot(pygame.sprite.Sprite):
         if item == LootItem.COIN:
             # self.level.coins.add_coin(random.randint(1, 3), self, 1)
             pass
-            # TODO: 
+            # TODO: tạo một class tính tỉ lệ rơi vật phẩm
         elif item == LootItem.FOOD:
-            self.level.foods.add_food(self)
+            # self.level.foods.add_food(self)
+            # TODO:
+            pass
         if self.collision_time == None:
             self.collision_time = time()
 

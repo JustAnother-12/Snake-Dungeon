@@ -130,40 +130,54 @@ class Snake(pygame.sprite.AbstractGroup):
     # from states import LevelTest
     
     def __init__(self, level, init_len):
-        super().__init__()
+        # Initialize base components
         self.run_time_overriding = {}
         super().__init__()
+
+        # Visual appearance
+        self.color = getattr(self, "color", pygame.Color(255, 139, 38))
+        self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
+        
+        # Item and skill management
+        self.skill_slot: list[ItemStack | None] = [None, None]
+        self.item_slot: list [ItemStack | None] = [None, None, None]
         self.level = level
+
+        # Movement and stamina attributes
         self.max_stamina = 10 * constant.TILE_SIZE
         self.stamina = 10 * constant.TILE_SIZE
         self.is_speed_boost = False
         self.speed_cool_down = 0
-        self.isDeath = False
-        self.coins = 0
-        self.previous_time = pygame.time.get_ticks()
-        self.blocks: list[SnakeBlock] = []
         self.base_speed = 16
-        self.gold = 0
-        self.keys = 0
-        self.direction = Vector2(1, 0)
-        self.base_stats = base_stats_value()
-        # self.items: list[ItemStack] = []
-        self.color = getattr(self, "color", pygame.Color(255, 139, 38))
-        self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
+        self.previous_time = pygame.time.get_ticks()
+        
+        # Snake state
+        self.is_death = False
+        self.blocks: list[SnakeBlock] = []
         self._block_positions = []
+        
+        # Direction handling
+        self.direction = Vector2(1, 0)
         self._last_direction = Vector2(0, 0)
         self.is_curling = False
 
+        # Movement control modes
         self.auto_state = True
         self.manual_state = False
 
+        # Out-of-bounds handling
         self._will_go_out_of_bounds = False
-        # thời gian mà đầu con rắn ra khỏi bound
         self._out_of_bounds_time = None
+
+        # Player resources
+        self.coins = 0
+        self.gold = 0
+        self.keys = 0
+        self.base_stats = base_stats_value()
+
+        # Initialize the snake blocks
         self._init_snake_blocks(init_len)
 
-        self.skill_slot: list[ItemStack | None] = [None, None]
-        self.item_slot: list [ItemStack | None] = [None, None, None]
 
     # NOTE: Intercept method calls to apply runtime overrides
     def __getattribute__(self, name: str) -> Any:
@@ -204,25 +218,33 @@ class Snake(pygame.sprite.AbstractGroup):
             raise
     
     def add_item(self, item: ItemStack):
-        if item.item_type.category == ItemCategory.EQUIPMENT:
-            for index, value in enumerate(self.skill_slot):
-                if not value is None: continue
-                self.skill_slot[index] = item
-                break
-            return
-        
-        for index, value in enumerate(self.item_slot):
-            if not value is None:
-                continue
-            self.item_slot[index] = item
-            break
 
-    def remove_item(self, item: ItemStack):
+        arr = self.item_slot
         if item.item_type.category == ItemCategory.EQUIPMENT:
-            self.skill_slot.remove(item)
-            return
-        
-        self.item_slot.remove(item)
+            arr = self.skill_slot
+
+        for index, value in enumerate(arr):
+            if value is None: continue
+            if value.can_stack_with(item):
+                arr[index].quantity += 1 # type: ignore
+                return 
+
+        for index, value in enumerate(arr):
+            if value is None: 
+                arr[index] = item
+                break
+                
+            
+    def remove_item(self, item: ItemStack):
+
+        arr = self.item_slot
+        if item.item_type.category == ItemCategory.EQUIPMENT:
+            arr = self.skill_slot
+
+        for index, value in enumerate(arr):
+            if value is None: break
+            if value.item_type.id == item.item_type.id: # type: ignore
+                arr[index] = None
 
     def __len__(self):
         return len(self.blocks)
@@ -236,7 +258,6 @@ class Snake(pygame.sprite.AbstractGroup):
             block = SnakeBlock(int(i==0) ,(x, y), self.color)
             self.blocks.append(block)
 
-        # self.blocks[0].image = pygame.transform.rotate(constant.HEAD_IMG, -90)
         self.blocks[0].is_head = True
 
         self._block_positions = [block.pos.copy() for block in self.blocks]
@@ -281,7 +302,6 @@ class Snake(pygame.sprite.AbstractGroup):
         else:
             self.is_speed_boost = False
         
-
         item_map = [
             pygame.K_1, 
             pygame.K_2, 
@@ -307,7 +327,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if snake_block.moving:
                 return
 
-        if self.isDeath: return
+        if self.is_death: return
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
@@ -320,7 +340,6 @@ class Snake(pygame.sprite.AbstractGroup):
         ):
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
-                # print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
                 self._out_of_bounds_time = 0
             self._will_go_out_of_bounds = True
             return
@@ -345,7 +364,7 @@ class Snake(pygame.sprite.AbstractGroup):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
                 if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY:
-                    self.isDeath = True
+                    self.is_death = True
                 else:
                     self._out_of_bounds_time += dt
         else:
@@ -353,7 +372,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def update(self):
         if len(self.blocks) <= constant.MIN_LEN:
-            self.isDeath = True
+            self.is_death = True
             return
         dt = min(pygame.time.get_ticks() - self.previous_time, 20)
         self.previous_time = pygame.time.get_ticks()
@@ -405,7 +424,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
         if len(self.blocks) <= constant.MIN_LEN:
-            self.isDeath = True
+            self.is_death = True
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
@@ -453,14 +472,6 @@ class Snake(pygame.sprite.AbstractGroup):
             ):
                 return True
         return False
-
-    # def __is_collide_with_food(self):
-    #     if self.isDeath: return False
-    #     # list = pygame.sprite.spritecollideany(self.blocks[0], self.level.foods)
-    #     # if list:
-    #     #     list.kill()
-    #     #     return True
-    #     return False
 
     def _collide_with_active_trap(self):
         pos = None

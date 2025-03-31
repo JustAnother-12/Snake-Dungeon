@@ -2,7 +2,7 @@
 from time import time
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
-from entities.items.item_type import ItemCategory, ItemType, Rarity
+from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 
 
 SHIELD_TYPE = ItemType(
@@ -10,7 +10,9 @@ SHIELD_TYPE = ItemType(
     name="Shield",
     category=ItemCategory.EQUIPMENT,
     rarity=Rarity.RARE,
-    texture_path="game-assets/graphics/pixil/BOMB_SHEET.pixil",
+    texture=ItemTexture(
+        "game-assets/graphics/pixil/BOMB_SHEET.pixil",
+    ),
     cooldown=15.0,
     description="Temporary invincibility for 3 seconds",
     price=150  # Shield is valuable!
@@ -26,24 +28,22 @@ class ShieldStack(ItemStack):
         self.shield_active = False
         self.shield_end_time = time() + 3
         
-        if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
-            snake.run_time_overriding['_is_collide_with_Obstacle'] = {
-                "after": [],
-                "return" : [],
-                "before" : []
-            }
+        # if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
+        #     snake.run_time_overriding['_is_collide_with_Obstacle'] = {
+        #         "after": [],
+        #         "return" : [],
+        #         "before" : []
+        #     }
         
-        snake.run_time_overriding['_is_collide_with_Obstacle']['after'].append(self.prevent_damage)
+        # snake.run_time_overriding['_is_collide_with_Obstacle']['after'].append(self.prevent_damage)
+        self.add_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
     
     def prevent_damage(self, snake, *args, **kwargs):
         if time() < self.shield_end_time:
             snake._will_go_out_of_bounds = False
             return False 
         else:
-            if "_is_collide_with_Obstacle" in snake.run_time_overriding:
-                if self.prevent_damage in snake.run_time_overriding["_is_collide_with_Obstacle"]["after"]:
-                    snake.run_time_overriding["_is_collide_with_Obstacle"]["after"].remove(self.prevent_damage)
-            
+            self.remove_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
             return False
     
 

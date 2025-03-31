@@ -10,21 +10,23 @@ from entities.items.item_type import ItemCategory
 class InteractionManager:
     def __init__(self, level):
         self.level = level
-        self.interactable_objs = []
+        self.__interactable_objs = []
         self.interaction_key = pygame.K_e
         self.font = pygame.font.Font(constant.PIXEL_FONT, 8)
     
-    
     def register_interact(self, obj):
-        if obj not in self.interactable_objs:
-            self.interactable_objs.append(obj)
+        if obj not in self.__interactable_objs:
+            self.__interactable_objs.append(obj)
 
-    def remove_register_interact(self, obj):
-        if obj in self.interactable_objs:
-            self.interactable_objs.remove(obj)
+    def unregister_interact(self, obj):
+        if obj in self.__interactable_objs:
+            self.__interactable_objs.remove(obj)
+    
+    def is_registered(self, obj):
+        return obj in self.__interactable_objs
 
     def get_closest_obj(self):
-        if not self.interactable_objs:
+        if not self.__interactable_objs:
             return None
     
         head_pos = pygame.Vector2(self.level.snake.blocks[0].rect.center)
@@ -32,7 +34,7 @@ class InteractionManager:
         closest_obj = None
         min_distance = float('inf')
 
-        for item in self.interactable_objs:
+        for item in self.__interactable_objs:
             item_pos = pygame.Vector2(item.rect.center)
             distance = head_pos.distance_to(item_pos)
 

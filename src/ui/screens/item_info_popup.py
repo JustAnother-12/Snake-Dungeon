@@ -35,6 +35,6 @@ class ItemInfoPopup(State):
                 self.level.snake.add_item(self.item_entity.to_item_stack())
                 self.item_entity.kill()
                 print('ok')
-                self.level.interaction_manager.remove_register_interact(self.item_entity)
+                self.level.interaction_manager.unregister_interact(self.item_entity)
                 self.level.game.state_stack.pop()
         return super().get_event(event)

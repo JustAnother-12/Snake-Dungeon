@@ -2,7 +2,7 @@ import random
 import pygame
 from config import constant
 from entities.items.item_entity import ItemEntity
-from entities.items.item_type import ItemCategory, ItemType, Rarity
+from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 
 
 FOOD_TYPE = ItemType(
@@ -10,7 +10,9 @@ FOOD_TYPE = ItemType(
     'Coin', 
     ItemCategory.INSTANT, 
     Rarity.COMMON,
-    constant.Texture.apple,
+    ItemTexture(
+        constant.Texture.apple,
+    ),
     "",
     1
 )

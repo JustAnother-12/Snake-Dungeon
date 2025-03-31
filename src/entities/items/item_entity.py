@@ -14,13 +14,12 @@ from utils import pixil
 
 class ItemEntity(pygame.sprite.Sprite):
     from entities.items.item_type import ItemType
-    import levels
-    def __init__(self, level: "levels.level.Level", item_type: ItemType, area=None, r=2, quantity=1):
+    def __init__(self, level: "levels.level.Level", item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
         super().__init__()
         self.level = level
         self.item_type = item_type
         self.quantity = quantity
-        self._image = pixil.Pixil.load(item_type.texture_path, 1).frames[0]
+        self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.frame]
         self.image = self._image.copy()
         self.random_pos(area, r)
         self.rect = self.image.get_rect(topleft=self.pos)
@@ -146,7 +145,7 @@ class ItemEntity(pygame.sprite.Sprite):
         if self.item_type.category == ItemCategory.INSTANT:
             if pygame.sprite.spritecollideany(self, self.level.snake.blocks): # type: ignore
                 self.on_collision()
-                return
+            return
         
         # For other items, check if in interaction range
         head_pos = self.level.snake.blocks[0].rect.center
@@ -164,7 +163,7 @@ class ItemEntity(pygame.sprite.Sprite):
             
         # Just left range - remove from interaction manager
         elif not self.in_range and was_in_range:
-            self.level.interaction_manager.remove_register_interact(self)
+            self.level.interaction_manager.unregister_interact(self)
             
         # Animate highlight effect
         self.pulse_animation = (self.pulse_animation + 0.05) % (2 * 3.14159)
