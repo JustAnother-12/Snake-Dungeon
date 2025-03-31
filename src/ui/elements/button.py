@@ -1,3 +1,4 @@
+from gc import callbacks
 from typing import Any
 import pygame
 import config.constant as constant
@@ -8,7 +9,7 @@ pygame.init()
 text_font = pygame.font.Font("game-assets/font/default-pixilart-text.ttf", 30)
 
 class ButtonElement(pygame.sprite.Sprite):
-    def __init__(self, x_pos, y_pos, text_input, text_color) -> None:
+    def __init__(self, x_pos, y_pos, text_input, text_color, callback = None) -> None:
         super().__init__()
         self.images = pixil.Pixil.load(constant.Texture.button, 2)
         self.image = self.images.frames[0]
@@ -21,28 +22,21 @@ class ButtonElement(pygame.sprite.Sprite):
         self.text_rect = self.text.get_rect(center=(self.rect.width // 2, self.rect.height // 2))
         for i in range(len(self.images.frames)):
             self.images.frames[i].blit(self.text, self.text_rect)
+        
+        self.callback = callback
 
-        self.isSelected = -1 
-        '''
-        isSelected:
-            -1: Cho phép dùng chuột
-             0: Không được chọn
-             1: Được chọn
-        '''
-
-    def update(self)-> None:
-        if self.checkForInputs(pygame.mouse.get_pos()) or self.isSelected == 1:
+    def update(self) -> None:
+        if self.isHovered():
             self.image = self.images.frames[1]
         else:
             self.image = self.images.frames[0]
-
-    def checkForInputs(self, mouse_pos) -> bool:
-        if mouse_pos[0] in range(self.rect.left, self.rect.right) and mouse_pos[1] in range(self.rect.top, self.rect.bottom):
-            return self.isSelected == -1
-        return False
     
-    def on_hover(self) -> bool:
-        return self.checkForInputs(pygame.mouse.get_pos()) or self.isSelected == 1
+    def isHovered(self) -> bool:
+        return self.rect.collidepoint(pygame.mouse.get_pos())
     
-    def set_selected(self, mode):
-        self.isSelected = mode
+    def on_click(self) -> None:
+        if self.callback != None:
+            self.callback()
+    
+    def add_action(self, callback):
+        self.callback = callback

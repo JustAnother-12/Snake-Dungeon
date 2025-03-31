@@ -31,7 +31,7 @@ class ItemInfoPopup(State):
     def get_event(self, event: Event):
         # TODO: sửa lại
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.button.on_hover():
+            if self.button.isHovered():
                 self.level.snake.add_item(self.item_entity.to_item_stack())
                 self.item_entity.kill()
                 print('ok')

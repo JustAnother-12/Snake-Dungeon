@@ -164,24 +164,9 @@ class Level(State):
             pygame.draw.line(surface, (100, 100, 100),
                              (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
-    def draw_stamina(self, surface: pygame.Surface):
-        if self.snake.stamina > 0:
-            pygame.draw.rect(
-                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5 *
-                                  constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 24)
-            )
-            pygame.draw.rect(
-                surface, (192, 237, 250), (6.5*constant.TILE_SIZE, 2.5 *
-                                           constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 4)
-            )
-        pygame.draw.rect(
-            surface, (133, 133, 133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE,
-                                       self.snake.max_stamina * 128 // 100 + 6, 32), 4, 0, 0, 10, 0, 10
-        )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
         # self.draw_grid(surface)
-        self.draw_stamina(surface)
 
         t = super().draw(surface)
         self.interaction_manager.draw(surface)

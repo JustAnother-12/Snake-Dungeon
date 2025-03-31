@@ -40,7 +40,11 @@ class Stats:
 
     @staticmethod
     def setValue(key, value):
-        Stats.stats[key]["value"] = value
+        Stats.stats[key]["value"] = min(value, 100)
+
+    @staticmethod
+    def increaseValue(key, value):
+        Stats.setValue(key, Stats.getValue(key) + value)
 
     @staticmethod
     def getValue(key):
