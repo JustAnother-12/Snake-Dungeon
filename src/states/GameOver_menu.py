@@ -15,8 +15,8 @@ class GameOver_menu(Menu):
         self.Background_texture = pygame.Surface((self.black_rect.w,self.black_rect.h))
         # self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
 
-        self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE ,"NEW RUN", "white")
-        self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 8)*game.TILE_SIZE ,"MAIN MENU", "white")
+        self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE ,"NEW RUN", "white", self.restart_button_event)
+        self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 8)*game.TILE_SIZE ,"MAIN MENU", "white", self.main_menu_button_event)
         self.addBtn([self.restart_button, self.main_menu_button])
 
         # self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
@@ -27,13 +27,17 @@ class GameOver_menu(Menu):
 
     def get_event(self, event):
         super().get_event(event)
-        if (self.game.selectBtnMode == "mouse" and event.type == pygame.MOUSEBUTTONDOWN) or (self.game.selectBtnMode == "key" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
-            if self.restart_button.on_click():
-                self.game.state_stack.pop()
-                self.game.state_stack[-1].reset()
-                self.game.state_stack[-1].visible = True
-            
-            if self.main_menu_button.on_click():
-                while len(self.game.state_stack) > 1:
-                    self.game.state_stack.pop()
-                self.game.state_stack[-1].reset()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for button in self.buttons:
+                if button.isHovered():
+                    button.on_click()
+
+    def restart_button_event(self):
+        self.game.state_stack.pop()
+        self.game.state_stack[-1].reset()
+        self.game.state_stack[-1].visible = True
+
+    def main_menu_button_event(self):
+        while len(self.game.state_stack) > 1:
+            self.game.state_stack.pop()
+        self.game.state_stack[-1].reset()

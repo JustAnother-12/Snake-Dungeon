@@ -47,7 +47,7 @@ class LevelTest(State):
         self.walls = Walls()
         
         self.currentRoom = 1
-        self.hud = HUD(self.snake.gold, self.snake, self.snake.keys)
+        self.hud = HUD(self.snake)
         self.roomText = TextElement("ROOM "+str(self.currentRoom),"white", 15, (int(constant.SCREEN_WIDTH_TILES/2))*constant.TILE_SIZE, constant.TILE_SIZE, 'center')
 
         self.is_paused = False
@@ -104,8 +104,7 @@ class LevelTest(State):
         self.bombs.update()
         self.coins.update()
         self.foods.update()
-        self.hud.update(self.snake.gold, len(
-            self.snake.blocks), self.snake.keys)
+        self.hud.update(self.snake)
         
         Stats.setValue("LENGTH", len(self.snake.blocks))
 
@@ -116,50 +115,8 @@ class LevelTest(State):
     def drawRoomCleared(self):
         pass
 
-    # def draw_grid(self, surface: pygame.Surface):
-    #     surface.fill("black")
-    #     pygame.draw.rect(
-    #         surface,
-    #         (51, 54, 71),
-    #         (
-    #             constant.MAP_LEFT,
-    #             constant.MAP_TOP,
-    #             constant.MAP_WIDTH,
-    #             constant.MAP_HEIGHT,
-    #         ),
-    #     )
-    #     for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
-    #         pygame.draw.line(surface, (100, 100, 100),
-    #                          (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
-    #     for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
-    #         pygame.draw.line(surface, (100, 100, 100),
-    #                          (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
-
-    def draw_stamina(self, surface: pygame.Surface):
-        if self.snake.stamina > 0:
-            pygame.draw.rect(
-                surface, "cyan", (6.5*constant.TILE_SIZE, 2.5 *
-                                  constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 24)
-            )
-            pygame.draw.rect(
-                surface, (192, 237, 250), (6.5*constant.TILE_SIZE, 2.5 *
-                                           constant.TILE_SIZE+4, self.snake.stamina * 128 // 100, 4)
-            )
-        pygame.draw.rect(
-            surface, (133, 133, 133), (6.5*constant.TILE_SIZE-4, 2.5*constant.TILE_SIZE,
-                                       self.snake.max_stamina * 128 // 100 + 6, 32), 4, 0, 0, 10, 0, 10
-        )
-
-    def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
-        # self.draw_grid(surface)
-        self.draw_stamina(surface)
-
-        return super().draw(surface)
-
-
 def main():
     pass
-
 
 if __name__ == "__main__":
     main()

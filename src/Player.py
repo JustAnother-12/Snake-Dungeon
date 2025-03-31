@@ -203,7 +203,6 @@ class SnakeBlock(pygame.sprite.Sprite):
 
     def update(self, snake, type) -> None:
         if self.timeSevered and time() - self.timeSevered > 2:
-            print(time() - self.timeSevered)
             if type == "COIN":
                 snake.level.coins.add_coin(random.randint(10, 15), self, 1)
             self.kill()
@@ -225,7 +224,7 @@ class Snake(pygame.sprite.LayeredUpdates):
         self.coins = 0
         self.previous_time = pygame.time.get_ticks()
         self.blocks: list[SnakeBlock] = []
-        self.base_speed = 16
+        self.base_speed = constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)
         self.gold = 0
         self.keys = 0
         self.direction = Vector2(1, 0)
@@ -374,7 +373,7 @@ class Snake(pygame.sprite.LayeredUpdates):
         ):
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
-                print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
+                print("Snake died after", constant.DEATH_DELAY * (1 + Stats.getValue("ARMOUR")/100), "out of bounds!")
                 self._out_of_bounds_time = 0
             self._will_go_out_of_bounds = True
             return
@@ -397,7 +396,7 @@ class Snake(pygame.sprite.LayeredUpdates):
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY:
+                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY * (1 + Stats.getValue("ARMOUR")/100):
                     self.isDeath = True
                 else:
                     self._out_of_bounds_time += dt
@@ -421,7 +420,7 @@ class Snake(pygame.sprite.LayeredUpdates):
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
             block.set_target(
-                self.base_speed + Stats.getValue("SPEED"), self._block_positions[i]  # NOTE: test stats (speed)
+                self.base_speed, self._block_positions[i]  # NOTE: test stats (speed)
             )
             if i == 0:
                 block.rotate(self.direction, self.headImg)
@@ -463,14 +462,14 @@ class Snake(pygame.sprite.LayeredUpdates):
     def handle_speed_boost(self):
         if self.is_speed_boost:
             if self.stamina > 0:
-                self.base_speed = 32
+                self.base_speed = (constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)) * 2
                 self.stamina -= constant.STAMINA_DECREASE
             else:
-                self.base_speed = 16
+                self.base_speed = constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)
         else:
-            self.base_speed = 16
-            if self.stamina < self.max_stamina:
-                self.stamina = min(self.max_stamina, self.stamina + constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")))
+            self.base_speed = constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)
+            if self.stamina < self.max_stamina * (1 + Stats.getValue("ENERGY CAPACITY")/100):
+                self.stamina = min(self.max_stamina, self.stamina + constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")/100))
 
     def _is_collide_with_Obstacle(self):
         for obstacle in self.level.obstacles:
@@ -566,7 +565,7 @@ class GreenSnake(Snake):
     def handle_go_out_of_bounds(self, dt):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY/1.2:
+                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY/1.2 * (1 + Stats.getValue("ARMOUR")/100):
                     block = self.blocks.pop()
                     block.kill()
                     self._out_of_bounds_time = None
@@ -580,7 +579,9 @@ class OrangeSnake(Snake):
     from states import LevelTest
 
     def __init__(self, level: "LevelTest.LevelTest", init_len):
-        Stats.setValue("ENERGY REGEN", 0.5)
+        Stats.setValue("ENERGY REGEN", 50)
+        Stats.setValue("ARMOUR", 20)
+        Stats.setValue("SPEED", 20)
         self.color = pygame.Color(255, 139, 38)
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
         super().__init__(level, init_len)
