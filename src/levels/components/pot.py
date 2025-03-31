@@ -42,7 +42,9 @@ class Pot(pygame.sprite.Sprite):
         self.isClosed = False
         item = self.lootpool.get_item()
         if item == LootItem.COIN:
-            self.level.coins.add_coin(random.randint(1, 3), self, 1)
+            # self.level.coins.add_coin(random.randint(1, 3), self, 1)
+            pass
+            # TODO: 
         elif item == LootItem.FOOD:
             self.level.foods.add_food(self)
         if self.collision_time == None:

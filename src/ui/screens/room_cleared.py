@@ -4,6 +4,7 @@ import pygame
 from time import time
 
 from ui.elements.state_description import StateDecription
+from ui.screens.state import State
 
 
 class RoomCleared(State):

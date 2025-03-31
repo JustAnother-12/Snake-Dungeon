@@ -1,9 +1,8 @@
 import random
 import pygame
 
-import constant
-import pixil
-
+from config import constant
+from utils import pixil
 
 class Floor_Tile(pygame.sprite.Sprite):
 

@@ -8,6 +8,7 @@ from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from levels.components.bomb import BombGroup
 from levels.components.chest import ChestGroup
+from levels.components.floor_tile import Floor
 from levels.components.food import FoodGroup
 from levels.components.key import Keys
 from levels.components.obstacle import Obstacle, Obstacle_group
@@ -64,14 +65,16 @@ class Level(State):
         self.generator()
 
         self.add(
+            Floor(),
             self.obstacle_group,
             self.trap_group,
             self.pot_group,
             
             self.wall_group,
             self.snake,
+            self.item_group,
             self.hud,
-            self.item_group
+            
         )
         
     def generator(self):
@@ -164,7 +167,7 @@ class Level(State):
         )
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
-        self.draw_grid(surface)
+        # self.draw_grid(surface)
         self.draw_stamina(surface)
 
         t = super().draw(surface)

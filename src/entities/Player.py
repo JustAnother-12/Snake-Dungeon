@@ -128,7 +128,6 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 class Snake(pygame.sprite.AbstractGroup):
     # from states import LevelTest
-    from Level import Level
     
     def __init__(self, level, init_len):
         super().__init__()
@@ -527,10 +526,9 @@ class GreenSnake(Snake):
             self._out_of_bounds_time = None
 
 class OrangeSnake(Snake):
-    from states import LevelTest
     from levels import level
 
-    def __init__(self, level: "LevelTest.LevelTest", init_len):
+    def __init__(self, level: "level.Level", init_len):
         Stats.setValue("ENERGY REGEN", 0.5)
         self.color = pygame.Color(255, 139, 38)
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
