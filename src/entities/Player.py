@@ -242,7 +242,7 @@ class Snake(pygame.sprite.AbstractGroup):
             arr = self.skill_slot
 
         for index, value in enumerate(arr):
-            if value is None: break
+            if value is None: continue
             if value.item_type.id == item.item_type.id: # type: ignore
                 arr[index] = None
 
