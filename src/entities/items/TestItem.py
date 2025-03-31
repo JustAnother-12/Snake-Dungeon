@@ -1,4 +1,5 @@
 
+from time import time
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemType, Rarity
@@ -18,9 +19,32 @@ SHIELD_TYPE = ItemType(
 class ShieldStack(ItemStack):
     def __init__(self):
         super().__init__(SHIELD_TYPE, 1)
+        self.shield_active = False
+        self.shield_end_time = 0
     
     def apply_effect(self, snake):
-        print("shield apply effect")
+        self.shield_active = False
+        self.shield_end_time = time() + 3
+        
+        if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
+            snake.run_time_overriding['_is_collide_with_Obstacle'] = {
+                "after": [],
+                "return" : [],
+                "before" : []
+            }
+        
+        snake.run_time_overriding['_is_collide_with_Obstacle']['after'].append(self.prevent_damage)
+    
+    def prevent_damage(self, snake, *args, **kwargs):
+        if time() < self.shield_end_time:
+            snake._will_go_out_of_bounds = False
+            return False 
+        else:
+            if "_is_collide_with_Obstacle" in snake.run_time_overriding:
+                if self.prevent_damage in snake.run_time_overriding["_is_collide_with_Obstacle"]["after"]:
+                    snake.run_time_overriding["_is_collide_with_Obstacle"]["after"].remove(self.prevent_damage)
+            
+            return False
     
 
 class ShieldEntity(ItemEntity):

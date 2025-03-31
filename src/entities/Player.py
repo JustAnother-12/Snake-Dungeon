@@ -269,7 +269,26 @@ class Snake(pygame.sprite.AbstractGroup):
             self.is_speed_boost = True
         else:
             self.is_speed_boost = False
+        
 
+        item_map = [
+            pygame.K_1, 
+            pygame.K_2, 
+            pygame.K_3
+        ]
+
+        skill_map = [
+            pygame.K_4, 
+            pygame.K_1,
+        ]
+
+        for index, key in enumerate(item_map):
+            if just_keys[key] and self.item_slot[index]:
+                self.item_slot[index].use(self) # type: ignore
+        
+        for index, key in enumerate(skill_map):
+            if just_keys[key] and self.skill_slot[index]:
+                self.skill_slot[index].use(self) # type: ignore
         
 
     def handle_movement(self):
@@ -290,7 +309,7 @@ class Snake(pygame.sprite.AbstractGroup):
         ):
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
-                print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
+                # print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
                 self._out_of_bounds_time = 0
             self._will_go_out_of_bounds = True
             self._last_direction = self.direction
