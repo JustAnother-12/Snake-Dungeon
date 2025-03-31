@@ -225,7 +225,7 @@ class Snake(pygame.sprite.LayeredUpdates):
         self.coins = 0
         self.previous_time = pygame.time.get_ticks()
         self.blocks: list[SnakeBlock] = []
-        self.base_speed = 16
+        self.base_speed = 32
         self.gold = 0
         self.keys = 0
         self.direction = Vector2(1, 0)
@@ -463,12 +463,12 @@ class Snake(pygame.sprite.LayeredUpdates):
     def handle_speed_boost(self):
         if self.is_speed_boost:
             if self.stamina > 0:
-                self.base_speed = 32
+                self.base_speed = 64
                 self.stamina -= constant.STAMINA_DECREASE
             else:
-                self.base_speed = 16
+                self.base_speed = 32
         else:
-            self.base_speed = 16
+            self.base_speed = 32
             if self.stamina < self.max_stamina:
                 self.stamina = min(self.max_stamina, self.stamina + constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")))
 
