@@ -18,7 +18,7 @@ from utils.pixil import Pixil
 from ui.screens.stats import base_stats_value
 
 class SnakeBlock(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int], color: pygame.Color) -> None:
+    def __init__(self, layer, pos: tuple[int, int], color: pygame.Color) -> None:
         super().__init__()
         self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
@@ -27,7 +27,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.target_pos = pygame.Vector2(self.rect.topleft)
         self.pos = pygame.Vector2(self.rect.topleft)
         self._last_target = pygame.Vector2(self.rect.topleft)
-
+        self._layer = layer
         self.speed = 0
         self.moving = False
         self.isOutside = False
@@ -46,7 +46,7 @@ class SnakeBlock(pygame.sprite.Sprite):
             pass
 
     def rotate(self, direction, img):
-        if not self.is_head:
+        if not self.is_head or direction == Vector2(0, 0):
             return
         direction = direction.normalize()
         if direction == Vector2(1, 0):
@@ -127,9 +127,11 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    from levels.level import Level
+    # from states import LevelTest
+    from Level import Level
     
-    def __init__(self, level: Level, init_len):
+    def __init__(self, level, init_len):
+        super().__init__()
         self.run_time_overriding = {}
         super().__init__()
         self.level = level
@@ -151,6 +153,10 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         self._block_positions = []
         self._last_direction = Vector2(0, 0)
+        self.is_curling = False
+
+        self.auto_state = True
+        self.manual_state = False
 
         self._will_go_out_of_bounds = False
         # thời gian mà đầu con rắn ra khỏi bound
@@ -228,7 +234,7 @@ class Snake(pygame.sprite.AbstractGroup):
         for i in range(init_len):
             x = (constant.SCREEN_WIDTH_TILES // 2 - i) * constant.TILE_SIZE
             y = (constant.SCREEN_HEIGHT_TILES // 2) * constant.TILE_SIZE
-            block = SnakeBlock((x, y), self.color)
+            block = SnakeBlock(int(i==0) ,(x, y), self.color)
             self.blocks.append(block)
 
         # self.blocks[0].image = pygame.transform.rotate(constant.HEAD_IMG, -90)
@@ -258,13 +264,19 @@ class Snake(pygame.sprite.AbstractGroup):
             if (
                 keys[key]
                 and self._last_direction != -direction
-                and self._last_direction != direction
-                and (self._block_positions[1] - self._block_positions[0]).normalize()
-                != direction
-            ):
+                and (((self.auto_state and self._last_direction != direction or self.is_curling)) or not self.auto_state)
+                and (
+                    self._block_positions[1] - self._block_positions[0] == Vector2(0, 0)
+                    or (self._block_positions[1] - self._block_positions[0]).normalize()
+                    != direction
+                )
+            ):  
                 self.direction = direction
+                self._last_direction = self.direction
+                self.is_curling = False
+                if self.manual_state:
+                    self.handle_movement()
                 break
-
         if keys[pygame.K_SPACE]:
             self.is_speed_boost = True
         else:
@@ -312,7 +324,6 @@ class Snake(pygame.sprite.AbstractGroup):
                 # print("Snake died after", constant.DEATH_DELAY, "out of bounds!")
                 self._out_of_bounds_time = 0
             self._will_go_out_of_bounds = True
-            self._last_direction = self.direction
             return
 
         self._will_go_out_of_bounds = False
@@ -320,10 +331,10 @@ class Snake(pygame.sprite.AbstractGroup):
         if len(self._block_positions) > len(self.blocks):
             self._block_positions.pop()
 
-        self._last_direction = self.direction
+        
 
     def handle_collision(self):
-        
+
         self._collide_with_active_trap()
         self._collide_with_bomb()
 
@@ -349,7 +360,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self.previous_time = pygame.time.get_ticks()
         self.handle_severed_blocks()
         self.handle_input()
-        self.handle_movement()
+        if self.auto_state:
+            self.handle_movement()
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()
@@ -381,7 +393,7 @@ class Snake(pygame.sprite.AbstractGroup):
     def grow_up(self, length=1):
         tail = self.blocks[-1]
         for i in range(length):
-            newBlock = SnakeBlock(tail.rect.topleft, self.color)
+            newBlock = SnakeBlock(0, tail.rect.topleft, self.color)
             self.blocks.insert(-1, newBlock)
             self._block_positions.append(newBlock.pos.copy())
             for i in self.blocks[0].groups():
@@ -400,13 +412,13 @@ class Snake(pygame.sprite.AbstractGroup):
         if self.is_speed_boost:
             if self.stamina > 0:
                 self.base_speed = 32
-                self.stamina -= 1
+                self.stamina -= constant.STAMINA_DECREASE
             else:
                 self.base_speed = 16
         else:
             self.base_speed = 16
             if self.stamina < self.max_stamina:
-                self.stamina += 1
+                self.stamina = min(self.max_stamina, self.stamina + constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")))
 
     def _is_collide_with_Obstacle(self):
         for obstacle in self.level.obstacle_group:
@@ -416,6 +428,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def _is_collide_with_self(self):
+        if self.is_curling: return False
         for block in self.blocks[1:]:
             if block.rect.colliderect(
                 (
@@ -485,6 +498,12 @@ class Snake(pygame.sprite.AbstractGroup):
     def handle_skills(self, dt):
         pass
 
+    def curl_snake(self):
+        if not self.is_curling:
+            self.is_curling = True
+            self.direction = Vector2(0, 0)
+        
+
 
 class GreenSnake(Snake):
 
@@ -508,9 +527,12 @@ class GreenSnake(Snake):
             self._out_of_bounds_time = None
 
 class OrangeSnake(Snake):
+    from states import LevelTest
     from levels import level
-    def __init__(self, level: "level.Level", init_len):
-        self.color = pygame.Color("#d3d3d3")
+
+    def __init__(self, level: "LevelTest.LevelTest", init_len):
+        Stats.setValue("ENERGY REGEN", 0.5)
+        self.color = pygame.Color(255, 139, 38)
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
         super().__init__(level, init_len)
 
@@ -528,3 +550,14 @@ class GraySnake(Snake):
         if keys[pygame.K_e] and self.skillCooldown > 5000:
             self.skillCooldown = 0
             self.split(-1)
+
+    def handle_severed_blocks(self):
+        for block in self.sprites():
+            if block not in self.blocks:
+                block: SnakeBlock
+                if block.rect.colliderect(
+                    self.blocks[0].rect
+                ):
+                    block.kill()
+                    self.grow_up(1)
+                block.update(self, "COIN")

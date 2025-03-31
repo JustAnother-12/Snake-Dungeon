@@ -1,6 +1,3 @@
-from operator import truediv
-
-
 import pygame
 
 from ui.elements.button import ButtonElement

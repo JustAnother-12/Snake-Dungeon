@@ -36,7 +36,7 @@ class Pot(pygame.sprite.Sprite):
                         self.kill()
 
     def __is_collision_with_snake(self):
-        return self.rect and self.level.snake.isDeath and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and not self.level.snake.isDeath and self.rect.colliderect(self.level.snake.blocks[0].rect)
     
     def open(self):
         self.isClosed = False

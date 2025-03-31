@@ -30,18 +30,18 @@ class Walls(pygame.sprite.AbstractGroup):
             bottom,
             WALL_TILES * TILE_SIZE,
         ):
-            self.add(Wall((left, y), random.randint(0, 3), 90))
-            self.add(Wall((right, y), random.randint(0, 3), 270))
+            self.add(Wall((left, y), random.randint(0, 4), 90))
+            self.add(Wall((right, y), random.randint(0, 4), 270))
 
         for x in range(
             left + WALL_TILES * TILE_SIZE,
             right,
             WALL_TILES * TILE_SIZE,
         ):
-            self.add(Wall((x, top), random.randint(0, 3)))
-            self.add(Wall((x, bottom), random.randint(0, 3), 180))
+            self.add(Wall((x, top), random.randint(0, 4)))
+            self.add(Wall((x, bottom), random.randint(0, 4), 180))
 
-        self.add(Wall((left, top), 4))
-        self.add(Wall((left, bottom), 4, 90))
-        self.add(Wall((right, bottom), 4, 180))
-        self.add(Wall((right, top), 4, 270))
+        self.add(Wall((left, top), 5))
+        self.add(Wall((left, bottom), 5, 90))
+        self.add(Wall((right, bottom), 5, 180))
+        self.add(Wall((right, top), 5, 270))
