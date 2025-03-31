@@ -138,8 +138,8 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         
         # Item and skill management
-        self.skill_slot: list[ItemStack | None] = [None, None]
-        self.item_slot: list [ItemStack | None] = [None, None, None]
+        self.skill_slot: list[ItemStack | None] = [None, None, None]
+        self.item_slot: list [ItemStack | None] = [None, None]
         self.level = level
 
         # Movement and stamina attributes
@@ -304,12 +304,12 @@ class Snake(pygame.sprite.AbstractGroup):
         item_map = [
             pygame.K_1, 
             pygame.K_2, 
-            pygame.K_3
         ]
 
         skill_map = [
+            pygame.K_3,
             pygame.K_4, 
-            pygame.K_1,
+            pygame.K_5,
         ]
 
         for index, key in enumerate(item_map):

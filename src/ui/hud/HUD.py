@@ -39,11 +39,11 @@ class HUD(pygame.sprite.Group):
         self.item_slot = [
             ItemSlot(i, 70),
             ItemSlot(i, 70 + 64),
-            ItemSlot(i, 70 + 64 * 2),
 
         ]
 
         self.skill_slot = [
+            ItemSlot(i, 70 + 64 * 2 + 20),
             ItemSlot(i, 70 + 64 * 3 + 20),
             ItemSlot(i, 70 + 64 * 4 + 20),
         ]
