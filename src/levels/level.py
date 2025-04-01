@@ -3,6 +3,7 @@ import pygame
 from time import time
 
 import config.constant as constant
+from entities.Monster import AIMonster
 from entities.items.TestItem import ShieldEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
@@ -42,6 +43,8 @@ class Level(State):
         
         # Main entities
         self.snake = GreenSnake(self, 5)
+        self.monster = AIMonster(self, 5)
+        self.monster.set_player_reference(self.snake)
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
         
@@ -66,6 +69,7 @@ class Level(State):
             self.trap_group,
             self.pot_group,
             self.snake,
+            self.monster,
             self.item_group,
             self.hud,
         )

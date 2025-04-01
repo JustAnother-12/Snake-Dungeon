@@ -333,9 +333,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self._block_positions.insert(0, new_head_pos)
 
         if (
-            self._is_collide_with_wall()
-            or self._is_collide_with_self()
-            or self._is_collide_with_Obstacle()
+            self._is_collide_with_wall(self._block_positions[0])
+            or self._is_collide_with_self(self._block_positions[0])
+            or self._is_collide_with_Obstacle(self._block_positions[0])
         ):
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
@@ -438,20 +438,20 @@ class Snake(pygame.sprite.AbstractGroup):
             if self.stamina < self.max_stamina * (1 + Stats.getValue("ENERGY CAPACITY")/100):
                 self.stamina = min(self.max_stamina, self.stamina + constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")/100))
 
-    def _is_collide_with_Obstacle(self):
+    def _is_collide_with_Obstacle(self, position):
         for obstacle in self.level.obstacle_group:
             obstacle: Obstacle
-            if obstacle.rect.colliderect((self._block_positions[0][0], self._block_positions[0][1], constant.TILE_SIZE, constant.TILE_SIZE)):  # type: ignore
+            if obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):  # type: ignore
                 return True
         return False
 
-    def _is_collide_with_self(self):
+    def _is_collide_with_self(self, position):
         if self.is_curling: return False
         for block in self.blocks[1:]:
             if block.rect.colliderect(
                 (
-                    self._block_positions[0][0],
-                    self._block_positions[0][1],
+                    position[0],
+                    position[1],
                     constant.TILE_SIZE,
                     constant.TILE_SIZE,
                 )
@@ -459,13 +459,13 @@ class Snake(pygame.sprite.AbstractGroup):
                 return True
         return False
 
-    def _is_collide_with_wall(self):
+    def _is_collide_with_wall(self, position):
         for wall in self.level.wall_group:
             wall: Wall
             if wall.rect and wall.rect.colliderect(
                 (
-                    self._block_positions[0][0],
-                    self._block_positions[0][1],
+                    position[0],
+                    position[1],
                     constant.TILE_SIZE,
                     constant.TILE_SIZE,
                 )
