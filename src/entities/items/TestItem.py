@@ -11,7 +11,7 @@ SHIELD_TYPE = ItemType(
     category=ItemCategory.EQUIPMENT,
     rarity=Rarity.RARE,
     texture=ItemTexture(
-        "game-assets/graphics/pixil/BOMB_SHEET.pixil",
+        "game-assets/graphics/pixil/SHIELD.pixil",
     ),
     cooldown=15.0,
     description="Temporary invincibility for 3 seconds",

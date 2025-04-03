@@ -3,7 +3,7 @@ from ui.elements.button import ButtonElement
 from ui.elements.image import ImageElement
 from ui.elements.text import TextElement
 from ui.screens.menu import Menu
-from ui.screens.stats import Stats_menu
+from ui.screens.Stats_Menu import Stats_menu
 from utils.pixil import Pixil
 
 
