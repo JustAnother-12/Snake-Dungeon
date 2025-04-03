@@ -5,6 +5,7 @@ from time import time
 
 import config.constant as constant
 from entities.Monster import AIMonster
+from entities.items.bomb_item import BombEntity
 from entities.items.TestItem import ShieldEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
@@ -55,6 +56,7 @@ class Level(State):
         self.obstacle_group = pygame.sprite.Group()
         self.trap_group = pygame.sprite.Group()
         self.pot_group = pygame.sprite.Group()
+        self.bomb_group = BombGroup(self)
         
         # Items
         self.item_group = pygame.sprite.Group()
@@ -74,6 +76,7 @@ class Level(State):
             self.monster,
             self.item_group,
             self.hud,
+            self.bomb_group
         )
         
     def generator(self):
@@ -110,6 +113,10 @@ class Level(State):
         for i in range(3):
             key = KeyEntity(self)
             self.item_group.add(key)
+
+        for i in range(3):
+            bomb = BombEntity(self)
+            self.item_group.add(bomb)
         
         for i in range(3):
             item = ShieldEntity(self)

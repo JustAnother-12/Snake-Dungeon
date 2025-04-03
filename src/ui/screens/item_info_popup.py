@@ -79,10 +79,10 @@ class ItemInfoPopup(State):
         return super().update(*args, **kwargs)
     
     def getItem(self):
-        self.level.snake.add_item(self.item_entity.to_item_stack())
-        self.item_entity.kill()
-        print('ok')
-        self.level.interaction_manager.unregister_interact(self.item_entity)
+        if self.level.snake.add_item(self.item_entity.to_item_stack()):
+            self.item_entity.kill()
+            print('ok')
+            self.level.interaction_manager.unregister_interact(self.item_entity)
         self.level.game.state_stack.pop()
     def sellItem(self):
         self.level.snake.gold+=self.sell_price
@@ -99,10 +99,12 @@ class ItemInfoPopup(State):
             if self.sell_btn.isHovered():
                 self.sellItem()
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e:
+            key = event.key
+            pygame.event.clear(eventtype=pygame.KEYDOWN)
+            if key == pygame.K_e:
                 self.getItem()
-            elif event.key == pygame.K_r:
+            elif key == pygame.K_r:
                 self.sellItem()
-            elif event.key == pygame.K_q: # <--- nhẽ ra phải là K_Escape, nhưng mà thoát xong phát nó vào pause luôn nên ko biết fix sao
+            elif key == pygame.K_ESCAPE:
                 self.level.game.state_stack.pop()
         return super().get_event(event)

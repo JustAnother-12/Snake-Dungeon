@@ -3,6 +3,7 @@
 
 import time
 from pygame import Rect
+from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
@@ -17,7 +18,8 @@ SPEED_BOOT_TYPE = ItemType(
         'game-assets/graphics/pixil/STATS_ICON_SHEET.pixil',
         0
     ),
-    max_stack=10
+    max_stack=10,
+    cooldown=5.0
 )
 
 class SpeedBootStack(ItemStack):
@@ -29,17 +31,17 @@ class SpeedBootStack(ItemStack):
     def apply_effect(self, snake):
         self.active_time = time.time()
 
-        self.last_speed = snake.base_speed
+        self.last_speed = snake.base_stats.speed
 
         self.add_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
     
-    def speed_boot(self, snake, *args, **kwargs):
+    def speed_boot(self, snake: Snake, *args, **kwargs):
         print('ok')
         if time.time() - self.active_time > 3:
             self.remove_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
             # self.remove_runtime_overriding()
         
-        snake.base_speed = self.last_speed * 2
+        snake.base_stats.speed = self.last_speed * 2
 
         return args, kwargs
 

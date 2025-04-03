@@ -33,7 +33,7 @@ class AIMonster(Snake):
         self.handle_skills(dt)
         for i, block in enumerate(self.blocks):
             block.set_target(
-                self.base_speed, self._block_positions[i]
+                self.base_stats.speed, self._block_positions[i]
             )
             if i == 0:
                 block.rotate(self.direction, self.headImg)

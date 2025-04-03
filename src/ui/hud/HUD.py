@@ -25,7 +25,7 @@ class HUD(pygame.sprite.Group):
 
         self.Gold_Icon = Pixil.load("game-assets/graphics/pixil/HUD_GOLD_ICON.pixil", 2).frames[0]
         self.Gold_Icon_rect = ImageElement(2*constant.TILE_SIZE, 9*constant.TILE_SIZE, self.Gold_Icon)
-        self.Gold_text = TextElement(str(snake.coins), "white", 15, 4*constant.TILE_SIZE, int(9.5*constant.TILE_SIZE), "midleft")
+        self.Gold_text = TextElement(str(snake.gold), "white", 15, 4*constant.TILE_SIZE, int(9.5*constant.TILE_SIZE), "midleft")
 
         self.Length_Icon = Pixil.load("game-assets/graphics/pixil/HUD_LENGTH_ICON.pixil", 2).frames[0]
         self.Length_Icon_rect = ImageElement(2*constant.TILE_SIZE, 13*constant.TILE_SIZE, self.Length_Icon)
@@ -53,7 +53,7 @@ class HUD(pygame.sprite.Group):
         self.add(*self.item_slot)
         self.add(*self.skill_slot)
         self.stamina_bar = pygame.sprite.Sprite()
-        self.draw_stamina(snake.stamina, snake.max_stamina)
+        self.draw_stamina(snake.stamina, snake.base_stats.energy_cap)
         self.add(self.stamina_bar)
 
     def set_gold(self, num):
@@ -101,7 +101,7 @@ class HUD(pygame.sprite.Group):
         self.stamina_bar.rect = self.stamina_bar.image.get_rect(topleft=(6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE))
 
     def update(self):
-        self.draw_stamina(self.level.snake.stamina, self.level.snake.max_stamina)
+        self.draw_stamina(self.level.snake.stamina, self.level.snake.base_stats.energy_cap)
         coin,length, keys = self.level.snake.gold, len(self.level.snake), self.level.snake.keys
         self.set_gold(coin)
         self.set_length(length)

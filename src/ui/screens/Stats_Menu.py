@@ -9,13 +9,9 @@ from utils.pixil import Pixil
 class base_stats_value:
     def __init__(self) -> None:
         self.speed = 0
-        self.armour = 0
+        self.resistance = 0
         self.energy_cap = 0
         self.energy_regen = 0
-        self.treasury = 0
-        self.luck = 0
-        self.food_potent = 0
-
 
 class Stats_menu(State):
     def __init__(self, game) -> None:
