@@ -1,5 +1,4 @@
 
-import enum
 from typing import Literal
 import pygame
 import config.constant as constant
@@ -11,7 +10,7 @@ class TextElement(pygame.sprite.Sprite):
                  font_size: int, 
                  x_pos: int, 
                  y_pos: int, 
-                 choice: Literal["midleft", "center", "midright"] = "midleft", 
+                 choice: Literal["midleft", "center", "midright", "topleft"] = "midleft", 
                  width = -1
             ) -> None:
         super().__init__()
@@ -47,13 +46,15 @@ class TextElement(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(midleft=(self.x_pos, self.y_pos))
         elif choice == "center":
             self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
-        else:
+        elif choice == "midright":
             self.rect = self.image.get_rect(midright=(self.x_pos, self.y_pos))
+        else:
+            self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
         
         # print(self.text, words)
 
         for i, word in enumerate(words):
-            if choice == "midleft":
+            if choice == "midleft" or choice == "topleft":
                 img = self.font.render(word, True, self.color), (0, i * self.font.size(word)[1])
             elif choice == "center":
                 img = self.font.render(word, True, self.color), (width//2 - self.font.size(word)[0]//2, i * self.font.size(word)[1])

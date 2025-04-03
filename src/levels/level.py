@@ -24,6 +24,7 @@ from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
 from ui.screens.game_over import GameOver_menu
 from ui.screens.pause import Pause_menu
+from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import State
 
 # làm cho nó gọn để kế thừa
@@ -105,22 +106,22 @@ class Level(State):
             coin = CoinEntity(self)
             self.item_group.add(coin)
         
-        for i in range(10):
+        for i in range(3):
             food = FoodEntity(self)
             self.item_group.add(food)
         
-        for i in range(10):
+        for i in range(3):
             key = KeyEntity(self)
             self.item_group.add(key)
 
-        for i in range(10):
+        for i in range(3):
             bomb = BombEntity(self)
             self.item_group.add(bomb)
         
-        for i in range(10):
+        for i in range(3):
             item = ShieldEntity(self)
             self.item_group.add(item)
-        for i in range(10):
+        for i in range(3):
             self.item_group.add(SpeedBootEntity(self))
 
     def reset(self):
@@ -129,9 +130,11 @@ class Level(State):
     def __dev_test(self):
         # TODO: nhớ bỏ cái này nếu test xong
         # tự tạo lại map khi nhấn phím
-        keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_r]:
-            self.generator()
+        # keys = pygame.key.get_just_pressed()
+        # if keys[pygame.K_r]:
+        #     # self.generator()
+        #     self.is_finished = True
+        pass
 
     def handle_input(self):
         keys = pygame.key.get_just_pressed()
@@ -145,17 +148,20 @@ class Level(State):
 
         self.__dev_test()
 
+        if self.is_finished:
+            self.game.state_stack.append(RoomCleared(self.game))
+            self.snake.auto_state = False
+            self.is_finished = False
+
         if self.snake.is_dead:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
         
+        Stats.setValue("LENGTH", len(self.snake))
+
         self.handle_input()
 
         super().update()
-
-
-    def drawRoomCleared(self):
-        pass
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")

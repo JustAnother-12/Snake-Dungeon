@@ -119,7 +119,7 @@ class SnakeBlock(pygame.sprite.Sprite):
     def transform(self, snake, type) -> None:
         if self.timeSevered and time() - self.timeSevered > 2:
             if type == "COIN":
-                for _ in range(random.randint(10, 15)):
+                for _ in range(random.randint(5, 10)):
                     snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))
             self.kill()
 
@@ -157,7 +157,6 @@ class Snake(pygame.sprite.AbstractGroup):
 
         # Movement control modes
         self.auto_state = True
-        self.manual_state = False
 
         # Out-of-bounds handling
         self._will_go_out_of_bounds = False
@@ -221,7 +220,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 arr[index].quantity += 1 # type: ignore
                 return True
             if value.item_type.id == item.item_type.id and value.item_type.category == ItemCategory.EQUIPMENT:
-                return False
+                return False # equipment không thể nhặt 2 cái cùng loại
 
         for index, value in enumerate(arr):
             if value is None: 
@@ -288,7 +287,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 self.direction = direction
                 self._last_direction = self.direction
                 self.is_curling = False
-                if self.manual_state:
+                if not self.auto_state:
                     self.handle_movement()
                 break
         if keys[pygame.K_SPACE]:

@@ -1,5 +1,3 @@
-
-
 import math
 import random
 import pygame
@@ -44,12 +42,12 @@ class ItemEntity(pygame.sprite.Sprite):
             color = (255, 255, 255, 100)  # White
         elif self.item_type.rarity.name == "UNCOMMON":
             color = (0, 255, 0, 100)  # Green
-        elif self.item_type.rarity.name == "RARE":
-            color = (0, 0, 255, 100)  # Blue
-        elif self.item_type.rarity.name == "EPIC":
-            color = (128, 0, 128, 100)  # Purple
         else:
             color = (255, 215, 0, 100)  # Gold
+        # elif self.item_type.rarity.name == "EPIC":
+        #     color = (128, 0, 128, 100)  # Purple
+        # else:
+        #     color = (255, 215, 0, 100)  # Gold
             
         pygame.draw.rect(
             self.highlight_effect, 

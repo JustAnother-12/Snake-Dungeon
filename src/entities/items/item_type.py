@@ -10,8 +10,8 @@ class Rarity(Enum):
     COMMON = "Common"
     UNCOMMON = "Uncommon" 
     RARE = "Rare"
-    EPIC = "Epic"
-    LEGENDARY = "Legendary"
+    # EPIC = "Epic"
+    # LEGENDARY = "Legendary"
 
 class ItemCategory(Enum):
     # Item nhận hiệu ứng ngay (coin, food) - không vào inventory
@@ -20,8 +20,11 @@ class ItemCategory(Enum):
     # Item dùng 1 lần và có thể stack (health potion, bomb)
     CONSUMABLE = auto()
     
-    # Item dùng nhiều lần, không stack (skills, equipment)
+    # Item passive, tự kích hoạt hiệu ứng
     EQUIPMENT = auto()
+
+    # Item dùng nhiều lần, không stack
+    SKILL = auto()
 
 @dataclass
 class ItemTexture:
@@ -52,7 +55,7 @@ class ItemType:
     
     def __post_init__(self):
         # Tự động điều chỉnh max_stack dựa trên category
-        if self.category == ItemCategory.EQUIPMENT:
+        if self.category == ItemCategory.EQUIPMENT or self.category == ItemCategory.SKILL:
             self.max_stack = 1
         elif self.category == ItemCategory.INSTANT:
             self.max_stack = 0
@@ -60,11 +63,11 @@ class ItemType:
         # Tự động gán giá dựa trên rarity nếu chưa được chỉ định
         if self.price == 0:
             rarities = {
-                Rarity.COMMON: 5,
-                Rarity.UNCOMMON: 15,
-                Rarity.RARE: 50,
-                Rarity.EPIC: 150,
-                Rarity.LEGENDARY: 500
+                Rarity.COMMON: 50,
+                Rarity.UNCOMMON: 100,
+                Rarity.RARE: 150,
+                # Rarity.EPIC: 150,
+                # Rarity.LEGENDARY: 500
             }
             self.price = rarities[self.rarity]
     
