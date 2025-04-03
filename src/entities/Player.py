@@ -162,7 +162,6 @@ class Snake(pygame.sprite.AbstractGroup):
 
         # Movement control modes
         self.auto_state = True
-        self.manual_state = False
 
         # Out-of-bounds handling
         self._will_go_out_of_bounds = False
@@ -293,7 +292,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 self.direction = direction
                 self._last_direction = self.direction
                 self.is_curling = False
-                if self.manual_state:
+                if not self.auto_state:
                     self.handle_movement()
                 break
         if keys[pygame.K_SPACE]:

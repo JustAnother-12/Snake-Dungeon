@@ -18,10 +18,10 @@ class Pause_menu(Menu):
         self.Background_texture = Pixil.load(constant.Texture.pasue_menu_bg, 2).frames[0]
         self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)
 
-        self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 9)*game.TILE_SIZE ,"NEW RUN", "white", self.restart_button_event)
-        self.continue_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 2)*game.TILE_SIZE ,"CONTINUE", "white", self.continue_button_event)
-        self.stats_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 5)*game.TILE_SIZE ,"STATS", "white", self.stats_button_event)
-        self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 12)*game.TILE_SIZE ,"MAIN MENU", "white", self.main_menu_button_event)
+        self.restart_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 9)*game.TILE_SIZE ,"NEW RUN", "white", callback=self.restart_button_event)
+        self.continue_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 2)*game.TILE_SIZE ,"CONTINUE", "white", callback=self.continue_button_event)
+        self.stats_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 5)*game.TILE_SIZE ,"STATS", "white", callback=self.stats_button_event)
+        self.main_menu_button = ButtonElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 + 12)*game.TILE_SIZE ,"MAIN MENU", "white", callback=self.main_menu_button_event)
         self.addBtn([self.restart_button, self.continue_button, self.stats_button, self.main_menu_button])
 
         self.add(self.Background_rect, self.Paused_text, self.restart_button, self.continue_button, self.stats_button, self.main_menu_button)

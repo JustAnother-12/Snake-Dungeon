@@ -1,5 +1,4 @@
 import pygame
-import json
 from stats import Stats
 from ui.elements.image import ImageElement
 from ui.elements.state_description import StateDecription

@@ -65,7 +65,7 @@ class AIMonster(Snake):
             new_head_pos = head_pos + move * constant.TILE_SIZE
             if not self._is_collide(new_head_pos):
                 valid_moves.append(move)
-                w.append(50 if move == self.direction else 1)
+                w.append(20 if move == self.direction else 1)
 
         if valid_moves:
             self._last_direction = self.direction

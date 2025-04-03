@@ -1,6 +1,5 @@
 from typing import Any
 from config import constant
-import pygame
 from time import time
 
 from ui.elements.state_description import StateDecription
