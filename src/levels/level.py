@@ -123,10 +123,11 @@ class Level(State):
     def __dev_test(self):
         # TODO: nhớ bỏ cái này nếu test xong
         # tự tạo lại map khi nhấn phím
-        keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_r]:
-            # self.generator()
-            self.is_finished = True
+        # keys = pygame.key.get_just_pressed()
+        # if keys[pygame.K_r]:
+        #     # self.generator()
+        #     self.is_finished = True
+        pass
 
     def handle_input(self):
         keys = pygame.key.get_just_pressed()
@@ -145,7 +146,7 @@ class Level(State):
             self.snake.auto_state = False
             self.is_finished = False
 
-        if self.snake.is_death:
+        if self.snake.is_dead:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
         
