@@ -7,6 +7,7 @@ import pygame
 from config import constant
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory
+from levels import region_generator
 import levels.level
 from ui.screens.item_info_popup import ItemInfoPopup
 from utils import pixil
@@ -22,8 +23,7 @@ class ItemEntity(pygame.sprite.Sprite):
         self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.frame]
         self.image = self._image.copy()
         self.random_pos(area, r)
-        self.rect = self.image.get_rect(topleft=self.pos)
-        
+        self.rect = self.image.get_rect(topleft=self.pos)    
         
         # Interaction properties
         self.interaction_radius = constant.TILE_SIZE * 2  # 2 tiles radius
@@ -59,6 +59,8 @@ class ItemEntity(pygame.sprite.Sprite):
         )    
 
     def random_pos(self, area: pygame.Rect | None, r = 2):
+
+        # Random position theo grid
         if not area:
             self.pos = pygame.Vector2(
                 random.randint(
@@ -67,6 +69,7 @@ class ItemEntity(pygame.sprite.Sprite):
                         constant.SCREEN_WIDTH_TILES
                         - constant.LEFT_RIGHT_BORDER_TILES
                         - constant.WALL_TILES
+                        - math.ceil(self.image.get_width()/constant.TILE_SIZE ) if self.image else 0
                     ),
                 )
                 * constant.TILE_SIZE,
@@ -76,10 +79,12 @@ class ItemEntity(pygame.sprite.Sprite):
                         constant.SCREEN_HEIGHT_TILES
                         - constant.TOP_BOTTOM_BORDER_TILES
                         - constant.WALL_TILES
+                        - math.ceil(self.image.get_height()/constant.TILE_SIZE ) if self.image else 0
                     ),
                 )
                 * constant.TILE_SIZE,
             )
+        # Random position trong area đã cho
         else:
             R = int(r * constant.TILE_SIZE)
             x = random.randint(
@@ -108,13 +113,18 @@ class ItemEntity(pygame.sprite.Sprite):
                     ]
                 )
             self.pos = pygame.Vector2(x, y)
-            if (
-                x < (constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES) * constant.TILE_SIZE + 4
-                or x > (constant.SCREEN_WIDTH_TILES - constant.LEFT_RIGHT_BORDER_TILES - constant.WALL_TILES) * constant.TILE_SIZE - 4
-                or y < (constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES) * constant.TILE_SIZE + 4
-                or y > (constant.SCREEN_HEIGHT_TILES - constant.TOP_BOTTOM_BORDER_TILES - constant.WALL_TILES) * constant.TILE_SIZE - 4
-            ):
-                self.random_pos(area)
+        if not self.check_pos(self.image):
+            self.random_pos(area)
+
+    def check_pos(self, image):
+        """Kiểm tra vị trí item có hợp lệ không"""
+        if self.pos.x < constant.MAP_LEFT or self.pos.x > constant.MAP_RIGHT - image.get_width() or self.pos.y < constant.MAP_TOP or self.pos.y > constant.MAP_BOTTOM - image.get_height():
+            return False
+        for sprite in self.level.obstacle_group.sprites():
+            if sprite.rect.colliderect(pygame.Rect(self.pos.x, self.pos.y, image.get_width(), image.get_height())):
+                return False
+        
+        return True
     
     def on_collision(self):
         """Xử lý khi va chạm với rắn"""
@@ -141,6 +151,8 @@ class ItemEntity(pygame.sprite.Sprite):
     
     def update(self):
         """Update item state"""
+        if self.level.snake.is_dead or len(self.level.snake) ==0:
+            return
         # For INSTANT items, use collision detection
         if self.item_type.category == ItemCategory.INSTANT:
             if pygame.sprite.spritecollideany(self, self.level.snake.blocks): # type: ignore

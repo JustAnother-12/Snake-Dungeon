@@ -1,5 +1,7 @@
 import random
 import config.constant as constant
+from entities.items.coin import CoinEntity
+from entities.items.food import FoodEntity
 import utils.pixil as pixil
 from time import time
 import pygame
@@ -16,10 +18,6 @@ class Pot(pygame.sprite.Sprite):
         self.collision_time = None
         self.alpha = 255
         self.isClosed = True
-        self.lootpool = LootPool()
-        self.lootpool.add_item(LootItem.COIN, 20)
-        self.lootpool.add_item(LootItem.FOOD, 8)
-        self.lootpool.add_item(LootItem.NONE, 72)
 
     def update(self):
         if self.__is_collision_with_snake():
@@ -36,19 +34,17 @@ class Pot(pygame.sprite.Sprite):
                         self.kill()
 
     def __is_collision_with_snake(self):
-        return self.rect and not self.level.snake.is_death and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and not self.level.snake.is_dead and self.rect.colliderect(self.level.snake.blocks[0].rect)
     
     def open(self):
         self.isClosed = False
-        item = self.lootpool.get_item()
+        item = LootPool().get_item("POT")
         if item == LootItem.COIN:
-            # self.level.coins.add_coin(random.randint(1, 3), self, 1)
-            pass
+            self.level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
             # TODO: tạo một class tính tỉ lệ rơi vật phẩm
         elif item == LootItem.FOOD:
-            # self.level.foods.add_food(self)
+            self.level.item_group.add(FoodEntity(self.level, self.rect, 1))
             # TODO:
-            pass
         if self.collision_time == None:
             self.collision_time = time()
 

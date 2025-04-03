@@ -1,8 +1,6 @@
 import random
-import re
 import pygame
 from pygame.math import Vector2
-from time import time
 
 from config import constant
 from entities.Player import Snake, SnakeBlock
@@ -10,10 +8,13 @@ from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
 
 class AIMonster(Snake):
-    def __init__(self, level, init_len):
+    def __init__(self, level, init_len, pos):
+        self.pos = pos
         super().__init__(level, init_len)
         self.player = None  # Reference to the player object
         self.avoidance_radius = 5 * constant.TILE_SIZE  # Radius to avoid traps and obstacles
+        self.direction = Vector2(0, 0)
+        self.is_curling = True
 
     def set_player_reference(self, player: Snake):
         self.player = player
@@ -22,8 +23,7 @@ class AIMonster(Snake):
         if len(self.blocks) <= constant.MIN_LEN:
             self.is_death = True
             return
-        dt = min(pygame.time.get_ticks() - self.previous_time, 20)
-        self.previous_time = pygame.time.get_ticks()
+        dt = self.level.game.clock.get_time()
         self.handle_severed_blocks()
         if self.auto_state:
             self.handle_ai_movement()
@@ -50,7 +50,7 @@ class AIMonster(Snake):
             if snake_block.moving:
                 return
 
-        if self.is_death:
+        if self.is_dead:
             return
 
         head_pos = self._block_positions[0]
@@ -62,17 +62,20 @@ class AIMonster(Snake):
         valid_moves = []
         w = []
         for move in potential_moves:
+            if move == -self.direction:
+                continue
             new_head_pos = head_pos + move * constant.TILE_SIZE
             if not self._is_collide(new_head_pos):
                 valid_moves.append(move)
-                w.append(50 if move == self.direction else 1)
+                w.append(20 if move == self.direction else 1)
 
-        if valid_moves:
-            self._last_direction = self.direction
+        if len(valid_moves) > 0:
             self.direction = random.choices(valid_moves, w)[0] 
-            #if self._last_direction not in valid_moves else self._last_direction
+            self.is_curling = False
             self._block_positions.insert(0, head_pos + self.direction * constant.TILE_SIZE)
-
+        else:
+            self.is_death = True
+            return
         if len(self._block_positions) > len(self.blocks):
             self._block_positions.pop()
 
@@ -132,11 +135,8 @@ class AIMonster(Snake):
         return False
     
     def _init_snake_blocks(self, init_len):
-        x = 0
-        y = 80
+        x, y = self.pos
         for i in range(init_len):
-            x = (constant.SCREEN_WIDTH_TILES // 2 - i) * constant.TILE_SIZE
-            y = (constant.SCREEN_HEIGHT_TILES // 2) * constant.TILE_SIZE
             block = SnakeBlock(int(i==0) ,(x, y), self.color)
             self.blocks.append(block)
 

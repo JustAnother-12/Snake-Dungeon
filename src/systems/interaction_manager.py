@@ -26,9 +26,8 @@ class InteractionManager:
         return obj in self.__interactable_objs
 
     def get_closest_obj(self):
-        if not self.__interactable_objs:
+        if not self.__interactable_objs or  len(self.level.snake) == 0:
             return None
-    
         head_pos = pygame.Vector2(self.level.snake.blocks[0].rect.center)
         
         closest_obj = None

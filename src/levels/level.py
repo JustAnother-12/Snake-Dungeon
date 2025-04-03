@@ -1,4 +1,5 @@
 from __future__ import annotations
+from operator import contains
 import pygame
 from time import time
 
@@ -43,7 +44,7 @@ class Level(State):
         
         # Main entities
         self.snake = GreenSnake(self, 5)
-        self.monster = AIMonster(self, 5)
+        self.monster = AIMonster(self, 5, (constant.MAP_LEFT, constant.MAP_TOP))
         self.monster.set_player_reference(self.snake)
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
@@ -137,7 +138,7 @@ class Level(State):
 
         self.__dev_test()
 
-        if self.snake.is_death:
+        if self.snake.is_dead:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(GameOver_menu(self.game))
         

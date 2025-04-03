@@ -15,7 +15,7 @@ from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
 from stats import Stats
 from utils.pixil import Pixil
-from ui.screens.stats import base_stats_value
+from ui.screens.Stats_Menu import base_stats_value
 
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, layer, pos: tuple[int, int], color: pygame.Color) -> None:
@@ -116,7 +116,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                 )
         return True
 
-    def update(self, snake, type) -> None:
+    def transform(self, snake, type) -> None:
         if self.timeSevered and time() - self.timeSevered > 2:
             if type == "COIN":
                 # snake.level.coins.add_coin(random.randint(10, 15), self, 1)
@@ -148,10 +148,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.is_speed_boost = False
         self.speed_cool_down = 0
         self.base_speed = 16
-        self.previous_time = pygame.time.get_ticks()
         
         # Snake state
-        self.is_death = False
+        self.is_dead = False
         self.blocks: list[SnakeBlock] = []
         self.base_speed = constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)
         self.gold = 0
@@ -326,7 +325,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if snake_block.moving:
                 return
 
-        if self.is_death: return
+        if self.is_dead: return
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
@@ -372,10 +371,9 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def update(self):
         if len(self.blocks) <= constant.MIN_LEN:
-            self.is_death = True
+            self.is_dead = True
             return
-        dt = min(pygame.time.get_ticks() - self.previous_time, 20)
-        self.previous_time = pygame.time.get_ticks()
+        dt = self.level.game.clock.get_time()
         self.handle_severed_blocks()
         self.handle_input()
         if self.auto_state:
@@ -402,7 +400,7 @@ class Snake(pygame.sprite.AbstractGroup):
     def handle_severed_blocks(self):
         for block in self.sprites():
             if block not in self.blocks:
-                block.update(self, "COIN")
+                block.transform(self, "COIN")
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
         t = super().draw(surface)
@@ -424,7 +422,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
         if len(self.blocks) <= constant.MIN_LEN:
-            self.is_death = True
+            self.is_dead = True
 
     def handle_speed_boost(self):
         if self.is_speed_boost:
