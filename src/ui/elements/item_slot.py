@@ -10,7 +10,7 @@ class ItemSlot(pygame.sprite.Sprite):
     from entities.items.item_stack import ItemStack
     def __init__(self, x_pos, y_pos, item_stack: ItemStack | None = None):
         super().__init__()
-        self._image = pixil.Pixil.load("game-assets/graphics/pixil/ITEM_SLOTS.pixil", 1).frames[0]
+        self._image = pixil.Pixil.load("game-assets/graphics/pixil/EQUIPMENT_SLOTS.pixil", 1).frames[0]
         self.image = self._image.copy()
         self.rect = self.image.get_rect(center=(x_pos, y_pos))
         self.__item_stack = item_stack
