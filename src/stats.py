@@ -12,7 +12,7 @@ class Stats:
             "value": 0,
             "description": "the overall length of the body"
         },
-        "ARMOUR": {
+        "RESISTANCE": {
             "value": 0,
             "description": "Increase I-frame upon hit"
         },

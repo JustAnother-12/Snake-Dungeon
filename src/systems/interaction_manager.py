@@ -25,7 +25,7 @@ class InteractionManager:
     def is_registered(self, obj):
         return obj in self.__interactable_objs
 
-    def get_closest_obj(self):
+    def get_closest_obj(self) -> ItemEntity | None:
         if not self.__interactable_objs or  len(self.level.snake) == 0:
             return None
         head_pos = pygame.Vector2(self.level.snake.blocks[0].rect.center)

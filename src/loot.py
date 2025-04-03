@@ -69,11 +69,6 @@ class LootPool:
         for item, rate in self.loot_table.items():
             print(f"{item}: {rate}%")
 
-class Rarity(Enum):
-    COMMON = "Common"
-    UNCOMMON = "Uncommon"
-    RARE = "Rare"
-
 class LootItem(Enum):
     EMPTY = "Empty"
     NON_EMPTY = "Non Empty"

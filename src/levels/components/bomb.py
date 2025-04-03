@@ -6,13 +6,16 @@ from time import time
 import pygame
 
 class Bomb(pygame.sprite.Sprite):
-    def __init__(self, level) -> None:
+    def __init__(self, level, pos = None) -> None:
         super().__init__()
         self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/BOMB_SHEET.pixil", 1
         ).frames[0]
-        self.random_pos()
+        if pos == None:
+            self.random_pos()
+        else:
+            self.pos = pos
         self.rect = self.image.get_rect(topleft=self.pos)
         self.activeTime = None
         self.timeAppear = time()
@@ -42,7 +45,7 @@ class Bomb(pygame.sprite.Sprite):
         )
 
     def __is_collision_with_snake(self):
-        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+        return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
 
     def update(self):
         if self.__is_collision_with_snake():
@@ -55,8 +58,8 @@ class Bomb(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect(topleft=self.pos- pygame.Vector2(TILE_SIZE, TILE_SIZE))
             else:
                 self.kill()
-        # elif time() - self.timeAppear > 3:
-        #     self.activeTime = time()
+        elif time() - self.timeAppear > 3:
+            self.activeTime = time()
 
     def on_collision(self):
         if not self.activeTime:

@@ -21,8 +21,7 @@ class ItemStack:
         current_time = time.time()
         
         # Kiểm tra cooldown cho equipment
-        if (self.item_type.category == ItemCategory.EQUIPMENT and 
-            current_time - self.last_used_time < self.item_type.cooldown):
+        if current_time - self.last_used_time < self.item_type.cooldown:
             return False
             
         # Gọi hiệu ứng của item
@@ -42,10 +41,7 @@ class ItemStack:
         pass
         
     def get_cooldown_remaining(self):
-        """Trả về thời gian cooldown còn lại"""
-        if self.item_type.category != ItemCategory.EQUIPMENT:
-            return 0
-        
+        """Trả về thời gian cooldown còn lại"""        
         elapsed = time.time() - self.last_used_time
         remaining = max(0, self.item_type.cooldown - elapsed)
         return remaining
@@ -70,3 +66,9 @@ class ItemStack:
         if fun_name in snake.run_time_overriding:
             if fun in snake.run_time_overriding[fun_name][pos]:
                 snake.run_time_overriding[fun_name][pos].remove( fun)
+
+
+    def __eq__(self, other):
+        if not isinstance(other, ItemStack):
+            return False
+        return self.item_type == other.item_type

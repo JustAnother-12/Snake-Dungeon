@@ -4,6 +4,7 @@ from typing import Any
 
 from pygame import Event
 import pygame
+from entities.items.item_type import ItemCategory
 from ui.elements import button
 from ui.elements.button import ButtonElement
 from ui.screens.state import State
@@ -31,10 +32,12 @@ class ItemInfoPopup(State):
     def get_event(self, event: Event):
         # TODO: sửa lại
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.button.isHovered():
-                self.level.snake.add_item(self.item_entity.to_item_stack())
-                self.item_entity.kill()
-                print('ok')
-                self.level.interaction_manager.unregister_interact(self.item_entity)
+            if self.button.isHovered():    
+                if self.level.snake.add_item(self.item_entity.to_item_stack()):
+                    self.item_entity.kill()
+                    print('ok')
+                    self.level.interaction_manager.unregister_interact(self.item_entity)
+                else:
+                    print("equipment exists")
                 self.level.game.state_stack.pop()
         return super().get_event(event)

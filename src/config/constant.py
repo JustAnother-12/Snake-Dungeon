@@ -40,6 +40,7 @@ class Texture:
     snake_head= "game-assets/graphics/pixil/SNAKE_HEAD.pixil"
     pasue_menu_bg = "game-assets/graphics/pixil/PAUSED_MENU_BG.pixil"
     apple = "game-assets/graphics/pixil/apple.pixil"
+    bomb = "game-assets/graphics/pixil/BOMB_SHEET.pixil"
 
 
     
