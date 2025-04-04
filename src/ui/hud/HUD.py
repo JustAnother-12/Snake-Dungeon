@@ -6,13 +6,13 @@ from ui.elements.text import TextElement
 from utils.pixil import Pixil
 import config.constant as constant
 
-
 class HUD(pygame.sprite.Group):
-    def __init__(self, level) -> None:
+    from levels import level
+    def __init__(self, level_: "level.Level") -> None:
         super().__init__()
-        self.level = level
-        snake = self.level.snake
-        coin,length, keys = self.level.snake.gold, len(self.level.snake), self.level.snake.keys
+        self.level_ = level_
+        snake = self.level_.snake
+        coin,length, keys = self.level_.snake.gold, len(self.level_.snake), self.level_.snake.keys
         from entities.Player import Snake, GreenSnake, OrangeSnake, GraySnake
         self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON_ALT.pixil", 1).frames[0]
         if isinstance(snake, OrangeSnake):
@@ -37,24 +37,26 @@ class HUD(pygame.sprite.Group):
 
         i = constant.TILE_SIZE * ( constant.SCREEN_HEIGHT_TILES) + 50
         self.item_slot = [
-            ItemSlot(i, 70),
-            ItemSlot(i, 70 + 64),
 
-        ]
-
-        self.skill_slot = [
+            ItemSlot(i, 70 + 64 + 20),
             ItemSlot(i, 70 + 64 * 2 + 20),
-            ItemSlot(i, 70 + 64 * 3 + 20),
-            ItemSlot(i, 70 + 64 * 4 + 20),
+
+            ItemSlot(i, 70 + 64 * 3 + 40),
+            ItemSlot(i, 70 + 64 * 4 + 40),
+            ItemSlot(i, 70 + 64 * 5 + 40),
+
+            ItemSlot(i, 70),
         ]
+
+        self.level_.snake.invitory.slots
+        
         self.Key_text = TextElement(str(snake.keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
+        self.stamina_bar = pygame.sprite.Sprite()
 
         self.add(self.Player_Icon_rect, self.Gold_Icon_rect, self.Length_Icon_rect, self.Gold_text, self.length_text, self.Key_Icon_rect, self.Key_text)
-        self.add(*self.item_slot)
-        self.add(*self.skill_slot)
-        self.stamina_bar = pygame.sprite.Sprite()
         self.draw_stamina(snake.stamina, snake.base_stats.energy_cap)
         self.add(self.stamina_bar)
+        self.add(*self.item_slot)
 
     def set_gold(self, num):
         for grp in self.Gold_text.groups():
@@ -101,16 +103,13 @@ class HUD(pygame.sprite.Group):
         self.stamina_bar.rect = self.stamina_bar.image.get_rect(topleft=(6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE))
 
     def update(self):
-        self.draw_stamina(self.level.snake.stamina, self.level.snake.base_stats.energy_cap)
-        coin,length, keys = self.level.snake.gold, len(self.level.snake), self.level.snake.keys
+        self.draw_stamina(self.level_.snake.stamina, self.level_.snake.base_stats.energy_cap)
+        coin,length, keys = self.level_.snake.gold, len(self.level_.snake), self.level_.snake.keys
         self.set_gold(coin)
         self.set_length(length)
         self.set_key(keys)
 
-        for index, value in enumerate(self.level.snake.item_slot):
+        for index, value in enumerate(self.level_.snake.invitory.slots):
             self.item_slot[index].item_stack = value # type: ignore
-        
-        for index, value in enumerate(self.level.snake.skill_slot):
-            self.skill_slot[index].item_stack = value # type: ignore
 
         super().update(self)

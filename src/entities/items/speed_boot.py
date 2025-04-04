@@ -36,14 +36,15 @@ class SpeedBootStack(ItemStack):
         self.add_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
     
     def speed_boot(self, snake: Snake, *args, **kwargs):
-        print('ok')
         if time.time() - self.active_time > 3:
             self.remove_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
             # self.remove_runtime_overriding()
         
         snake.base_stats.speed = self.last_speed * 2
-
         return args, kwargs
+    
+    def get_item_entity_class(self):
+        return SpeedBootEntity
 
 class SpeedBootEntity(ItemEntity):
     def __init__(self, level, area: Rect | None = None, r=2, quantity=1):

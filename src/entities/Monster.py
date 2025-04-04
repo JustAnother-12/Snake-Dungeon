@@ -7,7 +7,7 @@ from entities.Player import Snake, SnakeBlock
 from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
 
-class AIMonster(Snake):
+class Monster(Snake):
     def __init__(self, level, init_len, pos):
         self.pos = pos
         super().__init__(level, init_len)
@@ -102,21 +102,6 @@ class AIMonster(Snake):
         for obstacle in self.level.obstacle_group:
             obstacle: Obstacle
             if obstacle.rect and obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):
-                return True
-        return False
-
-    def _is_collide_with_self(self, position):
-        if self.is_curling:
-            return False
-        for block in self.blocks[1:]:
-            if block.rect.colliderect(
-                (
-                    position[0],
-                    position[1],
-                    constant.TILE_SIZE,
-                    constant.TILE_SIZE,
-                )
-            ):
                 return True
         return False
 

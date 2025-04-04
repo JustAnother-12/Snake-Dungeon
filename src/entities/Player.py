@@ -9,6 +9,7 @@ from pygame.math import Vector2
 from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
 from entities.items.item_type import ItemCategory
+from systems.invitory_manager import InvitoryManager
 import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
@@ -125,9 +126,8 @@ class SnakeBlock(pygame.sprite.Sprite):
 
 
 class Snake(pygame.sprite.AbstractGroup):
-    # from states import LevelTest
-    
     def __init__(self, level, init_len):
+
         # Initialize base components
         self.run_time_overriding = {}
         super().__init__()
@@ -137,9 +137,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         
         # Item and skill management
-        self.skill_slot: list[ItemStack | None] = [None, None, None]
-        self.item_slot: list [ItemStack | None] = [None, None]
-        self.level = level
+        self.invitory = InvitoryManager(self)
+        from levels.level import Level
+        self.level : Level= level
 
         # Movement and stamina attributes
         self.base_stats = base_stats_value()
@@ -207,37 +207,6 @@ class Snake(pygame.sprite.AbstractGroup):
         except AttributeError:
             # Handle case where attribute doesn't exist
             raise
-    
-    def add_item(self, item: ItemStack):
-
-        arr = self.item_slot
-        if item.item_type.category == ItemCategory.EQUIPMENT:
-            arr = self.skill_slot
-
-        for index, value in enumerate(arr):
-            if value is None: continue
-            if value.can_stack_with(item):
-                arr[index].quantity += 1 # type: ignore
-                return True
-            if value.item_type.id == item.item_type.id and value.item_type.category == ItemCategory.EQUIPMENT:
-                return False # equipment không thể nhặt 2 cái cùng loại
-
-        for index, value in enumerate(arr):
-            if value is None: 
-                arr[index] = item
-                return True
-                
-            
-    def remove_item(self, item: ItemStack):
-
-        arr = self.item_slot
-        if item.item_type.category == ItemCategory.EQUIPMENT:
-            arr = self.skill_slot
-
-        for index, value in enumerate(arr):
-            if value is None: continue
-            if value.item_type.id == item.item_type.id: # type: ignore
-                arr[index] = None
 
     def __len__(self):
         return len(self.blocks)
@@ -295,25 +264,8 @@ class Snake(pygame.sprite.AbstractGroup):
         else:
             self.is_speed_boost = False
         
-        item_map = [
-            pygame.K_1, 
-            pygame.K_2, 
-        ]
 
-        skill_map = [
-            pygame.K_3,
-            pygame.K_4, 
-            pygame.K_5,
-        ]
-
-        for index, key in enumerate(item_map):
-            if just_keys[key] and self.item_slot[index]:
-                self.item_slot[index].use(self) # type: ignore
-        
-        for index, key in enumerate(skill_map):
-            if just_keys[key] and self.skill_slot[index]:
-                self.skill_slot[index].use(self) # type: ignore
-        
+        self.invitory.handle_input()
 
     def handle_movement(self):
         for snake_block in self.blocks:
@@ -507,8 +459,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.base_stats.energy_regen = constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")/100)
 
 class GreenSnake(Snake):
-
-    from levels import level
+    from levels import level # type: ignore
     def __init__(self, level: "level.Level", init_len):
         self.color = pygame.Color("#0abf2b")
         self.headImg = Pixil.load("game-assets/graphics/pixil/SNAKE_HEAD.pixil", 1).frames[1]
@@ -528,7 +479,7 @@ class GreenSnake(Snake):
             self._out_of_bounds_time = None
 
 class OrangeSnake(Snake):
-    from levels import level
+    from levels import level # type: ignore
 
     def __init__(self, level: "level.Level", init_len):
         Stats.setValue("ENERGY REGEN", 50)
@@ -539,7 +490,7 @@ class OrangeSnake(Snake):
         super().__init__(level, init_len)
 
 class GraySnake(Snake):
-    from levels import level
+    from levels import level # type: ignore
     def __init__(self, level: "level.Level", init_len):
         self.color = pygame.Color("#d3d3d3")
         self.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[2]

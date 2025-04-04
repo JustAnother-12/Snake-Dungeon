@@ -44,6 +44,7 @@ class ItemType:
     value: int = 1
     cooldown: float = 0
     price: int = 0
+    energy_usage: int = 0
     
     def __eq__(self, value: object) -> bool:
         if isinstance(value, ItemType):
@@ -59,6 +60,10 @@ class ItemType:
             self.max_stack = 1
         elif self.category == ItemCategory.INSTANT:
             self.max_stack = 0
+
+        # chỉ có SKILL mới có energy_usage
+        if self.category != ItemCategory.SKILL and self.energy_usage:
+            raise ValueError("Chỉ có skill mới có energu_usage")
             
         # Tự động gán giá dựa trên rarity nếu chưa được chỉ định
         if self.price == 0:
@@ -66,8 +71,6 @@ class ItemType:
                 Rarity.COMMON: 50,
                 Rarity.UNCOMMON: 100,
                 Rarity.RARE: 150,
-                # Rarity.EPIC: 150,
-                # Rarity.LEGENDARY: 500
             }
             self.price = rarities[self.rarity]
     

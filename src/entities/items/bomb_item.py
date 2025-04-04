@@ -23,6 +23,9 @@ class BombStack(ItemStack):
 
     def apply_effect(self, snake):
         snake.level.bomb_group.add(Bomb(snake.level, snake.blocks[-1].pos))
+    
+    def get_item_entity_class(self):
+        return BombEntity
 
 
 class BombEntity(ItemEntity):
