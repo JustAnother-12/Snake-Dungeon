@@ -10,6 +10,11 @@ from levels.components.wall import Wall
 class Monster(Snake):
     def __init__(self, level, init_len, pos):
         self.pos = pos
+        self.color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
+        self.headImg.fill(self.color)
+        pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
+        pygame.draw.rect(self.headImg, (255, 255, 255), (11, 3, 2, 4))
         super().__init__(level, init_len)
         self.player = None  # Reference to the player object
         self.avoidance_radius = 5 * constant.TILE_SIZE  # Radius to avoid traps and obstacles
@@ -20,13 +25,16 @@ class Monster(Snake):
         self.player = player
 
     def update(self):
+        if self.is_dead:
+            for block in self.blocks:
+                block.kill()
+            return
         if len(self.blocks) <= constant.MIN_LEN:
-            self.is_death = True
+            self.is_dead = True
             return
         dt = self.level.game.clock.get_time()
         self.handle_severed_blocks()
-        if self.auto_state:
-            self.handle_ai_movement()
+        self.handle_ai_movement()
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()
@@ -74,7 +82,7 @@ class Monster(Snake):
             self.is_curling = False
             self._block_positions.insert(0, head_pos + self.direction * constant.TILE_SIZE)
         else:
-            self.is_death = True
+            self.is_dead = True
             return
         if len(self._block_positions) > len(self.blocks):
             self._block_positions.pop()

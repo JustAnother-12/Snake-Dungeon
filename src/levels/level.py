@@ -47,8 +47,10 @@ class Level(State):
         
         # Main entities
         self.snake = GreenSnake(self, 5)
-        self.monster = Monster(self, 5, (constant.MAP_LEFT, constant.MAP_TOP))
-        self.monster.set_player_reference(self.snake)
+        self.monsters = []
+        for i in range(3):
+            self.monsters.append(Monster(self, random.randint(5, 8), (constant.MAP_LEFT, constant.MAP_TOP)))
+            self.monsters[i].set_player_reference(self.snake)
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
         
@@ -74,7 +76,7 @@ class Level(State):
             self.trap_group,
             self.pot_group,
             self.snake,
-            self.monster,
+            self.monsters,
             self.item_group,
             self.hud,
             self.bomb_group
@@ -148,7 +150,7 @@ class Level(State):
     def update(self):
 
         self.__dev_test()
-
+        self.monsters = [monster for monster in self.monsters if not monster.is_dead]
         if self.is_finished:
             self.game.state_stack.append(RoomCleared(self.game))
             self.snake.auto_state = False
