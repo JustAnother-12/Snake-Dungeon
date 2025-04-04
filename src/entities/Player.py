@@ -9,8 +9,8 @@ from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
 from entities.items.item_type import ItemCategory
 from levels.components.bomb import Bomb, BombState
-from systems.invitory_manager import InvitoryManager
 from utils.help import Share
+from systems.inventory_manager import InventoryManager
 import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
@@ -143,7 +143,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         
         # Item and skill management
-        self.invitory = InvitoryManager(self)
+        self.inventory = InventoryManager(self)
         from levels.level import Level
         self.level : Level= level
 
@@ -271,7 +271,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self.is_speed_boost = False
         
 
-        self.invitory.handle_input()
+        self.inventory.handle_input()
 
     def handle_movement(self):
         for snake_block in self.blocks:

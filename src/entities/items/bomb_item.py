@@ -13,13 +13,13 @@ BOMB_TYPE = ItemType(
     ItemTexture(
         constant.Texture.bomb
     ),
-    max_stack=5,
-    cooldown=5.0
+    max_stack=10,
+    cooldown=3.0
 )
 
 class BombStack(ItemStack):
-    def __init__(self):
-        super().__init__(BOMB_TYPE, 1)
+    def __init__(self, quantity=1):
+        super().__init__(BOMB_TYPE, quantity)
 
     def apply_effect(self, snake):
         snake.level.bomb_group.add(Bomb(snake.level, snake.blocks[-1].pos))
@@ -33,4 +33,4 @@ class BombEntity(ItemEntity):
         super().__init__(level, BOMB_TYPE, area, r, quantity)
 
     def to_item_stack(self):
-        return BombStack()
+        return BombStack(self.quantity)

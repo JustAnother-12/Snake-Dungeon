@@ -8,14 +8,15 @@ from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 SHIELD_TYPE = ItemType(
     id="shield",
     name="Shield",
-    category=ItemCategory.EQUIPMENT,
+    category=ItemCategory.SKILL,
     rarity=Rarity.RARE,
     texture=ItemTexture(
         "game-assets/graphics/pixil/SHIELD.pixil",
     ),
     cooldown=15.0,
     description="Temporary invincibility for 3 seconds",
-    price=150  # Shield is valuable!
+    price=150,  # Shield is valuable!
+    energy_usage= 30
 )
 
 class ShieldStack(ItemStack):
@@ -27,6 +28,7 @@ class ShieldStack(ItemStack):
     def apply_effect(self, snake):
         self.shield_active = False
         self.shield_end_time = time() + 3
+        snake.stamina -= self.item_type.energy_usage
         
         # if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
         #     snake.run_time_overriding['_is_collide_with_Obstacle'] = {

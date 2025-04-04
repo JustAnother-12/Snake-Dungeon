@@ -1,0 +1,1 @@
+self.screen.fill("#000000")
