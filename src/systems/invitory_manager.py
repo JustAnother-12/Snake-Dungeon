@@ -47,6 +47,11 @@ class InvitoryManager:
                 if not self.slots[index] is None:
                     self.slots[index].use(self.snake) # type: ignore
                 self.time_pess[index] = 0
+    
+    def update(self):
+        for value in self.slots:
+            if value is None: continue
+            value.update()
 
     def _check_item_exits(self, item: ItemStack):
         '''chả về vị trị của item đó trong mảng Không thấy thì nó trả về -1'''

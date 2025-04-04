@@ -3,13 +3,14 @@ import random
 from typing import Any, Literal
 import inspect
 import pygame
-from time import time
 from pygame.math import Vector2
 
 from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
 from entities.items.item_type import ItemCategory
+from levels.components.bomb import Bomb, BombState
 from systems.invitory_manager import InvitoryManager
+from utils.help import Share
 import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
@@ -33,7 +34,8 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.moving = False
         self.isOutside = False
         self.__is_head = False
-        self.timeSevered: float | None = None
+        self.time_severed = 0
+        self.is_severed = False  # Tracks if this block is severed from the snake's main body
 
     @property
     def is_head(self):
@@ -118,12 +120,16 @@ class SnakeBlock(pygame.sprite.Sprite):
         return True
 
     def transform(self, snake, type) -> None:
-        if self.timeSevered and time() - self.timeSevered > 2:
-            if type == "COIN":
-                for _ in range(random.randint(5, 10)):
-                    snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))
-            self.kill()
+        if not self.is_severed: return
 
+        from GUI import Game
+        self.time_severed += Share.clock.get_time() / 1000
+
+        if self.time_severed <= 2: return
+        if type == "COIN":
+            for _ in range(random.randint(5, 10)):
+                snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))
+        self.kill()
 
 class Snake(pygame.sprite.AbstractGroup):
     def __init__(self, level, init_len):
@@ -295,8 +301,6 @@ class Snake(pygame.sprite.AbstractGroup):
         if len(self._block_positions) > len(self.blocks):
             self._block_positions.pop()
 
-        
-
     def handle_collision(self):
 
         self._collide_with_active_trap()
@@ -326,6 +330,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_speed_boost()
         self.handle_collision()
         self.handle_skills(dt)
+        self.invitory.update()
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
             block.set_target(
@@ -343,6 +348,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def handle_severed_blocks(self):
         for block in self.sprites():
+            block: SnakeBlock
             if block not in self.blocks:
                 block.transform(self, "COIN")
 
@@ -361,8 +367,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def split(self, index):
         for block in self.blocks[index:]:
-            if block.timeSevered == None:
-                block.timeSevered = time()
+            block.is_severed = True
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
         if len(self.blocks) <= constant.MIN_LEN:
@@ -431,14 +436,22 @@ class Snake(pygame.sprite.AbstractGroup):
         pos = None
         for i in range(len(self.blocks)):
             block = self.blocks[i]
-            if pygame.sprite.spritecollideany(
-                block,
-                self.level.bomb_group,
-                lambda x, y: x.rect.colliderect(y.rect)
-                and time() - float(getattr(y, "activeTime", "inf") or "inf") > 0.6,
-            ):
-                block.kill()
-                pos = i if pos == None else pos
+            bom = pygame.sprite.spritecollideany(block, self.level.bomb_group) # type: ignore
+            if not bom is None:
+                bom: Bomb
+                if bom.state == BombState.EXPLOSION:
+                    block.kill()
+                    pos = i if pos == None else pos
+            
+                
+            # if pygame.sprite.spritecollideany(
+            #     block,
+            #     self.level.bomb_group,
+            #     lambda x, y: x.rect.colliderect(y.rect)
+            #     and time() - float(getattr(y, "activeTime", "inf") or "inf") > 0.6,
+            # ):
+            #     block.kill()
+            #     pos = i if pos == None else pos
         if pos != None:
             self.split(pos)
         pass

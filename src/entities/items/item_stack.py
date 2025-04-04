@@ -1,9 +1,9 @@
 from __future__ import annotations
-import time
 from typing import Any, Callable
 import typing
 
 from entities.items.item_type import ItemCategory, ItemType
+from utils.help import Share
 
 F = Callable[[Any], Any]
 
@@ -13,15 +13,16 @@ class ItemStack:
         self.item_type = item_type
         self.quantity = min(quantity, item_type.max_stack) if item_type.max_stack > 0 else quantity
         self.active = False
-        self.last_used_time = 0
+        self.cool_down = 0
 
     from entities import Player
     def use(self, snake: "Player.Snake"):
         """Sử dụng item"""
-        current_time = time.time()
         
         # Kiểm tra cooldown
-        if current_time - self.last_used_time < self.item_type.cooldown:
+        # if current_time - self.last_used_time < self.item_type.cooldown:
+        #     return False
+        if self.cool_down > 0:
             return False
         
         # kiểm tra xem còn thanh năng lượng không
@@ -33,7 +34,7 @@ class ItemStack:
             
         # Gọi hiệu ứng của item
         self.apply_effect(snake)
-        self.last_used_time = current_time
+        self.cool_down = self.item_type.cooldown
         
         # Giảm số lượng nếu là consumable
         if self.item_type.category == ItemCategory.CONSUMABLE:
@@ -49,9 +50,7 @@ class ItemStack:
         
     def get_cooldown_remaining(self):
         """Trả về thời gian cooldown còn lại"""        
-        elapsed = time.time() - self.last_used_time
-        remaining = max(0, self.item_type.cooldown - elapsed)
-        return remaining
+        return self.cool_down
     
     def can_stack_with(self, other: ItemStack):
         """Kiểm tra xem có thể stack với item khác không"""
@@ -65,7 +64,6 @@ class ItemStack:
             return True
         
         return False
-            
         
     def add_runtime_overriding(self, snake, fun_name: str, pos: typing.Literal['after', 'return', 'before'], fun):
         if fun_name not in snake.run_time_overriding:
@@ -82,7 +80,6 @@ class ItemStack:
             if fun in snake.run_time_overriding[fun_name][pos]:
                 snake.run_time_overriding[fun_name][pos].remove( fun)
 
-
     def __eq__(self, other):
         if not isinstance(other, ItemStack):
             return False
@@ -91,4 +88,7 @@ class ItemStack:
     def get_item_entity_class(self):
         from entities.items.item_entity import ItemEntity
         return ItemEntity
+
+    def update(self):
+        self.cool_down = max(0, self.cool_down - Share.clock.get_time() / 1000)
     

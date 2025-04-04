@@ -1,24 +1,38 @@
+from enum import Enum
 import random
 from config.constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import config.constant as constant
+from utils.help import Share
 import utils.pixil as pixil
 from time import time
 import pygame
 
+class BombState(Enum):
+    APPEAR = 1
+    ACTIVE = 2
+    EXPLOSION = 3
+    DISAPPEAR = 4
+
 class Bomb(pygame.sprite.Sprite):
-    def __init__(self, level, pos = None) -> None:
+    def __init__(self, level, pos = None, state: BombState = BombState.APPEAR) -> None:
         super().__init__()
         self.level = level
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/BOMB_SHEET.pixil", 1
         ).frames[0]
-        if pos == None:
-            self.random_pos()
-        else:
-            self.pos = pos
+        self.state = state
+        self.pos = pos if pos != None else self.random_pos()
         self.rect = self.image.get_rect(topleft=self.pos)
-        self.activeTime = None
-        self.timeAppear = time()
+        self.time = 0
+        self.animation = pixil.Pixil.load(
+            "game-assets/graphics/pixil/EXPLOSION_ANIMATION.pixil", 1
+        )
+        self.key_time = {
+            BombState.APPEAR: 0,
+            BombState.ACTIVE: 0.7,
+            BombState.EXPLOSION: 1,
+            BombState.DISAPPEAR: 0.5,
+        }
 
     def random_pos(self):
         self.pos = pygame.Vector2(
@@ -44,26 +58,38 @@ class Bomb(pygame.sprite.Sprite):
             * TILE_SIZE,
         )
 
+        return self.pos
+
     def __is_collision_with_snake(self):
         return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
 
     def update(self):
         if self.__is_collision_with_snake():
             self.on_collision()
-        if self.activeTime != None:
-            if time() - self.activeTime < 1:
-                self.image = pixil.Pixil.load(
-                    "game-assets/graphics/pixil/EXPLOSION_ANIMATION.pixil", 1
-                ).frames[int((time() - self.activeTime) * 7)]
-                self.rect = self.image.get_rect(topleft=self.pos- pygame.Vector2(TILE_SIZE, TILE_SIZE))
-            else:
-                self.kill()
-        elif time() - self.timeAppear > 3:
-            self.activeTime = time()
+
+        if self.state == BombState.APPEAR:
+            return
+        
+        self.time += Share.clock.get_time() / 1000
+        if self.state == BombState.ACTIVE and self.time > self.key_time[BombState.ACTIVE]:
+                self.state = BombState.EXPLOSION
+                self.time = 0
+        
+        if self.state == BombState.EXPLOSION:
+            frame = self.animation.frames[
+                min(int(self.time / self.key_time[self.state] * len(self.animation.frames)), len(self.animation.frames) - 1)
+            ]
+            self.image = frame
+            self.rect = self.image.get_rect(topleft=self.pos - pygame.Vector2(TILE_SIZE, TILE_SIZE))
+            if self.time > self.key_time[BombState.EXPLOSION]:
+                self.state = BombState.DISAPPEAR
+                self.time = 0
+        
+        if self.state == BombState.DISAPPEAR and self.time > self.key_time[BombState.DISAPPEAR]:
+            self.kill()
 
     def on_collision(self):
-        if not self.activeTime:
-            self.activeTime = time()
+        self.state = BombState.ACTIVE
 
 class BombGroup(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity = 0) -> None:

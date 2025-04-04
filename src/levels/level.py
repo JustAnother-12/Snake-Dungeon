@@ -12,7 +12,7 @@ from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from entities.items.key import KeyEntity
 from entities.items.speed_boot import SpeedBootEntity
-from levels.components.bomb import BombGroup
+from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
 from levels.components.obstacle import Obstacle, Obstacle_group
@@ -101,6 +101,10 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
+        # tạo bom
+        self.bomb_group.empty()
+        for i in range(3):
+            self.bomb_group.add(Bomb(self))
         
         # tạo item
         for i in range(10):
