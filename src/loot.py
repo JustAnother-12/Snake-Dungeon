@@ -3,71 +3,74 @@ from enum import Enum
 import random
 from re import L
 
+from entities.items.item_type import Rarity
+
 class LootPool:
-    def __init__(self, pot: Tuple = (50, 35, 15), chest: Tuple = (45, 35, 20)):
-        self.loot_table = {
-            "POT": {
-                "first_roll": {
-                    LootItem.EMPTY: 30,
-                    LootItem.NON_EMPTY: 70
-                },
-                "second_roll": {
-                    LootItem.COIN: pot[0],
-                    LootItem.FOOD: pot[1],
-                    LootItem.ITEM_INSTANT: pot[2]
-                }
-            },
-            "CHEST": {
-                "first_roll": {
-                    LootItem.COIN: 1
-                },
-                "second_roll": {
-                    LootItem.CONSUMABLE: chest[0],
-                    LootItem.EQUIPMENT: chest[1],
-                    LootItem.SKILL: chest[2]
-                }
-            }}
+    def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (50, 35, 15)):
+        """Khởi tạo LootPool với tỉ lệ xuất hiện của các vật phẩm
+        - item_rate: tuple chứa tỉ lệ xuất hiện của các vật phẩm trong loot pool
+            + item_rate[0]: EMPTY
+            + item_rate[1]: COIN
+            + item_rate[2]: FOOD
+            + item_rate[3]: ITEM_INSTANT
+            + item_rate[4]: CONSUMABLE
+            + item_rate[5]: EQUIPMENT
+            + item_rate[6]: SKILL
+        - rarity_rate: tuple chứa tỉ lệ xuất hiện của các độ hiếm trong ITEM_INSTANT
+            + rarity_rate[0]: COMMON
+            + rarity_rate[1]: UNCOMMON
+            + rarity_rate[2]: RARE
+        """
+        self.loot_table = {   
+            LootItem.EMPTY: item_rate[0],
+            LootItem.COIN: item_rate[1],
+            LootItem.FOOD: item_rate[2],
+            LootItem.ITEM_INSTANT: item_rate[3],
+            LootItem.CONSUMABLE: item_rate[4],
+            LootItem.EQUIPMENT: item_rate[5],
+            LootItem.SKILL: item_rate[6]
+        }
+        self.rarity_table = {
+            Rarity.COMMON: rarity_rate[0],
+            Rarity.UNCOMMON: rarity_rate[1],
+            Rarity.RARE: rarity_rate[2]
+        }
     def add_item(self, item, rate):
         """Thêm vật phẩm với tỉ lệ xuất hiện (%)"""
         self.loot_table[item] = rate
+    
+    def add_rarity(self, rarity, rate):
+        """Thêm độ hiếm với tỉ lệ xuất hiện (%)"""
+        self.rarity_table[rarity] = rate
 
     def remove_item(self, item):
         """Xóa vật phẩm khỏi danh sách"""
         if item in self.loot_table:
             del self.loot_table[item]
+        
+    def remove_rarity(self, rarity):
+        """Xóa độ hiếm khỏi danh sách"""
+        if rarity in self.rarity_table:
+            del self.rarity_table[rarity]
 
-    def set_rate(self, item, rate):
+    def set_rate(self, item_rate = None, rarity_rate = None):
         """Chỉnh sửa tỉ lệ xuất hiện của vật phẩm"""
-        if item in self.loot_table:
-            self.loot_table[item] = rate
+        if item_rate:
+            for index, value in enumerate(self.loot_table):
+                self.loot_table[value] = item_rate[index]
+        if rarity_rate:
+            for index, value in enumerate(self.rarity_table):
+                self.rarity_table[value] = rarity_rate[index]
 
-    def get_item(self, source: str):
-        """Mở rương và chọn ngẫu nhiên vật phẩm dựa trên tỉ lệ
-        - source: "POT" hoặc "CHEST"
-        """
-        match source:
-            case "POT":
-                # first_roll
-                items = list(self.loot_table["POT"]["first_roll"].keys())
-                rates = list(self.loot_table["POT"]["first_roll"].values())
-                choice = random.choices(items, weights=rates, k=1)[0]
-                if choice == LootItem.NON_EMPTY:
-                    # second_roll
-                    items = list(self.loot_table["POT"]["second_roll"].keys())
-                    rates = list(self.loot_table["POT"]["second_roll"].values())
-                    return random.choices(items, weights=rates, k=1)[0]
-                else:
-                    return LootItem.EMPTY
-            case "CHEST":
-                items = list(self.loot_table["CHEST"]["second_roll"].keys())
-                rates = list(self.loot_table["CHEST"]["second_roll"].values())
-                return random.randint(20, 25) ,random.choices(items, weights=rates, k=1)[0]
-            case _:
-                return LootItem.EMPTY
-    def show_loot_table(self):
-        """Hiển thị danh sách vật phẩm và tỉ lệ"""
-        for item, rate in self.loot_table.items():
-            print(f"{item}: {rate}%")
+    def get_item(self):
+        keys = list(self.loot_table.keys())
+        values = list(self.loot_table.values())
+        result = random.choices(keys, values)[0]
+        if result == LootItem.ITEM_INSTANT:
+            # Chọn ngẫu nhiên độ hiếm của ITEM_INSTANT
+            rarity = random.choices(list(self.rarity_table.keys()), list(self.rarity_table.values()))[0]
+            return rarity
+        return result
 
 class LootItem(Enum):
     EMPTY = "Empty"

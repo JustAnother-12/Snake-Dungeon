@@ -38,13 +38,15 @@ class Pot(pygame.sprite.Sprite):
     
     def open(self):
         self.isClosed = False
-        item = LootPool().get_item("POT")
+        item = LootPool((300, 350, 245, 105, 0, 0, 0)).get_item()
         if item == LootItem.COIN:
             self.level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
-            # TODO: tạo một class tính tỉ lệ rơi vật phẩm
         elif item == LootItem.FOOD:
             self.level.item_group.add(FoodEntity(self.level, self.rect, 1))
-            # TODO:
+        elif item == LootItem.EMPTY:
+            print("Empty pot")
+        else:
+            print(f"[{item.value}]: Instant item")
         if self.collision_time == None:
             self.collision_time = time()
 
