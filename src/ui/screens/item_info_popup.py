@@ -50,13 +50,13 @@ class ItemInfoPopup(State):
 
         # item's description display
         self.description_text = TextElement(item_entity.item_type.description.upper(), 'white', 14, self.bg_rect.midleft[0]+2*TILE_SIZE, self.bg_rect.midleft[1]+TILE_SIZE,'topleft',width=42*TILE_SIZE)
-
+        
         # popup's buttons display
         self.confirm_btn = ButtonElement(self.bg_rect.bottomleft[0]+10*TILE_SIZE, self.bg_rect.bottomleft[1]-3*TILE_SIZE, "CONFIRM", "white", 14, width=160, height=50)
         self.confirm_key_text = TextElement("E",'yellow', 20, self.bg_rect.bottomleft[0]+3*TILE_SIZE, self.bg_rect.bottomleft[1]-3*TILE_SIZE)
         self.sell_btn = ButtonElement(self.bg_rect.bottomright[0]-15*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE, "SELL FOR ", "white", 14, width=160, height=50)
         self.sell_key_text = TextElement("R",'yellow', 20, self.bg_rect.bottomright[0]-22*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
-        self.sell_price = int(item_entity.item_type.price*(1-40/100))
+        self.sell_price = int(item_entity.item_type.price*(1-40/100))*self.item_entity.quantity
         self.sell_price_text = TextElement(str(self.sell_price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-9*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
         
         self.add(self.bg_sprite, 
@@ -71,6 +71,11 @@ class ItemInfoPopup(State):
                  self.sell_key_text,
                  self.confirm_key_text
                  )
+        
+        if self.item_entity.quantity>1:
+            self.stack_info_text = TextElement("THIS IS A STACK OF ("+str(self.item_entity.quantity)+") ITEMS", 'grey', 10,self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]-7*TILE_SIZE, 'center')
+            self.add(self.stack_info_text)
+
     
     def update(self, *args: Any, **kwargs: Any) -> None:
         # if self.confirm_btn.on_hover():

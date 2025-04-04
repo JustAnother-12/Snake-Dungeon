@@ -1,5 +1,6 @@
 from __future__ import annotations
 from operator import contains
+import random
 import pygame
 from time import time
 
@@ -115,14 +116,14 @@ class Level(State):
             self.item_group.add(key)
 
         for i in range(3):
-            bomb = BombEntity(self)
+            bomb = BombEntity(self, quantity=random.randint(2,4))
             self.item_group.add(bomb)
         
         for i in range(3):
             item = ShieldEntity(self)
             self.item_group.add(item)
         for i in range(3):
-            self.item_group.add(SpeedBootEntity(self))
+            self.item_group.add(SpeedBootEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()
