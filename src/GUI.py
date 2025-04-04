@@ -1,9 +1,12 @@
+from __future__ import annotations
 import pygame
 import sys
 import config.constant as constant
 
+from systems.event_manager import EventManager
 from ui.screens.game_menu import MainMenu
 from ui.screens.state import State
+from utils.help import Share
 
 class Game:
     def __init__(self):
@@ -17,18 +20,18 @@ class Game:
         self.LEFT_RIGHT_BORDER_TILES = constant.LEFT_RIGHT_BORDER_TILES
         self.TOP_BOTTOM_BORDER_TILES = constant.TOP_BOTTOM_BORDER_TILES
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH_TILES*self.TILE_SIZE, self.SCREEN_HEIGHT_TILES*self.TILE_SIZE))
-        self.clock = pygame.time.Clock()
+        self.clock = Share.clock
         self.running, self.playing = True, True
         self.selectBtnMode = "mouse"
 
         self.state_stack: list[State] = []
         self.load_states()
-
+    
     def update(self):
         self.state_stack[-1].update()
 
     def get_events(self):
-        for event in pygame.event.get():
+        for event in EventManager.get_events():
             if event.type == pygame.QUIT:
                 self.running = False
                 self.playing = False
@@ -44,6 +47,7 @@ class Game:
     def run(self):
         while self.playing:
             # print(self.state_stack, end=" " * 50 + "\r", flush=True)
+            EventManager.update()
             self.get_events()
             self.render()
             self.update()

@@ -7,8 +7,10 @@ from entities.Player import Snake, SnakeBlock
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from levels.components.obstacle import Obstacle
+from levels.components.trap import TrapState
 from levels.components.wall import Wall
 from loot import LootItem, LootPool
+from levels.components.bomb import BombState
 
 class Monster(Snake):
     def __init__(self, level, init_len, pos = None):
@@ -168,7 +170,7 @@ class Monster(Snake):
             if distance < self.avoidance_radius:
                 # Nguy hiểm tăng khi khoảng cách giảm
                 danger += 1 - (distance / self.avoidance_radius)
-                if trap.isActive:
+                if trap.state == TrapState.ACTIVATED:
                     return 10
         return danger
 
@@ -181,7 +183,7 @@ class Monster(Snake):
             if distance < self.avoidance_radius:
                 # Nguy hiểm tăng khi khoảng cách giảm
                 danger += 1 - (distance / self.avoidance_radius)
-                if bomb.activeTime:
+                if bomb.state == BombState.ACTIVE or bomb.state == BombState.EXPLOSION:
                     return 10
         return danger
 
