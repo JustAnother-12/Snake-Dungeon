@@ -7,6 +7,7 @@ from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
+from stats import Stats
 
 
 SPEED_BOOT_TYPE = ItemType(
@@ -33,11 +34,11 @@ class SpeedBootStack(ItemStack):
 
         self.last_speed = snake.base_stats.speed
 
-        self.add_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
+        self.add_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boot)
     
     def speed_boot(self, snake: Snake, *args, **kwargs):
         if time.time() - self.active_time > 3:
-            self.remove_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
+            self.remove_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boot)
             # self.remove_runtime_overriding()
         
         snake.base_stats.speed = self.last_speed * 2
