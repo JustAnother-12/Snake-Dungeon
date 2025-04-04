@@ -84,7 +84,7 @@ class ItemInfoPopup(State):
         return super().update(*args, **kwargs)
     
     def getItem(self):
-        if self.level.snake.invitory.add_item(self.item_entity.to_item_stack()):
+        if self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
             self.item_entity.kill()
             print('ok')
             self.level.interaction_manager.unregister_interact(self.item_entity)

@@ -44,10 +44,6 @@ class ItemEntity(pygame.sprite.Sprite):
             color = (0, 255, 0, 100)  # Green
         else:
             color = (255, 215, 0, 100)  # Gold
-        # elif self.item_type.rarity.name == "EPIC":
-        #     color = (128, 0, 128, 100)  # Purple
-        # else:
-        #     color = (255, 215, 0, 100)  # Gold
             
         pygame.draw.rect(
             self.highlight_effect, 

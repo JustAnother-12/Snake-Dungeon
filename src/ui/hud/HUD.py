@@ -35,20 +35,30 @@ class HUD(pygame.sprite.Group):
         self.Key_Icon_rect = ImageElement(2*constant.TILE_SIZE, 18*constant.TILE_SIZE, self.Key_Icon)
         self.Key_text = TextElement(str(keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
 
-        i = constant.TILE_SIZE * ( constant.SCREEN_HEIGHT_TILES) + 50
+        i = constant.TILE_SIZE * ( constant.SCREEN_HEIGHT_TILES) + 85
+        gap = 4 # 4 pixel gap between slots
+        self.item_slot_index = [
+            TextElement("1",'white', 15, i-50, 128 + 64 + 20, 'midleft'),
+            TextElement("2",'white', 15, i-50, 128 + 64 * 2 + 20+gap, 'midleft'),
+
+            TextElement("3",'white', 15, i-50, 128 + 64 * 3 + 40+gap*2, 'midleft'),
+            TextElement("4",'white', 15, i-50, 128 + 64 * 4 + 40+gap*3, 'midleft'),
+            TextElement("5",'white', 15, i-50, 128 + 64 * 5 + 40+gap*4, 'midleft'),
+        ]
+        
         self.item_slot = [
 
-            ItemSlot(i, 70 + 64 + 20),
-            ItemSlot(i, 70 + 64 * 2 + 20),
+            ItemSlot(i, 128 + 64 + 20),
+            ItemSlot(i, 128 + 64 * 2 + 20+gap),
 
-            ItemSlot(i, 70 + 64 * 3 + 40),
-            ItemSlot(i, 70 + 64 * 4 + 40),
-            ItemSlot(i, 70 + 64 * 5 + 40),
+            ItemSlot(i, 128 + 64 * 3 + 40+gap*2),
+            ItemSlot(i, 128 + 64 * 4 + 40+gap*3),
+            ItemSlot(i, 128 + 64 * 5 + 40+gap*4),
 
-            ItemSlot(i, 70),
+            ItemSlot(i-(85-50-5), 80, scale=2),
         ]
 
-        self.level_.snake.invitory.slots
+        self.level_.snake.inventory.slots
         
         self.Key_text = TextElement(str(snake.keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
         self.stamina_bar = pygame.sprite.Sprite()
@@ -57,6 +67,7 @@ class HUD(pygame.sprite.Group):
         self.draw_stamina(snake.stamina, snake.base_stats.energy_cap)
         self.add(self.stamina_bar)
         self.add(*self.item_slot)
+        self.add(*self.item_slot_index)
 
     def set_gold(self, num):
         for grp in self.Gold_text.groups():
@@ -109,7 +120,7 @@ class HUD(pygame.sprite.Group):
         self.set_length(length)
         self.set_key(keys)
 
-        for index, value in enumerate(self.level_.snake.invitory.slots):
+        for index, value in enumerate(self.level_.snake.inventory.slots):
             self.item_slot[index].item_stack = value # type: ignore
 
         super().update(self)
