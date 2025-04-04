@@ -18,7 +18,7 @@ SPEED_BOOT_TYPE = ItemType(
         'game-assets/graphics/pixil/STATS_ICON_SHEET.pixil',
         0
     ),
-    max_stack=10,
+    max_stack=5,
     cooldown=5.0
 )
 

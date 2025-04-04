@@ -7,7 +7,7 @@ from entities.items.item_stack import F, ItemStack
 from entities.items.item_type import ItemCategory
 
 
-class InvitoryManager:
+class InventoryManager:
     from entities import Player
     def __init__(self, snake: "Player.Snake") -> None:
 
@@ -27,7 +27,7 @@ class InvitoryManager:
             pygame.K_3,
             pygame.K_4,
             pygame.K_5,
-            pygame.K_COMMA
+            pygame.K_LCTRL
         ]
         self.time_pess: list[float] = [0, 0, 0, 0, 0, 0]
         self.pess_time = 0.5
@@ -98,6 +98,8 @@ class InvitoryManager:
     def drop(self, index: int):
         # self.snake.level.item_group.add(ItemEntity())
         if self.slots[index] is None:
+            return False
+        elif self.slots[index].get_cooldown_remaining() > 0: # type:ignore
             return False
         
         item_entity_class = self.slots[index].get_item_entity_class() # type: ignore

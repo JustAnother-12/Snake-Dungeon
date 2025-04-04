@@ -10,8 +10,6 @@ class Rarity(Enum):
     COMMON = "Common"
     UNCOMMON = "Uncommon" 
     RARE = "Rare"
-    # EPIC = "Epic"
-    # LEGENDARY = "Legendary"
 
 class ItemCategory(Enum):
     # Item nhận hiệu ứng ngay (coin, food) - không vào inventory
