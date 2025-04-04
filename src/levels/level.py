@@ -49,7 +49,7 @@ class Level(State):
         self.snake = GreenSnake(self, 5)
         self.monsters = []
         for i in range(3):
-            self.monsters.append(Monster(self, random.randint(5, 8), (constant.MAP_LEFT, constant.MAP_TOP)))
+            self.monsters.append(Monster(self, random.randint(5, 8)))
             self.monsters[i].set_player_reference(self.snake)
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
@@ -59,7 +59,7 @@ class Level(State):
         self.obstacle_group = pygame.sprite.Group()
         self.trap_group = pygame.sprite.Group()
         self.pot_group = pygame.sprite.Group()
-        self.bomb_group = BombGroup(self)
+        self.bomb_group = pygame.sprite.Group()
         
         # Items
         self.item_group = pygame.sprite.Group()
@@ -103,7 +103,7 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
-        
+        self.bomb_group.empty()
         # tạo item
         for i in range(10):
             coin = CoinEntity(self)

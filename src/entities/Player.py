@@ -151,9 +151,9 @@ class Snake(pygame.sprite.AbstractGroup):
         # Snake state
         self.is_dead = False
         self.blocks: list[SnakeBlock] = []
-        self.direction = Vector2(1, 0)
+        self.direction = Vector2(0, 0)
         self._last_direction = Vector2(0, 0)
-        self.is_curling = False
+        self.is_curling = True
 
         # Movement control modes
         self.auto_state = True
@@ -212,11 +212,9 @@ class Snake(pygame.sprite.AbstractGroup):
         return len(self.blocks)
 
     def _init_snake_blocks(self, init_len):
-        x = 0
-        y = 0
         for i in range(init_len):
-            x = (constant.SCREEN_WIDTH_TILES // 2 - i) * constant.TILE_SIZE
-            y = (constant.SCREEN_HEIGHT_TILES // 2) * constant.TILE_SIZE
+            x = (constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE
+            y = constant.MAP_BOTTOM - constant.TILE_SIZE
             block = SnakeBlock(int(i==0) ,(x, y), self.color)
             self.blocks.append(block)
 

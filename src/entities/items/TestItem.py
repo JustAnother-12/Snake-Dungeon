@@ -28,7 +28,6 @@ class ShieldStack(ItemStack):
     def apply_effect(self, snake):
         self.shield_active = False
         self.shield_end_time = time() + 3
-        snake.stamina -= self.item_type.energy_usage
         
         # if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
         #     snake.run_time_overriding['_is_collide_with_Obstacle'] = {

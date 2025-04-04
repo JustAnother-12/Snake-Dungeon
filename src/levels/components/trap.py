@@ -17,30 +17,6 @@ class Trap(pygame.sprite.Sprite):
         self.isActive = False
         self.collisionTime = None
 
-    # def random_pos(self):
-    #     self.pos = pygame.Vector2(
-    #         random.randint(
-    #             constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
-    #             (
-    #                 SCREEN_WIDTH_TILES
-    #                 - constant.LEFT_RIGHT_BORDER_TILES
-    #                 - 2
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #         random.randint(
-    #             constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
-    #             (
-    #                 SCREEN_HEIGHT_TILES
-    #                 - constant.TOP_BOTTOM_BORDER_TILES
-    #                 - 2
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #     )
-
     def reset(self):
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
