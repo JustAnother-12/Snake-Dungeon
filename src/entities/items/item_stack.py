@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 from typing import Any, Callable
 import typing
@@ -14,13 +15,21 @@ class ItemStack:
         self.active = False
         self.last_used_time = 0
 
-    def use(self, snake):
+    from entities import Player
+    def use(self, snake: "Player.Snake"):
         """Sử dụng item"""
         current_time = time.time()
         
-        # Kiểm tra cooldown cho equipment
+        # Kiểm tra cooldown
         if current_time - self.last_used_time < self.item_type.cooldown:
             return False
+        
+        # kiểm tra xem còn thanh năng lượng không
+        if snake.stamina < self.item_type.energy_usage:
+            return False
+        
+        # Trừ năng lượng của người trơi
+        snake.stamina -= self.item_type.energy_usage
             
         # Gọi hiệu ứng của item
         self.apply_effect(snake)
@@ -30,7 +39,7 @@ class ItemStack:
         if self.item_type.category == ItemCategory.CONSUMABLE:
             self.quantity -= 1
             if self.quantity <= 0:
-                snake.remove_item(self)
+                snake.invitory.remove_item(self)
                 
         return True
     
@@ -44,11 +53,19 @@ class ItemStack:
         remaining = max(0, self.item_type.cooldown - elapsed)
         return remaining
     
-    def can_stack_with(self, other):
+    def can_stack_with(self, other: ItemStack):
         """Kiểm tra xem có thể stack với item khác không"""
         return (self.item_type.id == other.item_type.id and 
                 self.item_type.category == ItemCategory.CONSUMABLE and
-                self.quantity < self.item_type.max_stack)
+                self.quantity + other.quantity <= self.item_type.max_stack)
+        
+    def stack(self, other: ItemStack):
+        if self.can_stack_with(other):
+            self.quantity += other.quantity
+            return True
+        
+        return False
+            
         
     def add_runtime_overriding(self, snake, fun_name: str, pos: typing.Literal['after', 'return', 'before'], fun):
         if fun_name not in snake.run_time_overriding:
@@ -70,3 +87,8 @@ class ItemStack:
         if not isinstance(other, ItemStack):
             return False
         return self.item_type == other.item_type
+    
+    def get_item_entity_class(self):
+        from entities.items.item_entity import ItemEntity
+        return ItemEntity
+    

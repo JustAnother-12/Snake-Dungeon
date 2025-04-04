@@ -46,6 +46,9 @@ class ShieldStack(ItemStack):
             self.remove_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
             return False
     
+    def get_item_entity_class(self):
+        return ShieldEntity
+    
 
 class ShieldEntity(ItemEntity):
     def __init__(self, level, area=None, r=2, quantity=1):

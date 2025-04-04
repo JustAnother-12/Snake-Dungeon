@@ -13,8 +13,8 @@ from utils.pixil import Pixil
 
 
 class ItemInfoPopup(State):
-    
-    def __init__(self, level, item_entity):
+    from levels import level as l
+    def __init__(self, level: "l.Level", item_entity):
         super().__init__(self)
         self.level = level
         self.item_entity = item_entity
@@ -84,11 +84,12 @@ class ItemInfoPopup(State):
         return super().update(*args, **kwargs)
     
     def getItem(self):
-        if self.level.snake.add_item(self.item_entity.to_item_stack()):
+        if self.level.snake.invitory.add_item(self.item_entity.to_item_stack()):
             self.item_entity.kill()
             print('ok')
             self.level.interaction_manager.unregister_interact(self.item_entity)
         self.level.game.state_stack.pop()
+
     def sellItem(self):
         self.level.snake.gold+=self.sell_price
         self.item_entity.kill()

@@ -11,6 +11,7 @@ class ItemSlot(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, item_stack: ItemStack | None = None):
         super().__init__()
         self._image = pixil.Pixil.load("game-assets/graphics/pixil/EQUIPMENT_SLOTS.pixil", 1).frames[0]
+        self._empty_slot = pixil.Pixil.load("game-assets/graphics/pixil/EMPTY_SLOTS.pixil", 1).frames[0]
         self.image = self._image.copy()
         self.rect = self.image.get_rect(center=(x_pos, y_pos))
         self.__item_stack = item_stack
@@ -35,7 +36,10 @@ class ItemSlot(pygame.sprite.Sprite):
     
     def update(self, *args: Any, **kwargs: Any) -> None:
         self.image.fill((0,0,0,0)) # type: ignore
-        self.image.blit(self._image) # type: ignore
+        if self.item_stack is None:
+            self.image.blit(self._empty_slot) # type: ignore
+        else:
+            self.image.blit(self._image) # type: ignore
         if not self.item_img: 
             super().update(*args, **kwargs)
             return
