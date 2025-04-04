@@ -104,5 +104,3 @@ class InvitoryManager:
         self.snake.level.item_group.add(item_entity_class(self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity)) # type: ignore
         self.slots[index] = None
         return True
-
-        
