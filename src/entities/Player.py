@@ -330,7 +330,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_speed_boost()
         self.handle_collision()
         self.handle_skills(dt)
-        self.invitory.update()
+        self.inventory.update()
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
             block.set_target(
