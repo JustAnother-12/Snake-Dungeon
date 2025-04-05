@@ -149,7 +149,7 @@ class ItemEntity(pygame.sprite.Sprite):
             return
         # For INSTANT items, use collision detection
         if self.item_type.category == ItemCategory.INSTANT:
-            if pygame.sprite.spritecollideany(self, self.level.snake.blocks): # type: ignore
+            if self._is_collision_with_snake(): # type: ignore
                 self.on_collision()
             return
         
@@ -196,3 +196,6 @@ class ItemEntity(pygame.sprite.Sprite):
         # TODO: hiển thị thông popup 
         self.level.game.state_stack.append(ItemInfoPopup(self.level, self))
         # print("aloooo")
+
+    def _is_collision_with_snake(self):
+        return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
