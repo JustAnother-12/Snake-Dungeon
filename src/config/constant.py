@@ -1,5 +1,3 @@
-import pygame
-
 TILE_SIZE = 16
 SCREEN_WIDTH_TILES = 58
 SCREEN_HEIGHT_TILES = 50
@@ -41,6 +39,7 @@ class Texture:
     pasue_menu_bg = "game-assets/graphics/pixil/PAUSED_MENU_BG.pixil"
     apple = "game-assets/graphics/pixil/apple.pixil"
     bomb = "game-assets/graphics/pixil/BOMB_SHEET.pixil"
+    ouroboros = "game-assets/graphics/pixil/EQUIPMENT_TEST.pixil"
 
 
     

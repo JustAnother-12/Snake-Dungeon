@@ -1,6 +1,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
+from tkinter import NO
 from unicodedata import category
 
 from utils import pixil
@@ -24,6 +25,18 @@ class ItemCategory(Enum):
     # Item dùng nhiều lần, không stack
     SKILL = auto()
 
+class ActivationType(Enum):
+    # Kích hoạt khi va chạm với item
+    ON_COLLISION = auto()
+    
+    # Kích hoạt khi nhặt item
+    ON_PICKUP = auto()
+    
+    # Kích hoạt khi người dùng chọn dùng từ slot
+    ON_USE = auto()
+
+    AUTO = auto()
+
 @dataclass
 class ItemTexture:
     pixil_path: str
@@ -43,6 +56,7 @@ class ItemType:
     cooldown: float = 0
     price: int = 0
     energy_usage: int = 0
+    activation_type: ActivationType = ActivationType.AUTO
     
     def __eq__(self, value: object) -> bool:
         if isinstance(value, ItemType):
@@ -58,6 +72,13 @@ class ItemType:
             self.max_stack = 1
         elif self.category == ItemCategory.INSTANT:
             self.max_stack = 0
+
+        if self.activation_type == ActivationType.AUTO:
+            match self.category:
+                case ItemCategory.INSTANT | ItemCategory.EQUIPMENT:
+                    self.activation_type = ActivationType.ON_PICKUP
+                case ItemCategory.CONSUMABLE | ItemCategory.SKILL:
+                    self.activation_type = ActivationType.ON_USE
 
         # chỉ có SKILL mới có energy_usage
         if self.category != ItemCategory.SKILL and self.energy_usage:

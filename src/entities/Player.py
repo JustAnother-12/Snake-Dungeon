@@ -5,11 +5,9 @@ import inspect
 import pygame
 from pygame.math import Vector2
 
-from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
-from entities.items.item_type import ItemCategory
 from levels.components.bomb import Bomb, BombState
-from levels.components.trap import Trap, TrapState
+from levels.components.trap import TrapState
 from utils.help import Share
 from systems.inventory_manager import InventoryManager
 import utils.pixil as pixil
@@ -309,7 +307,7 @@ class Snake(pygame.sprite.AbstractGroup):
         if self._will_go_out_of_bounds:
             if self._out_of_bounds_time != None:
                 if self._out_of_bounds_time / 1000 > self.base_stats.resistance:
-                    self.isDeath = True
+                    self.is_dead = True
                 else:
                     self._out_of_bounds_time += dt
         else:
@@ -473,19 +471,6 @@ class GreenSnake(Snake):
         self.color = pygame.Color("#0abf2b")
         self.headImg = Pixil.load("game-assets/graphics/pixil/SNAKE_HEAD.pixil", 1).frames[1]
         super().__init__(level, init_len)
-
-    def handle_go_out_of_bounds(self, dt):
-        if self._will_go_out_of_bounds:
-            if self._out_of_bounds_time != None:
-                if self._out_of_bounds_time / 1000 > constant.DEATH_DELAY/1.2 * (1 + Stats.getValue("RESISTANCE")/100):
-                    block = self.blocks.pop()
-                    block.kill()
-                    self._out_of_bounds_time = None
-                    self._will_go_out_of_bounds = False
-                else:
-                    self._out_of_bounds_time += dt
-        else:
-            self._out_of_bounds_time = None
 
 class OrangeSnake(Snake):
     from levels import level # type: ignore

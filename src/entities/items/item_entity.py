@@ -4,8 +4,7 @@ import pygame
 
 from config import constant
 from entities.items.item_stack import ItemStack
-from entities.items.item_type import ItemCategory
-from levels import region_generator
+from entities.items.item_type import ActivationType, ItemCategory
 import levels.level
 from ui.screens.item_info_popup import ItemInfoPopup
 from utils import pixil
@@ -122,17 +121,14 @@ class ItemEntity(pygame.sprite.Sprite):
     
     def on_collision(self):
         """Xử lý khi va chạm với rắn"""
-        if self.item_type.category == ItemCategory.INSTANT:
-            # Item tức thời (coin, food) - áp dụng hiệu ứng ngay
-            self.apply_instant_effect()
-        else:
-            # Các item khác - thêm vào inventory
-            item_stack = self.to_item_stack()
-            added = self.level.snake.add_item(item_stack)
-            if not added:
-                # Nếu inventory đầy, có thể hiển thị thông báo
-                pass
-        
+        self.apply_instant_effect()
+        # else:
+        #     # Các item khác - thêm vào inventory
+        #     item_stack = self.to_item_stack()
+        #     added = self.level.snake.add_item(item_stack)
+        #     if not added:
+        #         # Nếu inventory đầy, có thể hiển thị thông báo
+        #         pass
         self.kill()
     
     def apply_instant_effect(self):
@@ -147,9 +143,10 @@ class ItemEntity(pygame.sprite.Sprite):
         """Update item state"""
         if self.level.snake.is_dead or len(self.level.snake) ==0:
             return
-        # For INSTANT items, use collision detection
-        if self.item_type.category == ItemCategory.INSTANT:
-            if self._is_collision_with_snake(): # type: ignore
+        
+        # Không add vào inventory nếu item là ON_COLLISION
+        if self.item_type.activation_type == ActivationType.ON_COLLISION:
+            if self._is_collision_with_snake():
                 self.on_collision()
             return
         
@@ -192,10 +189,7 @@ class ItemEntity(pygame.sprite.Sprite):
     
     def on_pickup(self):
         """Called when player picks up the item"""
-        pass
-        # TODO: hiển thị thông popup 
         self.level.game.state_stack.append(ItemInfoPopup(self.level, self))
-        # print("aloooo")
 
     def _is_collision_with_snake(self):
         return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
