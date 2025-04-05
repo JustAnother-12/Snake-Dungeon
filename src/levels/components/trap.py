@@ -1,87 +1,71 @@
 import random
 import config.constant as constant
+from utils.help import Share
 import utils.pixil as pixil
 from time import time
 import pygame
+from enum import Enum
 
+class TrapState(Enum):
+    VISIBLE = 1  # Chỉ hiển thị, chưa kích hoạt (trạng thái mặc định)
+    WAITING = 2  # Đang kích hoạt (gai xuất hiện)
+    ACTIVATED = 3  # Đang trong quá trình lặp lại (trở về trạng thái ban đầu)
 
 class Trap(pygame.sprite.Sprite):
     def __init__(self, level, pos) -> None:
         super().__init__()
         self.level = level
         self.pos = pos
-        self.image = pixil.Pixil.load(
+        # Tải sprite sheet cho bẫy
+        self.sprite_sheet = pixil.Pixil.load(
             "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
-        ).frames[0]
+        )
+        self.image = self.sprite_sheet.frames[0]  # Frame mặc định (chưa kích hoạt)
         self.rect = self.image.get_rect(topleft=self.pos)
-        self.isActive = False
-        self.collisionTime = None
+        
+        # Trạng thái và thời gian
+        self.state = TrapState.VISIBLE
+        self.state_time = 0  # Thời gian ở trạng thái hiện tại
+        
+        # Cấu hình thời gian cho mỗi trạng thái
+        self.duration = {
+            TrapState.VISIBLE: 0,  # Trạng thái mặc định, không hết hạn
+            TrapState.WAITING: 1.5,  # Thời gian gai xuất hiện
+            TrapState.ACTIVATED: 0.5,  # Thời gian để lặp lại
+        }
 
-    # def random_pos(self):
-    #     self.pos = pygame.Vector2(
-    #         random.randint(
-    #             constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
-    #             (
-    #                 SCREEN_WIDTH_TILES
-    #                 - constant.LEFT_RIGHT_BORDER_TILES
-    #                 - 2
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #         random.randint(
-    #             constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
-    #             (
-    #                 SCREEN_HEIGHT_TILES
-    #                 - constant.TOP_BOTTOM_BORDER_TILES
-    #                 - 2
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #     )
-
-    def reset(self):
-        self.image = pixil.Pixil.load(
-            "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
-        ).frames[0]
-        self.isActive = False
-        self.collisionTime = None
-
-    def on_collision(self):
-        if self.collisionTime == None:
-            self.collisionTime = time()
-
-    def active(self):
-        self.isActive = True
-        self.image = pixil.Pixil.load(
-            "game-assets/graphics/pixil/TRAP_SPIKE_SHEET.pixil", 1
-        ).frames[1]
-    
     def update(self):
-        if self.__is_collision_with_snake() and not self.isActive:
-            self.on_collision()
+        # Kiểm tra va chạm với rắn
+        if (self.__is_collision_with_snake() or self.__is_collision_with_monster()) and self.state == TrapState.VISIBLE:
+            self.change_state(TrapState.WAITING)
+        
+        # Cập nhật trạng thái dựa trên thời gian
+        if self.state != TrapState.VISIBLE:
+            self.state_time += Share.clock.get_time() / 1000
             
-        if not self.collisionTime == None:
-            if time() - self.collisionTime > 1.5:
-                self.reset()
-            elif time() - self.collisionTime > 1:
-                self.active()
+            if self.state == TrapState.WAITING and self.state_time >= self.duration[TrapState.WAITING]:
+                self.change_state(TrapState.ACTIVATED)
+                
+            elif self.state == TrapState.ACTIVATED and self.state_time >= self.duration[TrapState.ACTIVATED]:
+                self.change_state(TrapState.VISIBLE)
+    
+    def change_state(self, new_state):
+        self.state = new_state
+        self.state_time = 0
+        
+        # Cập nhật hình ảnh dựa trên trạng thái
+        if new_state == TrapState.VISIBLE:
+            self.image = self.sprite_sheet.frames[0]
+        elif new_state == TrapState.WAITING:
+            self.image = self.sprite_sheet.frames[0]
+        elif new_state == TrapState.ACTIVATED:
+            self.image = self.sprite_sheet.frames[1]
     
     def __is_collision_with_snake(self):
-        return pygame.sprite.spritecollideany(self, self.level.snake.blocks) # type: ignore
-
-
-# class TrapGroup(pygame.sprite.AbstractGroup):
-#     def __init__(self, level, traps_pos) -> None:
-#         super().__init__()
-#         self.empty()
-#         self.traps_pos = traps_pos
-        
-#         # if len(self.traps_pos) == 0:
-#         for x,y in self.traps_pos:
-#             self.add(Trap(level, (x,y)))
-
-#     def update(self) -> None:
-#         for trap in self.sprites():
-#             trap.update()
+        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
+    
+    def __is_collision_with_monster(self):
+        for monster in self.level.monsters:
+            if pygame.sprite.spritecollideany(self, monster.blocks):
+                return True
+        return False

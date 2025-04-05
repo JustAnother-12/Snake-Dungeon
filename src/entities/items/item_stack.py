@@ -40,7 +40,7 @@ class ItemStack:
         if self.item_type.category == ItemCategory.CONSUMABLE:
             self.quantity -= 1
             if self.quantity <= 0:
-                snake.invitory.remove_item(self)
+                snake.inventory.remove_item(self)
                 
         return True
     

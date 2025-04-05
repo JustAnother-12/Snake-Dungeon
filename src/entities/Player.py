@@ -9,6 +9,7 @@ from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
 from entities.items.item_type import ItemCategory
 from levels.components.bomb import Bomb, BombState
+from levels.components.trap import Trap, TrapState
 from utils.help import Share
 from systems.inventory_manager import InventoryManager
 import utils.pixil as pixil
@@ -157,9 +158,9 @@ class Snake(pygame.sprite.AbstractGroup):
         # Snake state
         self.is_dead = False
         self.blocks: list[SnakeBlock] = []
-        self.direction = Vector2(1, 0)
+        self.direction = Vector2(0, 0)
         self._last_direction = Vector2(0, 0)
-        self.is_curling = False
+        self.is_curling = True
 
         # Movement control modes
         self.auto_state = True
@@ -218,11 +219,9 @@ class Snake(pygame.sprite.AbstractGroup):
         return len(self.blocks)
 
     def _init_snake_blocks(self, init_len):
-        x = 0
-        y = 0
         for i in range(init_len):
-            x = (constant.SCREEN_WIDTH_TILES // 2 - i) * constant.TILE_SIZE
-            y = (constant.SCREEN_HEIGHT_TILES // 2) * constant.TILE_SIZE
+            x = (constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE
+            y = constant.MAP_BOTTOM - constant.TILE_SIZE
             block = SnakeBlock(int(i==0) ,(x, y), self.color)
             self.blocks.append(block)
 
@@ -421,13 +420,10 @@ class Snake(pygame.sprite.AbstractGroup):
         pos = None
         for i in range(len(self.blocks)):
             block = self.blocks[i]
-            if pygame.sprite.spritecollideany(
-                block,
-                self.level.trap_group,
-                lambda x, y: x.rect.colliderect(y.rect)
-                and getattr(y, "isActive", False),
-            ):
-                pos = i
+            trap = pygame.sprite.spritecollideany(block, self.level.trap_group)
+            if not trap is None:
+                if trap.state == TrapState.ACTIVATED:
+                    pos = i
                 break
         if pos != None:
             self.split(pos)

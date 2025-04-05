@@ -29,7 +29,7 @@ class Bomb(pygame.sprite.Sprite):
         )
         self.key_time = {
             BombState.APPEAR: 0,
-            BombState.ACTIVE: 0.7,
+            BombState.ACTIVE: 1,
             BombState.EXPLOSION: 1,
             BombState.DISAPPEAR: 0.5,
         }
@@ -72,8 +72,8 @@ class Bomb(pygame.sprite.Sprite):
         
         self.time += Share.clock.get_time() / 1000
         if self.state == BombState.ACTIVE and self.time > self.key_time[BombState.ACTIVE]:
-                self.state = BombState.EXPLOSION
-                self.time = 0
+            self.state = BombState.EXPLOSION
+            self.time = 0
         
         if self.state == BombState.EXPLOSION:
             frame = self.animation.frames[
@@ -89,7 +89,8 @@ class Bomb(pygame.sprite.Sprite):
             self.kill()
 
     def on_collision(self):
-        self.state = BombState.ACTIVE
+        if self.state == BombState.APPEAR:
+            self.state = BombState.ACTIVE
 
 class BombGroup(pygame.sprite.AbstractGroup):
     def __init__(self, level, quantity = 0) -> None:

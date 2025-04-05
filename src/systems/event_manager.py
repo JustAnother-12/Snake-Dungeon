@@ -12,4 +12,4 @@ class EventManager:
     
     @staticmethod
     def get_events():
-        return EventManager.__event;
+        return EventManager.__event
