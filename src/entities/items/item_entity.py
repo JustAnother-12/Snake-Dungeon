@@ -17,7 +17,7 @@ class ItemEntity(pygame.sprite.Sprite):
         self.level = level
         self.item_type = item_type
         self.quantity = quantity
-        self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.frame]
+        self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.entity_frame]
         self.image = self._image.copy()
         self.random_pos(area, r)
         self.rect = self.image.get_rect(topleft=self.pos)    

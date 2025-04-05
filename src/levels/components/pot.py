@@ -1,7 +1,7 @@
 import random
 import config.constant as constant
-from entities.items.coin import CoinEntity
-from entities.items.food import FoodEntity
+from entities.items.instant.coin import CoinEntity
+from entities.items.instant.food import FoodEntity
 import utils.pixil as pixil
 from time import time
 import pygame

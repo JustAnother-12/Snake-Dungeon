@@ -1,4 +1,3 @@
-import pygame
 from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity

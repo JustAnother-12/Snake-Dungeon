@@ -1,11 +1,5 @@
-
 from dataclasses import dataclass
 from enum import Enum, auto
-from tkinter import NO
-from unicodedata import category
-
-from utils import pixil
-
 
 class Rarity(Enum):
     COMMON = "Common"
@@ -40,7 +34,8 @@ class ActivationType(Enum):
 @dataclass
 class ItemTexture:
     pixil_path: str
-    frame: int = 0
+    entity_frame: int = 0
+    stack_frame: int = 1
     scale: int = 1
 
 @dataclass
