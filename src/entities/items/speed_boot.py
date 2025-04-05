@@ -35,7 +35,9 @@ class SpeedBootStack(ItemStack):
         self.add_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boot)
     
     def speed_boot(self, snake: Snake, *args, **kwargs):
-        if time.time() - self.active_time > 3:
+        self.active_time -= Share.clock.get_time() / 1000
+        if self.active_time <= 0:
+            self.active_time = 0
             self.remove_runtime_overriding(snake, 'handle_speed_boost', 'after', self.speed_boot)
             # self.remove_runtime_overriding()
         

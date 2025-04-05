@@ -51,7 +51,7 @@ class InventoryManager:
                 self.time_pess[index] = time.time()
             
             elif self.time_pess[index] and keys[key]:
-                print(time.time() - self.time_pess[index])
+                # print(time.time() - self.time_pess[index])
                 if time.time() - self.time_pess[index] > self.pess_time:
                     self.drop(index)
 

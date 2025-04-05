@@ -1,5 +1,6 @@
 import random
 import config.constant as constant
+from entities.items.item_stack import F
 from utils.help import Share
 import utils.pixil as pixil
 from time import time
@@ -12,9 +13,10 @@ class TrapState(Enum):
     ACTIVATED = 3  # Đang trong quá trình lặp lại (trở về trạng thái ban đầu)
 
 class Trap(pygame.sprite.Sprite):
-    def __init__(self, level, pos) -> None:
+    from levels import level
+    def __init__(self, level_: "level.Level", pos) -> None:
         super().__init__()
-        self.level = level
+        self._level = level_
         self.pos = pos
         # Tải sprite sheet cho bẫy
         self.sprite_sheet = pixil.Pixil.load(
@@ -36,7 +38,7 @@ class Trap(pygame.sprite.Sprite):
 
     def update(self):
         # Kiểm tra va chạm với rắn
-        if (self.__is_collision_with_snake() or self.__is_collision_with_monster()) and self.state == TrapState.VISIBLE:
+        if (self.__is_collision_with_snake()) and self.state == TrapState.VISIBLE:
             self.change_state(TrapState.WAITING)
         
         # Cập nhật trạng thái dựa trên thời gian
@@ -62,10 +64,14 @@ class Trap(pygame.sprite.Sprite):
             self.image = self.sprite_sheet.frames[1]
     
     def __is_collision_with_snake(self):
-        return pygame.sprite.spritecollideany(self, self.level.snake.blocks)
-    
-    def __is_collision_with_monster(self):
-        for monster in self.level.monsters:
-            if pygame.sprite.spritecollideany(self, monster.blocks):
+        for snake in self._level.snake_group._sub_group__:
+            if pygame.sprite.spritecollideany(self, snake.blocks): # type: ignore
                 return True
         return False
+        # return pygame.sprite.spritecollideany(self, self._level.snake.blocks) # type: ignore
+    
+    # def __is_collision_with_monster(self):
+    #     for snake in self._level.monster_group._sub_group__:
+    #         if pygame.sprite.spritecollideany(self, snake.blocks): # type: ignore
+    #             return True
+    #     return False

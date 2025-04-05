@@ -1,4 +1,5 @@
 import random
+from time import sleep
 import pygame
 from pygame.math import Vector2
 
@@ -11,6 +12,7 @@ from levels.components.trap import TrapState
 from levels.components.wall import Wall
 from loot import LootItem, LootPool
 from levels.components.bomb import BombState
+from utils.help import Share
 
 class Monster(Snake):
     def __init__(self, level, init_len, pos = None):
@@ -36,31 +38,13 @@ class Monster(Snake):
     def update_stats(self):
         pass
 
-    def update(self):
-        self.die()
-        if len(self.blocks) <= constant.MIN_LEN:
-            self.is_dead = True
-            return
-        dt = self.level.game.clock.get_time()
-        self.handle_severed_blocks()
+    def handle_input(self):
         self.handle_ai_movement()
-        self.handle_go_out_of_bounds(dt)
-        self.handle_speed_boost()
-        self.handle_collision()
-        self.handle_skills(dt)
-        for i, block in enumerate(self.blocks):
-            block.set_target(
-                self.base_stats.speed, self._block_positions[i]
-            )
-            if i == 0:
-                block.rotate(self.direction, self.headImg)
-            block.move(
-                dt / 100,
-                i != 0
-                and block.target_pos - block._last_target
-                != self.blocks[i - 1].target_pos
-                - self.blocks[i - 1]._last_target,
-            )
+        return True
+        # return super().handle_input()
+
+    def update(self):
+        return super().update()
 
     def handle_ai_movement(self):
         # Nếu đang di chuyển hoặc đã chết, không xử lý
@@ -94,54 +78,11 @@ class Monster(Snake):
         if len(valid_moves) > 0:
             self.direction = random.choices(valid_moves, weights=move_weights)[0] 
             self.is_curling = False
-            self._block_positions.insert(0, head_pos + self.direction * constant.TILE_SIZE)
+            # self._block_positions.insert(0, head_pos + self.direction * constant.TILE_SIZE)
         else:
             self.is_dead = True
             return
             
-        if len(self._block_positions) > len(self.blocks):
-            self._block_positions.pop()
-
-    def _is_collide(self, position):
-        if self._is_collide_with_wall(position) or self._is_collide_with_Obstacle(position) or self._is_collide_with_self(position) or self._is_collide_with_player(position):
-            return True
-        return False
-
-    def _is_collide_with_wall(self, position):
-        for wall in self.level.wall_group:
-            wall: Wall
-            if wall.rect and wall.rect.colliderect(
-                (
-                    position[0],
-                    position[1],
-                    constant.TILE_SIZE,
-                    constant.TILE_SIZE,
-                )
-            ):
-                return True
-        return False
-
-    def _is_collide_with_Obstacle(self, position):
-        for obstacle in self.level.obstacle_group:
-            obstacle: Obstacle
-            if obstacle.rect and obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):
-                return True
-        return False
-
-    def _is_collide_with_player(self, position):
-        if not self.player: return False
-        for block in self.player.blocks:
-            if block.rect.colliderect(
-                (
-                    position[0],
-                    position[1],
-                    constant.TILE_SIZE,
-                    constant.TILE_SIZE,
-                )
-            ):
-                return True
-        return False
-    
     def _calculate_weight(self, move, position):
         weight = 100 if move == self.direction else 10
                 
@@ -215,16 +156,18 @@ class Monster(Snake):
             self.add(block)
 
     def die(self):
-        if self.is_dead:
-            loot_pool = LootPool((5, 10, 7, 3, 0, 0, 0))
-            for block in self.sprites():
-                block.kill()
-                item = loot_pool.get_item()
-                if item == LootItem.COIN:
-                    self.level.item_group.add(CoinEntity(self.level, block.rect, 1, random.randint(10, 15)))
-                elif item == LootItem.FOOD:
-                    self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
-                elif item == LootItem.EMPTY:
-                    pass
-                else:
-                    print(f"[{item.value}]: Instant item")
+        loot_pool = LootPool((5, 10, 7, 3, 0, 0, 0))
+        if len(self.sprites()) == 0:
+            self.level.snake_group.remove(self)
+            return
+        block = self.sprites()[-1]
+        block.kill()
+        item = loot_pool.get_item()
+        if item == LootItem.COIN:
+            self.level.item_group.add(CoinEntity(self.level, block.rect, 1, random.randint(10, 15)))
+        elif item == LootItem.FOOD:
+            self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
+        elif item == LootItem.EMPTY:
+            pass
+        else:
+            print(f"[{item.value}]: Instant item")
