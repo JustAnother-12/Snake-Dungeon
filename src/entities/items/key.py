@@ -1,7 +1,7 @@
 
 
 from entities.items.item_entity import ItemEntity
-from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
+from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity
 
 
 KEY_TYPE = ItemType(
@@ -12,7 +12,8 @@ KEY_TYPE = ItemType(
     ItemTexture(
         "game-assets/graphics/pixil/KEY_SPRITE.pixil",
     ),
-    "",       
+    "",
+    activation_type=ActivationType.ON_COLLISION      
 )
 
 class KeyEntity(ItemEntity):

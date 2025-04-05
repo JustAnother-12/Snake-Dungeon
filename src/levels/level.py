@@ -1,16 +1,20 @@
 from __future__ import annotations
+from enum import Enum
 from operator import contains
+from poplib import CR
 import random
+from numpy import isin
 import pygame
-from time import time
 
 import config.constant as constant
 from entities.Monster import Monster
+from entities.Player import Snake
 from entities.items.bomb_item import BombEntity
 from entities.items.TestItem import ShieldEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from entities.items.key import KeyEntity
+from entities.items.ouroboros import OuroborosEntity
 from entities.items.speed_boot import SpeedBootEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
@@ -26,31 +30,38 @@ from levels.region_generator import RegionGenerator
 from ui.screens.game_over import GameOver_menu
 from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
-from ui.screens.state import State
+from ui.screens.state import NestedGroup, State
+from ui.screens.title_screen import TitleScreen
+
+
+class LevelStatus(Enum):
+    CREATED = 0
+    PLAYING = 1
+    GAME_OVER = 2
+    ROOM_CLEARED = 3
+    PAUSED = 4
 
 # làm cho nó gọn để kế thừa
 class Level(State):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.init()
+        
 
     def init(self):
-        from entities.Player import Snake, GreenSnake, OrangeSnake, GraySnake
+        from entities.Player import Snake
         # Clear previous state
         self.empty()
         self.remove(self.sprites())
         
         # Game state
-        self.is_paused = False
-        self.is_finished = False
-        self.timer = time()
+        self.level_status = LevelStatus.CREATED
         
         # Main entities
-        self.snake = GreenSnake(self, 5)
-        self.monsters = []
-        for i in range(3):
-            self.monsters.append(Monster(self, random.randint(5, 8)))
-            self.monsters[i].set_player_reference(self.snake)
+        self.snake_group = NestedGroup()
+        self.snake = Snake(self, 5)
+        self.snake_group.add(self.snake)
+
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
         
@@ -75,8 +86,8 @@ class Level(State):
             self.obstacle_group,
             self.trap_group,
             self.pot_group,
-            self.snake,
-            self.monsters,
+            # self.snake,
+            self.snake_group,
             self.item_group,
             self.hud,
             self.bomb_group
@@ -107,13 +118,19 @@ class Level(State):
         self.bomb_group.empty()
         for i in range(3):
             self.bomb_group.add(Bomb(self))
+            
+        # tạo monster
+        for i in range(3):
+            monster = Monster(self, random.randint(5, 8))
+            monster.set_player_reference(self.snake)
+            self.snake_group.add(monster)
         
         # tạo item
         for i in range(10):
             coin = CoinEntity(self)
             self.item_group.add(coin)
         
-        for i in range(3):
+        for i in range(200):
             food = FoodEntity(self)
             self.item_group.add(food)
         
@@ -131,9 +148,11 @@ class Level(State):
         for i in range(3):
             self.item_group.add(SpeedBootEntity(self, quantity=random.randint(2,4)))
 
+        self.item_group.add(OuroborosEntity(self))
+
     def reset(self):
         self.init()
-    
+
     def __dev_test(self):
         # TODO: nhớ bỏ cái này nếu test xong
         # tự tạo lại map khi nhấn phím
@@ -152,23 +171,26 @@ class Level(State):
         self.interaction_manager.handle_input()
         
     def update(self):
-
+        
+        if self.level_status == LevelStatus.CREATED:
+            self.game.state_stack[-1].visible = False
+            self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
+        
         self.__dev_test()
-        self.monsters = [monster for monster in self.monsters if not monster.is_dead]
-        if self.is_finished:
+        
+        if self.level_status == LevelStatus.ROOM_CLEARED:
             self.game.state_stack.append(RoomCleared(self.game))
             self.snake.auto_state = False
             self.is_finished = False
-
-        if self.snake.is_dead:
-            self.game.state_stack[-1].visible = False
-            self.game.state_stack.append(GameOver_menu(self.game))
         
         Stats.setValue("LENGTH", len(self.snake))
 
         self.handle_input()
 
         super().update()
+    
+    def check_room_cleared(self):
+        pass
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")

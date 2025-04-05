@@ -2,8 +2,10 @@ from typing import Tuple
 from enum import Enum
 import random
 from re import L
+from unittest import result
 
 from entities.items.item_type import Rarity
+from stats import Stats
 
 class LootPool:
     def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (50, 35, 15)):
@@ -65,7 +67,8 @@ class LootPool:
     def get_item(self):
         keys = list(self.loot_table.keys())
         values = list(self.loot_table.values())
-        result = random.choices(keys, values)[0]
+        choices = random.choices(keys, values, k = 1 + Stats.getValue("LUCK")//10)
+        result = sorted(choices, key = lambda x: x.value, reverse=True)[0]
         if result == LootItem.ITEM_INSTANT:
             # Chọn ngẫu nhiên độ hiếm của ITEM_INSTANT
             rarity = random.choices(list(self.rarity_table.keys()), list(self.rarity_table.values()))[0]
@@ -73,11 +76,10 @@ class LootPool:
         return result
 
 class LootItem(Enum):
-    EMPTY = "Empty"
-    NON_EMPTY = "Non Empty"
-    COIN = "Coin"
-    FOOD = "Food"
-    ITEM_INSTANT = "Item Instant"
-    CONSUMABLE = "Consumable"
-    EQUIPMENT = "Equipment"
-    SKILL = "Skill"
+    EMPTY = 1
+    COIN = 2
+    FOOD = 3
+    ITEM_INSTANT = 4
+    CONSUMABLE = 5
+    EQUIPMENT = 6
+    SKILL = 7

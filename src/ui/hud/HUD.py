@@ -13,14 +13,14 @@ class HUD(pygame.sprite.Group):
         self.level_ = level_
         snake = self.level_.snake
         coin,length, keys = self.level_.snake.gold, len(self.level_.snake), self.level_.snake.keys
-        from entities.Player import Snake, GreenSnake, OrangeSnake, GraySnake
+        from entities.Player import Snake
         self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON_ALT.pixil", 1).frames[0]
-        if isinstance(snake, OrangeSnake):
-            self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[0]
-        elif isinstance(snake, GreenSnake):
-            self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[1]
-        elif isinstance(snake, GraySnake):
-            self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[2]
+        # if isinstance(snake, OrangeSnake):
+        #     self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[0]
+        # elif isinstance(snake, GreenSnake):
+        #     self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[1]
+        # elif isinstance(snake, GraySnake):
+            # self.Player_Icon = Pixil.load("game-assets/graphics/pixil/HUD_PLAYER_ICON.pixil", 1).frames[2]
         self.Player_Icon_rect = ImageElement(4*constant.TILE_SIZE, 3.5*constant.TILE_SIZE, self.Player_Icon)
 
         self.Gold_Icon = Pixil.load("game-assets/graphics/pixil/HUD_GOLD_ICON.pixil", 2).frames[0]

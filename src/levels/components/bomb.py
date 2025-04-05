@@ -4,7 +4,6 @@ from config.constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
 import config.constant as constant
 from utils.help import Share
 import utils.pixil as pixil
-from time import time
 import pygame
 
 class BombState(Enum):
@@ -17,14 +16,15 @@ class Bomb(pygame.sprite.Sprite):
     def __init__(self, level, pos = None, state: BombState = BombState.APPEAR) -> None:
         super().__init__()
         self.level = level
-        self.image = pixil.Pixil.load(
+        self.bomb_sheet = pixil.Pixil.load(
             "game-assets/graphics/pixil/BOMB_SHEET.pixil", 1
-        ).frames[0]
+        )
+        self.image = self.bomb_sheet.frames[0]
         self.state = state
         self.pos = pos if pos != None else self.random_pos()
         self.rect = self.image.get_rect(topleft=self.pos)
         self.time = 0
-        self.animation = pixil.Pixil.load(
+        self.animation_sheet = pixil.Pixil.load(
             "game-assets/graphics/pixil/EXPLOSION_ANIMATION.pixil", 1
         )
         self.key_time = {
@@ -63,21 +63,35 @@ class Bomb(pygame.sprite.Sprite):
     def __is_collision_with_snake(self):
         return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
 
+    def __is_collision_with_monster(self):
+        for monster in self.level.monsters:
+            if pygame.sprite.spritecollideany(self, monster.blocks):
+                return True
+        return False
+    
     def update(self):
-        if self.__is_collision_with_snake():
+        if (self.__is_collision_with_snake() or self.__is_collision_with_monster()) and self.state == BombState.APPEAR:
             self.on_collision()
 
         if self.state == BombState.APPEAR:
             return
         
         self.time += Share.clock.get_time() / 1000
-        if self.state == BombState.ACTIVE and self.time > self.key_time[BombState.ACTIVE]:
-            self.state = BombState.EXPLOSION
-            self.time = 0
+        if self.state == BombState.ACTIVE:
+            
+            # 2: nhấp nháy 2 lần
+            self.image = self.bomb_sheet.frames[
+                int(self.time / (self.key_time[self.state] / 2) * len(self.bomb_sheet.frames)) % len(self.bomb_sheet.frames)
+            ]
+            self.rect = self.image.get_rect(topleft=self.pos)
+
+            if self.time > self.key_time[BombState.ACTIVE]:
+                self.state = BombState.EXPLOSION
+                self.time = 0
         
         if self.state == BombState.EXPLOSION:
-            frame = self.animation.frames[
-                min(int(self.time / self.key_time[self.state] * len(self.animation.frames)), len(self.animation.frames) - 1)
+            frame = self.animation_sheet.frames[
+                min(int(self.time / self.key_time[self.state] * len(self.animation_sheet.frames)), len(self.animation_sheet.frames) - 1)
             ]
             self.image = frame
             self.rect = self.image.get_rect(topleft=self.pos - pygame.Vector2(TILE_SIZE, TILE_SIZE))
