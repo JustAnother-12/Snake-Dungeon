@@ -23,7 +23,7 @@ class FoodEntity(ItemEntity):
         self.eaten_by = self.level.snake
     
     def apply_instant_effect(self):
-        self.eaten_by.grow_up(self.quantity)
+        self.eaten_by.grow_up(self.quantity) # type: ignore
 
     def update(self):
         if self.level.snake.is_dead:
@@ -32,9 +32,10 @@ class FoodEntity(ItemEntity):
             self.on_collision()
 
     def _is_collision_with_monster(self):
-        for monster in self.level.monsters:
-            if pygame.sprite.spritecollideany(self, monster.blocks):
-                self.eaten_by = monster
-                return True
+        for snake in self.level.snake_group._sub_group__:
+            if snake != self.level.snake:
+                if self.rect and len(snake.blocks) > 0 and self.rect.colliderect(snake.blocks[0].rect): # type: ignore
+                    self.eaten_by = snake
+                    return True
         return False
     

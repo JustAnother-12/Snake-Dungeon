@@ -17,7 +17,7 @@ class MainMenu(Menu):
 
     def init(self, game):
         self.music = pygame.mixer.music
-        self.music.load('game-assets/audio/Sekiro Shadows Die Twice _ OST Main Menu Theme ♪.wav')
+        self.music.load('game-assets/audio/main_menu.wav')
         self.music.set_volume(0.6)
         self.music.play(-1)
 
