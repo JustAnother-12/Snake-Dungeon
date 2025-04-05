@@ -6,7 +6,7 @@ import inspect
 import pygame
 from pygame.math import Vector2
 
-from entities.items.coin import CoinEntity
+from entities.items.instant.coin import CoinEntity
 from levels.components.bomb import Bomb, BombState
 from levels.components.trap import Trap, TrapState
 from ui.screens.game_over import GameOver_menu
@@ -16,7 +16,7 @@ import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
-from stats import Stats
+from stats import StatType, Stats
 from utils.pixil import Pixil
 from ui.screens.Stats_Menu import base_stats_value
 
@@ -154,13 +154,6 @@ class Snake(pygame.sprite.AbstractGroup):
         from levels.level import Level
         self.level : Level= level
 
-        # Movement and stamina attributes
-        self.base_stats = base_stats_value()
-        self.update_stats()
-        self.stamina = self.base_stats.energy_cap
-        self.is_speed_boost = False
-        self.speed_cool_down = 0
-        
         # Snake state
         self.is_dead = False
         self.blocks: list[SnakeBlock] = []
@@ -168,6 +161,13 @@ class Snake(pygame.sprite.AbstractGroup):
         self._last_direction = Vector2(0, 0)
         self.is_curling = True
         self.time_die = 0
+
+        # Movement and stamina attributes
+        self.base_stats = base_stats_value()
+        self.update_stats()
+        self.stamina = self.base_stats.energy_cap
+        self.is_speed_boost = False
+        self.speed_cool_down = 0
 
         # Movement control modes
         self.auto_state = True
@@ -364,7 +364,7 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def grow_up(self, length=1):
         tail = self.blocks[-1]
-        for i in range(length):
+        for i in range(length * self.base_stats.food_potency):
             newBlock = SnakeBlock(0, tail.rect.topleft, self.color)
             self.blocks.insert(-1, newBlock)
             self._block_positions.append(newBlock.pos.copy())
@@ -483,10 +483,12 @@ class Snake(pygame.sprite.AbstractGroup):
             self.direction = Vector2(0, 0)
 
     def update_stats(self):
-        self.base_stats.speed = constant.BASE_SPEED * (1 + Stats.getValue("SPEED")/100)
-        self.base_stats.resistance = constant.DEATH_DELAY * (1 + Stats.getValue("RESISTANCE")/100)
-        self.base_stats.energy_cap = 10 * constant.TILE_SIZE * (1 + Stats.getValue("ENERGY CAPACITY")/100)
-        self.base_stats.energy_regen = constant.STAMINA_RECOVERY * (1 + Stats.getValue("ENERGY REGEN")/100)
+        self.base_stats.speed = constant.BASE_SPEED * (1 + Stats.getValue(StatType.SPEED)/100)
+        self.base_stats.resistance = constant.DEATH_DELAY * (1 + Stats.getValue(StatType.RESISTANCE)/100)
+        self.base_stats.energy_cap = 10 * constant.TILE_SIZE * (1 + Stats.getValue(StatType.ENERGY_CAPACITY)/100)
+        self.base_stats.energy_regen = constant.STAMINA_RECOVERY * (1 + Stats.getValue(StatType.ENERGY_REGEN)/100)
+        self.base_stats.food_potency =  1 + Stats.getValue(StatType.FOOD_POTENCY)//25
+        Stats.setValue(StatType.LENGTH, len(self.blocks))
     
     def die(self):
         if len(self.blocks) == 0:

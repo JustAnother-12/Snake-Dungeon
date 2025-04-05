@@ -4,7 +4,6 @@ from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
-from stats import Stats
 from utils.help import Share
 
 

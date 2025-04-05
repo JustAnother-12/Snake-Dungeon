@@ -12,6 +12,7 @@ class base_stats_value:
         self.resistance = 0
         self.energy_cap = 0
         self.energy_regen = 0
+        self.food_potency = 0
 
 class Stats_menu(State):
     def __init__(self, game) -> None:
@@ -45,7 +46,7 @@ class Stats_menu(State):
         v_gap = 10.5
         h_gap = 16
         for key, value in Stats.stats.items():
-            name = TextElement(key, 
+            name = TextElement(key.value, 
                                "white", 
                                10, 
                                (self.game.SCREEN_WIDTH_TILES/2 - h_gap)*self.game.TILE_SIZE, 

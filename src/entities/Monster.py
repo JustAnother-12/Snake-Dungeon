@@ -5,8 +5,8 @@ from pygame.math import Vector2
 
 from config import constant
 from entities.Player import Snake, SnakeBlock
-from entities.items.coin import CoinEntity
-from entities.items.food import FoodEntity
+from entities.items.instant.coin import CoinEntity
+from entities.items.instant.food import FoodEntity
 from levels.components.obstacle import Obstacle
 from levels.components.trap import TrapState
 from levels.components.wall import Wall

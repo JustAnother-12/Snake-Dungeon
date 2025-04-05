@@ -1,38 +1,46 @@
 
 from enum import Enum
 
-
+class StatType(Enum):
+    SPEED = "SPEED"
+    LENGTH = "LENGTH"
+    RESISTANCE = "RESISTANCE"
+    ENERGY_CAPACITY = "ENERGY CAPACITY"
+    ENERGY_REGEN = "ENERGY REGEN"
+    TREASURY = "TREASURY"
+    LUCK = "LUCK"
+    FOOD_POTENCY = "FOOD POTENCY"
 class Stats:
     stats = {
-        "SPEED": {
+        StatType.SPEED: {
             "value": 0,
             "description": "increase movement speed"
         },
-        "LENGTH": {
+        StatType.LENGTH: {
             "value": 0,
             "description": "the overall length of the body"
         },
-        "RESISTANCE": {
+        StatType.RESISTANCE: {
             "value": 0,
             "description": "Increase I-frame upon hit"
         },
-        "ENERGY CAPACITY": {
+        StatType.ENERGY_CAPACITY: {
             "value": 0,
             "description": "increase max energy"
         },
-        "ENERGY REGEN": {
+        StatType.ENERGY_REGEN: {
             "value": 0,
             "description": "increase energy regeneration speed"
         },
-        "TREASURY": {
+        StatType.TREASURY: {
             "value": 0,
             "description": "increase chances for more Chests"
         },
-        "LUCK": {
+        StatType.LUCK: {
             "value": 0,
             "description": "increase luck for loots"
         },
-        "FOOD POTENCY": {
+        StatType.FOOD_POTENCY: {
             "value": 0,
             "description": "increase amount of length foods give"
         }
@@ -58,3 +66,4 @@ class Stats:
     def reset():
         for key in Stats.stats:
             Stats.stats[key]["value"] = 0
+
