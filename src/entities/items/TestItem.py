@@ -1,8 +1,8 @@
 
-from time import time
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
+from utils.help import Share
 
 
 SHIELD_TYPE = ItemType(
@@ -22,30 +22,27 @@ SHIELD_TYPE = ItemType(
 class ShieldStack(ItemStack):
     def __init__(self):
         super().__init__(SHIELD_TYPE, 1)
-        self.shield_active = False
-        self.shield_end_time = 0
+        self.shield_active_time = 0
+        self.shield_active_duration = 3  # seconds
     
     def apply_effect(self, snake):
-        self.shield_active = False
-        self.shield_end_time = time() + 3
+        self.shield_active_time = self.shield_active_duration
         snake.stamina -= self.item_type.energy_usage
-        
-        # if '_is_collide_with_Obstacle' not in snake.run_time_overriding:
-        #     snake.run_time_overriding['_is_collide_with_Obstacle'] = {
-        #         "after": [],
-        #         "return" : [],
-        #         "before" : []
-        #     }
         
         # snake.run_time_overriding['_is_collide_with_Obstacle']['after'].append(self.prevent_damage)
         self.add_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
     
+    def update(self):
+        self.shield_active_time -= Share.clock.get_time() / 1000
+        return super().update()
+    
     def prevent_damage(self, snake, *args, **kwargs):
-        if time() < self.shield_end_time:
-            snake._will_go_out_of_bounds = False
+        if self.shield_active_time <= 0:
+            self.remove_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
             return False 
         else:
-            self.remove_runtime_overriding(snake, '_is_collide_with_Obstacle', 'after', self.prevent_damage)
+            self.shield_active_time = 0
+            snake._will_go_out_of_bounds = False
             return False
     
     def get_item_entity_class(self):
