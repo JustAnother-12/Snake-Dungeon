@@ -2,10 +2,8 @@
 
 import time
 import pygame
-from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import F, ItemStack
 from entities.items.item_type import ItemCategory
-
 
 class InventoryManager:
     from entities import Player
@@ -31,6 +29,20 @@ class InventoryManager:
         ]
         self.time_pess: list[float] = [0, 0, 0, 0, 0, 0]
         self.pess_time = 0.5
+    
+    def count_slots(self):
+        skill_count=0
+        consumable_count=0
+        equipment_count=0
+        for item in self.slots:
+            if item is not None:
+                if item.item_type.category == ItemCategory.CONSUMABLE:
+                    consumable_count+=1
+                elif item.item_type.category == ItemCategory.EQUIPMENT:
+                    equipment_count+=1
+                else:
+                    skill_count+=1
+        return skill_count, consumable_count, equipment_count
     
     def handle_input(self):
         keys = pygame.key.get_pressed()

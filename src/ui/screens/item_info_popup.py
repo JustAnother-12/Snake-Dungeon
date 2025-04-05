@@ -4,6 +4,7 @@ from typing import Any
 from pygame import Event
 import pygame
 from config.constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
+from entities.items.item_type import ItemCategory
 from ui.elements.button import ButtonElement
 from ui.elements.image import ImageElement
 from ui.screens.state import State
@@ -12,12 +13,18 @@ from utils.pixil import Pixil
 # from entities.items.item_entity import ItemEntity
 
 
+
 class ItemInfoPopup(State):
     from levels import level as l
     def __init__(self, level: "l.Level", item_entity):
         super().__init__(self)
         self.level = level
         self.item_entity = item_entity
+        self.item_in_slot_index = level.snake.inventory._check_item_exits(item_entity.to_item_stack())
+        if self.item_in_slot_index>=0:
+            self.current_stack = level.snake.inventory.slots[self.item_in_slot_index].quantity # type:ignore
+        self.item_quantity = item_entity.quantity
+        self.skill_count , self.consumable_count, self.equipment_count = level.snake.inventory.count_slots()
 
         # popup's background display
         self.bg = Pixil.load("game-assets/graphics/pixil/ITEM_DESCRIPTION_BOX.pixil", 2).frames[0]
@@ -72,11 +79,48 @@ class ItemInfoPopup(State):
                  self.confirm_key_text
                  )
         
-        if self.item_entity.quantity>1:
-            self.stack_info_text = TextElement("THIS IS A STACK OF ("+str(self.item_entity.quantity)+") ITEMS", 'grey', 10,self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]-7*TILE_SIZE, 'center')
+        if self.item_quantity>1:
+            self.stack_info_text = TextElement("THIS IS A STACK OF ("+str(self.item_quantity)+") ITEMS", 'grey', 10,self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]-7*TILE_SIZE, 'center')
             self.add(self.stack_info_text)
 
-    
+        self.inventory_manager = self.level.snake.inventory
+
+    def print_message(self, case):
+        message = None
+        match case:
+            case 1:
+                message = TextElement("THIS ITEM'S ALREADY EXISTS IN YOUR INVENTORY!", 'yellow',20, self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]+4*TILE_SIZE, 'center')
+            case 2:
+                message = TextElement("OVERALL STACK EXCEEDS ITEM'S MAX STACK! ("+ str(self.item_entity.item_type.max_stack) +")", 'yellow', 20,  self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]+4*TILE_SIZE, 'center')
+            case 3:
+                message = TextElement("NO EMPTY "+ str(self.item_entity.item_type.category.name) +" SLOT AVAILABLE!", 'yellow', 20,  self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]+4*TILE_SIZE, 'center')
+        if message is not None:
+            self.add(message)
+
+    def check_for_slots(self):
+        if self.item_entity.item_type.category != ItemCategory.CONSUMABLE:
+            if self.inventory_manager._check_item_exits(self.item_entity.to_item_stack()) >= 0: # type:ignore
+                return 1
+            else:
+                if self.item_entity.item_type.category == ItemCategory.SKILL and self.skill_count == 1:
+                    return 3
+                if self.item_entity.item_type.category == ItemCategory.EQUIPMENT and self.equipment_count == 3:
+                    return 3
+                return 0
+        else:
+            if self.inventory_manager._check_item_exits(self.item_entity.to_item_stack()) >= 0:
+                if self.item_quantity + self.current_stack > self.item_entity.item_type.max_stack:
+                    print(self.item_quantity + self.current_stack)
+                    print(self.item_quantity)
+                    print(self.current_stack)
+                    return 2
+                else:
+                    return 0
+            else:
+                if self.item_entity.item_type.category == ItemCategory.CONSUMABLE and self.consumable_count == 2:
+                    return 3
+                return 0
+
     def update(self, *args: Any, **kwargs: Any) -> None:
         # if self.confirm_btn.on_hover():
         #     self.level.snake.add_item(self.item_stack)
@@ -101,14 +145,20 @@ class ItemInfoPopup(State):
         # TODO: sửa lại
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.confirm_btn.isHovered():
-                self.getItem()
+                if not self.check_for_slots(): # type:ignore
+                    self.getItem()
+                else: 
+                    self.print_message(self.check_for_slots())
             if self.sell_btn.isHovered():
                 self.sellItem()
         elif event.type == pygame.KEYDOWN:
             key = event.key
             pygame.event.clear(eventtype=pygame.KEYDOWN)
             if key == pygame.K_e:
-                self.getItem()
+                if not self.check_for_slots():
+                    self.getItem()
+                else: 
+                    self.print_message(self.check_for_slots())
             elif key == pygame.K_r:
                 self.sellItem()
             elif key == pygame.K_ESCAPE:
