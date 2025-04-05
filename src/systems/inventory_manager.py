@@ -3,7 +3,7 @@
 import time
 import pygame
 from entities.items.item_stack import F, ItemStack
-from entities.items.item_type import ItemCategory
+from entities.items.item_type import ActivationType, ItemCategory
 
 class InventoryManager:
     from entities import Player
@@ -94,6 +94,8 @@ class InventoryManager:
 
             if value is None: 
                 self.slots[index] = item
+                if item.item_type.activation_type == ActivationType.ON_PICKUP:
+                    item.apply_effect(self.snake) # tự động kích hoạt hiệu ứng nếu là equipment
                 return True
         
         return False
@@ -118,6 +120,9 @@ class InventoryManager:
             return False
         elif self.slots[index].get_cooldown_remaining() > 0: # type:ignore
             return False
+        
+        if self.slots[index].item_type.category == ItemCategory.EQUIPMENT: # type: ignore
+            self.slots[index].remove_effect(self.snake) # type: ignore
         
         item_entity_class = self.slots[index].get_item_entity_class() # type: ignore
         self.snake.level.item_group.add(item_entity_class(self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity)) # type: ignore

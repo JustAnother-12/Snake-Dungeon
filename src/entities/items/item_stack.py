@@ -19,6 +19,10 @@ class ItemStack:
     def use(self, snake: "Player.Snake"):
         """Sử dụng item"""
         
+        # Equipment tự đông kích hoạt hiệu ứng
+        if self.item_type.category == ItemCategory.EQUIPMENT:
+            return False
+        
         # Kiểm tra cooldown
         # if current_time - self.last_used_time < self.item_type.cooldown:
         #     return False
@@ -46,6 +50,10 @@ class ItemStack:
     
     def apply_effect(self, snake):
         """Áp dụng hiệu ứng của item - được ghi đè bởi lớp con"""
+        pass
+
+    def remove_effect(self, snake):
+        """Ghi đè hiệu ứng của item - được ghi đè bởi lớp con"""
         pass
         
     def get_cooldown_remaining(self):

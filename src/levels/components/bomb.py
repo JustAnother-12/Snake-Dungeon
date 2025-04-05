@@ -63,8 +63,14 @@ class Bomb(pygame.sprite.Sprite):
     def __is_collision_with_snake(self):
         return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
 
+    def __is_collision_with_monster(self):
+        for monster in self.level.monsters:
+            if pygame.sprite.spritecollideany(self, monster.blocks):
+                return True
+        return False
+    
     def update(self):
-        if self.__is_collision_with_snake():
+        if (self.__is_collision_with_snake() or self.__is_collision_with_monster()) and self.state == BombState.APPEAR:
             self.on_collision()
 
         if self.state == BombState.APPEAR:

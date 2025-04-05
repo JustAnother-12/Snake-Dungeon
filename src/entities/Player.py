@@ -6,9 +6,7 @@ import inspect
 import pygame
 from pygame.math import Vector2
 
-from entities.items.item_stack import ItemStack
 from entities.items.coin import CoinEntity
-from entities.items.item_type import ItemCategory
 from levels.components.bomb import Bomb, BombState
 from levels.components.trap import Trap, TrapState
 from ui.screens.game_over import GameOver_menu

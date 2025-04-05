@@ -14,6 +14,7 @@ from entities.items.TestItem import ShieldEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from entities.items.key import KeyEntity
+from entities.items.ouroboros import OuroborosEntity
 from entities.items.speed_boot import SpeedBootEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
@@ -146,6 +147,8 @@ class Level(State):
             self.item_group.add(item)
         for i in range(3):
             self.item_group.add(SpeedBootEntity(self, quantity=random.randint(2,4)))
+
+        self.item_group.add(OuroborosEntity(self))
 
     def reset(self):
         self.init()

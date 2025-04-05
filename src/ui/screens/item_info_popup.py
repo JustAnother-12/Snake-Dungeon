@@ -4,7 +4,7 @@ from typing import Any
 from pygame import Event
 import pygame
 from config.constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
-from entities.items.item_type import ItemCategory
+from entities.items.item_type import ActivationType, ItemCategory
 from ui.elements.button import ButtonElement
 from ui.elements.image import ImageElement
 from ui.screens.state import State
@@ -128,7 +128,10 @@ class ItemInfoPopup(State):
         return super().update(*args, **kwargs)
     
     def getItem(self):
-        if self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
+        if self.item_entity.item_type.activation_type == ActivationType.ON_PICKUP and self.item_entity.item_type.category == ItemCategory.INSTANT:
+            self.item_entity.apply_instant_effect()
+            self.item_entity.kill()
+        elif self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
             self.item_entity.kill()
             print('ok')
             self.level.interaction_manager.unregister_interact(self.item_entity)

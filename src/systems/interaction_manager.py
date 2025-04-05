@@ -4,7 +4,7 @@ import pygame
 
 from config import constant
 from entities.items.item_entity import ItemEntity
-from entities.items.item_type import ItemCategory
+from entities.items.item_type import ActivationType, ItemCategory
 
 
 class InteractionManager:
@@ -56,7 +56,7 @@ class InteractionManager:
         if not closest_item:
             return
         
-        if closest_item.item_type.category == ItemCategory.INSTANT:
+        if closest_item.item_type.activation_type == ActivationType.ON_COLLISION:
             return
         # Draw interaction prompt
         prompt_text = f"Press E to pick up {closest_item.item_type.name}"
