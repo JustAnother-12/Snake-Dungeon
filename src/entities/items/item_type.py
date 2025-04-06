@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 
 
@@ -46,7 +46,7 @@ class ItemType:
     name: str
     category: ItemCategory
     rarity: Rarity
-    texture: ItemTexture = ItemTexture("game-assets/graphics/pixil/item-sprite/DEFAULT.pixil")
+    texture: ItemTexture = field(default_factory=lambda: ItemTexture("game-assets/graphics/pixil/item-sprite/DEFAULT.pixil"))
     description: str = ""
     max_stack: int = 1
     value: int = 1

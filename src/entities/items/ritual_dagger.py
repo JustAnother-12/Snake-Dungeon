@@ -1,7 +1,6 @@
 
 
 from entities.Player import Snake, SnakeBlock
-from entities.items.food import FOOD_TYPE, FoodEntity
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity

@@ -1,5 +1,6 @@
 
 
+import pygame
 from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
@@ -13,7 +14,7 @@ REVERSE_TYPE = ItemType(
     Rarity.COMMON,
     description="Reverse head and tail after 3 seconds come back to normal",
     max_stack=3,
-    cooldown=10,
+    cooldown=1,
 )
 
 class ReverseStack(ItemStack):
@@ -21,7 +22,17 @@ class ReverseStack(ItemStack):
         super().__init__(REVERSE_TYPE, quantity)
     
     def apply_effect(self, snake: Snake):
-        print("ok")
+        snake._block_positions.reverse()
+        for index, pos in enumerate(snake._block_positions):
+            snake.blocks[index].pos = pos
+        
+        print(snake.direction)
+        v = snake._block_positions[0] - snake._block_positions[1]
+        v.scale_to_length(1)
+        print(v)
+        snake._last_direction = -v
+        snake.direction = v
+        
 
     def get_item_entity_class(self):
         return ReverseEntity
@@ -33,5 +44,6 @@ class ReverseEntity(ItemEntity):
     
     def to_item_stack(self):
         return ReverseStack(self.quantity)
+
     def get_item_entity_class(self):
-        return ReverseStack(self.quantity)
+        return ReverseStack

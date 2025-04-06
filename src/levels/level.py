@@ -14,12 +14,8 @@ from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_boot import SpeedBootEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
-from entities.items.coin import CoinEntity
-from entities.items.food import FoodEntity
-from entities.items.key import KeyEntity
-from entities.items.ouroboros import OuroborosEntity
+from entities.items.reverse import ReverseEntity
 from entities.items.ritual_dagger import RitualDaggerEntity
-from entities.items.speed_boot import SpeedBootEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
@@ -165,6 +161,8 @@ class Level(State):
             self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
+        for i in range(3):
+            self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()
