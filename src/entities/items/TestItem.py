@@ -12,9 +12,8 @@ SHIELD_TYPE = ItemType(
     category=ItemCategory.SKILL,
     rarity=Rarity.RARE,
     texture=ItemTexture(
-        "game-assets/graphics/pixil/SHIELD.pixil",
+        "game-assets/graphics/pixil/item-sprite/GHOST_LIKE_BODY.pixil",
         0,
-        0
     ),
     cooldown=15.0,
     description="Temporary invincibility for 3 seconds",

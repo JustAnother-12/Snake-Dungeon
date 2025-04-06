@@ -11,7 +11,8 @@ BOMB_TYPE = ItemType(
     ItemCategory.CONSUMABLE,
     Rarity.COMMON,
     ItemTexture(
-        constant.Texture.bomb
+        'game-assets/graphics/pixil/item-sprite/BOMB_ITEM.pixil',
+        0
     ),
     max_stack=10,
     cooldown=3.0

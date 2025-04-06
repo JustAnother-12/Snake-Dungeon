@@ -12,7 +12,7 @@ from entities.items.instant.food import FoodEntity
 from entities.items.instant.key import KeyEntity
 from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
-from entities.items.comsumalbe.speed_boot import SpeedBootEntity
+from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
@@ -152,7 +152,7 @@ class Level(State):
             item = ShieldEntity(self)
             self.item_group.add(item)
         for i in range(3):
-            self.item_group.add(SpeedBootEntity(self, quantity=random.randint(2,4)))
+            self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
 
         self.item_group.add(OuroborosEntity(self))
 

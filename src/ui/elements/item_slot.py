@@ -33,7 +33,7 @@ class ItemSlot(pygame.sprite.Sprite):
             if item_stack.item_type.category != ItemCategory.SKILL:
                 self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 2).frames[item_stack.item_type.texture.stack_frame]
             else:
-                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 6).frames[item_stack.item_type.texture.stack_frame]
+                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 4).frames[item_stack.item_type.texture.stack_frame]
         else:
             self.item_img = None
     
@@ -48,11 +48,11 @@ class ItemSlot(pygame.sprite.Sprite):
             super().update(*args, **kwargs)
             return
 
-        t = ((64) - (16 * 3)) // 2
+        # t = ((64) - (16 * 3)) // 2
         if self.__item_stack.item_type.category != ItemCategory.SKILL: # type:ignore
             self.image.blit(self.item_img, (0, 0)) # type: ignore
         else:
-            self.image.blit(self.item_img, (t*2, t*2)) # type: ignore
+            self.image.blit(self.item_img, (0, 0)) # type: ignore
 
         if self.item_stack.item_type.category == ItemCategory.CONSUMABLE: # type: ignore
             if self.item_stack.quantity == self.item_stack.item_type.max_stack: # type: ignore
