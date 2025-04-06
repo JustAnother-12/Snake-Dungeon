@@ -1,4 +1,5 @@
 
+from random import choice
 from typing import Literal
 import pygame
 import config.constant as constant
@@ -19,9 +20,13 @@ class TextElement(pygame.sprite.Sprite):
         self.size = font_size
         self.x_pos = x_pos
         self.y_pos = y_pos
-        self.__render_text(choice, width)
+        self.__choice = choice
+        self.__width = width
+        self.__render_text()
     
-    def __render_text(self, choice, width):
+    def __render_text(self):
+        choice = self.__choice
+        width = self.__width
         self.font = pygame.font.Font(constant.PIXEL_FONT, self.size)
         if width == -1:
             width = self.font.size(self.text)[0]
@@ -62,3 +67,7 @@ class TextElement(pygame.sprite.Sprite):
                 img = self.font.render(word, True, self.color), (width - self.font.size(word)[0], i * self.font.size(word)[1])
             # print(self.font.size(word))
             self.image.blit(*img)
+    
+    def set_text(self, text: str):
+        self.text = text
+        self.__render_text()

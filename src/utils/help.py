@@ -1,5 +1,7 @@
 import pygame
 
+from systems.audio_manager import AudioManager
+
 def check_collision(sprite: pygame.sprite.Sprite, list_sprite):
     '''
     Return true if sprite collision with any sprite in list
@@ -11,3 +13,4 @@ def check_collision(sprite: pygame.sprite.Sprite, list_sprite):
 
 class Share:
     clock = pygame.time.Clock()
+    audio = AudioManager()

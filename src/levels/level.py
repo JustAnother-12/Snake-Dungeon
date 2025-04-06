@@ -4,15 +4,17 @@ import random
 import pygame
 
 import config.constant as constant
-from entities.items.TestItem import ShieldEntity
+from entities.items.skill.ghost_body import GhostEntity
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.instant.key import KeyEntity
 from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
-from entities.items.comsumalbe.speed_boot import SpeedBootEntity
+from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
+from entities.items.reverse import ReverseEntity
+from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from levels.components.bomb import Bomb
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
@@ -22,6 +24,7 @@ from levels.components.trap import Trap
 from levels.components.wall import Walls
 from stats import Stats
 from systems.interaction_manager import InteractionManager
+from systems.wave_manager import WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
 from ui.screens.game_over import GameOver_menu
@@ -29,6 +32,7 @@ from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
 from ui.screens.title_screen import TitleScreen
+from utils.help import Share
 
 
 class LevelStatus(Enum):
@@ -62,6 +66,7 @@ class Level(State):
 
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
+        self.wave_manager = WaveManager(self)
         
         # Environment groups
         self.wall_group = Walls()
@@ -75,7 +80,6 @@ class Level(State):
         # self.item_group.add(ShieldEntity(self))
         
         # Generate level components
-        self.generator()
         
         # Add all components to the level
         self.add(
@@ -90,12 +94,15 @@ class Level(State):
             self.hud,
             self.bomb_group
         )
+
+        self.generator()
         
     def generator(self):
 
         region_generator = RegionGenerator()
         # Make wall
 
+        self.wave_manager.generate_waves()
         
         # Make obstacle
         self.obstacle_group.empty()
@@ -129,15 +136,15 @@ class Level(State):
             coin = CoinEntity(self)
             self.item_group.add(coin)
         
-        for i in range(20):
+        for i in range(10):
             food = FoodEntity(self)
             self.item_group.add(food)
         
-        for i in range(5):
+        for i in range(2):
             gale_essence = GaleEssenceEntity(self)
             self.item_group.add(gale_essence)
 
-        for i in range(5):
+        for i in range(2):
             water_essence = WaterEssenceEntity(self)
             self.item_group.add(water_essence)
             
@@ -149,13 +156,18 @@ class Level(State):
             bomb = BombEntity(self, quantity=random.randint(2,4))
             self.item_group.add(bomb)
         
-        for i in range(3):
-            item = ShieldEntity(self)
+        for i in range(1):
+            item = GhostEntity(self)
             self.item_group.add(item)
-        for i in range(3):
-            self.item_group.add(SpeedBootEntity(self, quantity=random.randint(2,4)))
+        for i in range(2):
+            self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
+        
+        for i in range(1):
+            self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
+        for i in range(2):
+            self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()
@@ -184,18 +196,25 @@ class Level(State):
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
         
         self.__dev_test()
+
+        if self.level_status == LevelStatus.PLAYING:
+            self.wave_manager.update(Share.clock.get_time() / 1000)
+            self.check_room_cleared()
+            self.handle_input()
+            t = self.snake._will_go_out_of_bounds
+            super().update()
+            if self.snake._will_go_out_of_bounds and not t:
+                Share.audio.play_sound('hit_hurt', 1)
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
             self.game.state_stack.append(RoomCleared(self.game))
             self.snake.auto_state = False
             self.is_finished = False
-        
-        self.handle_input()
-
-        super().update()
     
     def check_room_cleared(self):
-        pass
+        if self.wave_manager.is_complete():
+            self.level_status = LevelStatus.ROOM_CLEARED
+            self.snake.auto_state = False
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")

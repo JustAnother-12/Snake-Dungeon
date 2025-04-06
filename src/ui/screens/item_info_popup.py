@@ -43,9 +43,6 @@ class ItemInfoPopup(State):
         self.rarity_sprite = ImageElement((SCREEN_WIDTH_TILES/2)*TILE_SIZE, self.bg_rect.top + 3*TILE_SIZE, self.rarity)
 
         # item's Image display
-        # if self.item_entity.image:
-        #     scaled_image = pygame.transform.scale(self.item_entity.image, (self.item_entity.image.get_width()*6, self.item_entity.image.get_height()*6))
-        #     self.item_sprite = ImageElement(self.bg_rect.midleft[0]+6*TILE_SIZE, self.bg_rect.midleft[1]-5*TILE_SIZE-4, scaled_image)
         self.item_image = Pixil.load(item_entity.item_type.texture.pixil_path, 3).frames[item_entity.item_type.texture.stack_frame]
         self.item_sprite = ImageElement(self.bg_rect.midleft[0]+6*TILE_SIZE, self.bg_rect.midleft[1]-5*TILE_SIZE-4, self.item_image)
 

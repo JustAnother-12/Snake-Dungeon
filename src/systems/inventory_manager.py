@@ -47,16 +47,21 @@ class InventoryManager:
     def handle_input(self):
         keys = pygame.key.get_pressed()
         for index, key in enumerate(self.keys_map):
+            if not self.slots[index] is None:
+                self.slots[index].active = False # type: ignore
             if self.time_pess[index] == 0 and keys[key]:
                 self.time_pess[index] = time.time()
             
             elif self.time_pess[index] and keys[key]:
                 # print(time.time() - self.time_pess[index])
-                if time.time() - self.time_pess[index] > self.pess_time:
-                    self.drop(index)
+                if not self.slots[index] is None:
+                    self.slots[index].active = True # type: ignore
+                    if time.time() - self.time_pess[index] > self.pess_time:
+                        self.drop(index)
 
             elif self.time_pess[index] and not keys[key]:
                 if not self.slots[index] is None:
+                    self.slots[index].active = True # type: ignore
                     self.slots[index].use(self.snake) # type: ignore
                 self.time_pess[index] = 0
     

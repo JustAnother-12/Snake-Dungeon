@@ -18,7 +18,8 @@ class ItemStack:
     from entities import Player
     def use(self, snake: "Player.Snake"):
         """Sử dụng item"""
-        
+        self.last_use_time = Share.clock.get_time()
+        self.active = True
         # Equipment tự đông kích hoạt hiệu ứng
         if self.item_type.category == ItemCategory.EQUIPMENT:
             return False
@@ -48,7 +49,7 @@ class ItemStack:
                 
         return True
     
-    def apply_effect(self, snake):
+    def apply_effect(self, snake: "Player.Snake"):
         """Áp dụng hiệu ứng của item - được ghi đè bởi lớp con"""
         pass
 
