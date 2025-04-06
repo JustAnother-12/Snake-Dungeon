@@ -131,6 +131,7 @@ class ItemInfoPopup(State):
         if self.item_entity.item_type.activation_type == ActivationType.ON_PICKUP and self.item_entity.item_type.category == ItemCategory.INSTANT:
             self.item_entity.apply_instant_effect()
             self.item_entity.kill()
+            self.level.interaction_manager.unregister_interact(self.item_entity)
         elif self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
             self.item_entity.kill()
             print('ok')

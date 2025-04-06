@@ -23,7 +23,7 @@ from ui.screens.Stats_Menu import base_stats_value
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, layer, pos: tuple[int, int], color: pygame.Color) -> None:
         super().__init__()
-        self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
+        self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE), pygame.SRCALPHA)
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.color = color
         self.image.fill(self.color)
@@ -87,7 +87,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                     (
                         constant.TILE_SIZE + int(self.target_pos.x != self.pos.x), #NOTE: pos bị lệch khoảng nhỏ nên cần thêm 1
                         constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
-                    )
+                    ), pygame.SRCALPHA
                 )
                 self.image.fill(self.color)
             self.rect.topleft = (
@@ -102,7 +102,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                 (
                     d_x + constant.TILE_SIZE + int(self.target_pos.x != self.pos.x),
                     d_y + constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
-                )
+                ), pygame.SRCALPHA
             )
             self.image.fill(self.color)
             if self.target_pos.x > self.pos.x or self.target_pos.y > self.pos.y:
@@ -487,7 +487,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.base_stats.resistance = constant.DEATH_DELAY * (1 + Stats.getValue(StatType.RESISTANCE)/100)
         self.base_stats.energy_cap = 10 * constant.TILE_SIZE * (1 + Stats.getValue(StatType.ENERGY_CAPACITY)/100)
         self.base_stats.energy_regen = constant.STAMINA_RECOVERY * (1 + Stats.getValue(StatType.ENERGY_REGEN)/100)
-        self.base_stats.food_potency =  1 + Stats.getValue(StatType.FOOD_POTENCY)//25
+        self.base_stats.food_potency =  int(1 + Stats.getValue(StatType.FOOD_POTENCY)//25)
         Stats.setValue(StatType.LENGTH, len(self.blocks))
     
     def die(self):

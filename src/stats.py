@@ -48,15 +48,19 @@ class Stats:
 
     @staticmethod
     def setValue(key, value):
-        Stats.stats[key]["value"] = min(value, 100)
+        Stats.stats[key]["value"] = value
 
     @staticmethod
     def increaseValue(key, value):
         Stats.setValue(key, Stats.getValue(key) + value)
 
     @staticmethod
+    def decreaseValue(key, value):
+        Stats.setValue(key, Stats.getValue(key) - value)
+
+    @staticmethod
     def getValue(key):
-        return Stats.stats[key]["value"]
+        return max(-100, min(Stats.stats[key]["value"], 100))
 
     @staticmethod
     def getDescription(key):
@@ -66,4 +70,3 @@ class Stats:
     def reset():
         for key in Stats.stats:
             Stats.stats[key]["value"] = 0
-

@@ -48,7 +48,9 @@ class Texture:
     luck_essence = "game-assets/graphics/pixil/item-sprite/LUCK_ESSENCE.pixil"
     water_essence = "game-assets/graphics/pixil/item-sprite/WATER_ESSENCE.pixil"
     dungeon_essence = "game-assets/graphics/pixil/item-sprite/DUNGEON_ESSENCE.pixil"
-
+    green_jade = "game-assets/graphics/pixil/item-sprite/GREEN_JADE_PELLET.pixil"
+    time_efficiency = "game-assets/graphics/pixil/item-sprite/TIME_EFFICIENCY.pixil"
+    credit_card = "game-assets/graphics/pixil/item-sprite/CREDIT_CARD.pixil"
 
     
 

@@ -91,7 +91,7 @@ class HUD(pygame.sprite.Group):
             grp.add(self.Key_text) #type: ignore
 
     def draw_stamina(self, stamina, max_stamina):
-        self.stamina_bar.image = pygame.Surface((132, 32))
+        self.stamina_bar.image = pygame.Surface((max_stamina + 4, 32))
         if stamina > 0:
             color = [(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 255, 191), (0, 255, 255)]
             rate = stamina / max_stamina
@@ -101,15 +101,15 @@ class HUD(pygame.sprite.Group):
             b = color[index][2] + (color[index + 1][2] - color[index][2]) * (stamina - index * 0.3 * max_stamina) // (min(max_stamina, (index + 1)*0.3 * max_stamina) - index * 0.3 * max_stamina)
 
             pygame.draw.rect(
-                self.stamina_bar.image, (r, g, b), (0, 4, stamina * 128 // max_stamina, 24)
+                self.stamina_bar.image, (r, g, b), (0, 4, stamina, 24)
             )
             
-            white_line = pygame.Surface((stamina * 128 // max_stamina, 4), pygame.SRCALPHA)
+            white_line = pygame.Surface((stamina, 4), pygame.SRCALPHA)
             white_line.fill((255, 255, 255, 200))
             self.stamina_bar.image.blit(white_line, (0, 4))
 
         pygame.draw.rect(
-            self.stamina_bar.image, (133, 133, 133), (0, 0, 132, 32), 4, 0, 0, 10, 0, 10
+            self.stamina_bar.image, (133, 133, 133), (0, 0, max_stamina + 4, 32), 4, 0, 0, 10, 0, 10
         )
         self.stamina_bar.rect = self.stamina_bar.image.get_rect(topleft=(6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE))
 

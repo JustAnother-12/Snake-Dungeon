@@ -1,10 +1,9 @@
 from enum import Enum
+import importlib
 import random
 import pygame
 
 import config.constant as constant
-from entities.Monster import Monster
-from entities.Player import Snake
 from entities.items.TestItem import ShieldEntity
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
@@ -14,13 +13,13 @@ from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_boot import SpeedBootEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
-from levels.components.bomb import Bomb, BombGroup
+from levels.components.bomb import Bomb
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
-from levels.components.obstacle import Obstacle, Obstacle_group
-from levels.components.pot import Pot, Pot_group
+from levels.components.obstacle import Obstacle
+from levels.components.pot import Pot
 from levels.components.trap import Trap
-from levels.components.wall import Wall, Walls
+from levels.components.wall import Walls
 from stats import Stats
 from systems.interaction_manager import InteractionManager
 from ui.hud.HUD import HUD
@@ -48,6 +47,7 @@ class Level(State):
 
     def init(self):
         from entities.Player import Snake
+
         # Clear previous state
         self.empty()
         self.remove(self.sprites())
@@ -118,6 +118,7 @@ class Level(State):
             self.bomb_group.add(Bomb(self))
             
         # tạo monster
+        from entities.Monster import Monster
         for i in range(3):
             monster = Monster(self, random.randint(5, 8))
             monster.set_player_reference(self.snake)

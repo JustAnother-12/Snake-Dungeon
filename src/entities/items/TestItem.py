@@ -1,4 +1,5 @@
 
+import pygame
 from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
@@ -29,8 +30,15 @@ class ShieldStack(ItemStack):
         self.shield_active_duration = 3  # seconds
     
     def apply_effect(self, snake):
+        from config import constant
         self.shield_active_time = self.shield_active_duration
         snake.stamina -= self.item_type.energy_usage
+        snake.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE), pygame.SRCALPHA)
+        snake.headImg.fill((255, 255, 255, 80))
+        pygame.draw.rect(snake.headImg, (255, 255, 255), (3, 3, 2, 4))
+        pygame.draw.rect(snake.headImg, (255, 255, 255), (11, 3, 2, 4))
+        for block in snake.blocks:
+            block.color = (255, 255, 255, 80)
         
         # snake.run_time_overriding['_is_collide_with_Obstacle']['after'].append(self.prevent_damage)
         self.add_runtime_overriding(snake, '_is_collide_with_obstacle', 'after', self.prevent_damage)

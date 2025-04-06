@@ -8,10 +8,10 @@ from utils.pixil import Pixil
 
 class base_stats_value:
     def __init__(self) -> None:
-        self.speed = 0
-        self.resistance = 0
-        self.energy_cap = 0
-        self.energy_regen = 0
+        self.speed = 0.0
+        self.resistance = 0.0
+        self.energy_cap = 0.0
+        self.energy_regen = 0.0
         self.food_potency = 0
 
 class Stats_menu(State):
@@ -54,7 +54,7 @@ class Stats_menu(State):
                                "midleft"
                                )
             self.add(name)
-            value = TextElement(str(value["value"]), 
+            value = TextElement(str(Stats.getValue(key)), 
                                 "yellow", 
                                 13, 
                                 (self.game.SCREEN_WIDTH_TILES/2 - h_gap + 14.5)*self.game.TILE_SIZE, 

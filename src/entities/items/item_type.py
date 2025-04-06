@@ -8,16 +8,16 @@ class Rarity(Enum):
 
 class ItemCategory(Enum):
     # Item nhận hiệu ứng ngay (coin, food) - không vào inventory
-    INSTANT = auto()
+    INSTANT = 'instant'
     
     # Item dùng 1 lần và có thể stack (health potion, bomb)
-    CONSUMABLE = auto()
+    CONSUMABLE = 'consumable'
     
     # Item passive, tự kích hoạt hiệu ứng
-    EQUIPMENT = auto()
+    EQUIPMENT = 'equipment'
 
     # Item dùng nhiều lần, không stack
-    SKILL = auto()
+    SKILL = 'skill'
 
 class ActivationType(Enum):
     # Kích hoạt khi va chạm với item

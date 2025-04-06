@@ -162,7 +162,7 @@ class Monster(Snake):
             return
         block = self.sprites()[-1]
         block.kill()
-        item = loot_pool.get_item()
+        item, rarity = loot_pool.get_item()
         if item == LootItem.COIN:
             self.level.item_group.add(CoinEntity(self.level, block.rect, 1, random.randint(10, 15)))
         elif item == LootItem.FOOD:
