@@ -5,7 +5,7 @@ from re import L
 from unittest import result
 
 from entities.items.item_type import Rarity
-from stats import Stats
+from stats import StatType, Stats
 
 class LootPool:
     def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (50, 35, 15)):
@@ -67,7 +67,7 @@ class LootPool:
     def get_item(self):
         keys = list(self.loot_table.keys())
         values = list(self.loot_table.values())
-        choices = random.choices(keys, values, k = 1 + Stats.getValue("LUCK")//10)
+        choices = random.choices(keys, values, k = 1 + Stats.getValue(StatType.LUCK)//10)
         result = sorted(choices, key = lambda x: x.value, reverse=True)[0]
         if result == LootItem.ITEM_INSTANT:
             # Chọn ngẫu nhiên độ hiếm của ITEM_INSTANT

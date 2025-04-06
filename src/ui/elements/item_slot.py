@@ -18,7 +18,7 @@ class ItemSlot(pygame.sprite.Sprite):
         self._item_cooldown = pixil.Pixil.load("game-assets/graphics/pixil/ITEM_SLOT_COOLDOWN.pixil", scale).frames[0]
         self.font = pygame.font.Font(constant.PIXEL_FONT, 15)
         if item_stack:
-            self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 3).frames[item_stack.item_type.texture.frame]
+            self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 3).frames[item_stack.item_type.texture.stack_frame]
         else: 
             self.item_img = None
     
@@ -30,10 +30,10 @@ class ItemSlot(pygame.sprite.Sprite):
     def item_stack(self, item_stack: ItemStack):
         self.__item_stack = item_stack
         if item_stack:
-            if item_stack.item_type.category.name is not "SKILL":
-                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 3).frames[item_stack.item_type.texture.frame]
+            if item_stack.item_type.category != ItemCategory.SKILL:
+                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 2).frames[item_stack.item_type.texture.stack_frame]
             else:
-                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 6).frames[item_stack.item_type.texture.frame]
+                self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 6).frames[item_stack.item_type.texture.stack_frame]
         else:
             self.item_img = None
     
@@ -49,8 +49,8 @@ class ItemSlot(pygame.sprite.Sprite):
             return
 
         t = ((64) - (16 * 3)) // 2
-        if self.__item_stack.item_type.category.name is not "SKILL": # type:ignore
-            self.image.blit(self.item_img, (t, t)) # type: ignore
+        if self.__item_stack.item_type.category != ItemCategory.SKILL: # type:ignore
+            self.image.blit(self.item_img, (0, 0)) # type: ignore
         else:
             self.image.blit(self.item_img, (t*2, t*2)) # type: ignore
 
@@ -63,7 +63,7 @@ class ItemSlot(pygame.sprite.Sprite):
         if self.item_stack.item_type.cooldown: # type: ignore
             p = (self.item_stack.get_cooldown_remaining() / self.item_stack.item_type.cooldown) # type: ignore
             
-            if self.__item_stack.item_type.category.name is not "SKILL": # type:ignore
+            if self.__item_stack.item_type.category != ItemCategory.SKILL: # type:ignore
                 height = int(p * 65)
                 top = 64 - height
                 self.image.blit(self._item_cooldown, (0, top), (0, top, 64, height)) # type: ignore

@@ -1,16 +1,19 @@
-from __future__ import annotations
 from enum import Enum
-from operator import contains
-from poplib import CR
 import random
-from numpy import isin
 import pygame
 
 import config.constant as constant
 from entities.Monster import Monster
 from entities.Player import Snake
-from entities.items.bomb_item import BombEntity
 from entities.items.TestItem import ShieldEntity
+from entities.items.instant.gale_essence import GaleEssenceEntity
+from entities.items.instant.coin import CoinEntity
+from entities.items.instant.food import FoodEntity
+from entities.items.instant.key import KeyEntity
+from entities.items.equipment.ouroboros import OuroborosEntity
+from entities.items.comsumalbe.bomb_item import BombEntity
+from entities.items.comsumalbe.speed_boot import SpeedBootEntity
+from entities.items.instant.water_essence import WaterEssenceEntity
 from entities.items.coin import CoinEntity
 from entities.items.food import FoodEntity
 from entities.items.key import KeyEntity
@@ -136,6 +139,14 @@ class Level(State):
             food = FoodEntity(self)
             self.item_group.add(food)
         
+        for i in range(5):
+            gale_essence = GaleEssenceEntity(self)
+            self.item_group.add(gale_essence)
+
+        for i in range(5):
+            water_essence = WaterEssenceEntity(self)
+            self.item_group.add(water_essence)
+            
         for i in range(3):
             key = KeyEntity(self)
             self.item_group.add(key)
@@ -188,8 +199,6 @@ class Level(State):
             self.snake.auto_state = False
             self.is_finished = False
         
-        Stats.setValue("LENGTH", len(self.snake))
-
         self.handle_input()
 
         super().update()

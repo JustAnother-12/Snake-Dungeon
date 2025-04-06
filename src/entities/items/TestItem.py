@@ -13,6 +13,8 @@ SHIELD_TYPE = ItemType(
     rarity=Rarity.RARE,
     texture=ItemTexture(
         "game-assets/graphics/pixil/SHIELD.pixil",
+        0,
+        0
     ),
     cooldown=15.0,
     description="Temporary invincibility for 3 seconds",

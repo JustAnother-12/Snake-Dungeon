@@ -39,7 +39,15 @@ class Texture:
     pasue_menu_bg = "game-assets/graphics/pixil/PAUSED_MENU_BG.pixil"
     apple = "game-assets/graphics/pixil/apple.pixil"
     bomb = "game-assets/graphics/pixil/BOMB_SHEET.pixil"
-    ouroboros = "game-assets/graphics/pixil/EQUIPMENT_TEST.pixil"
+    ouroboros = "game-assets/graphics/pixil/item-sprite/THE_OUROBOROS.pixil"
+    earth_essence = "game-assets/graphics/pixil/item-sprite/EARTH_ESSENCE.pixil"
+    gale_essence = "game-assets/graphics/pixil/item-sprite/GALE_ESSENCE.pixil"
+    gluttony_essence = "game-assets/graphics/pixil/item-sprite/GLUTTONY_ESSENCE.pixil"
+    gold_essence = "game-assets/graphics/pixil/item-sprite/GOLD_ESSENCE.pixil"
+    lightning_essence = "game-assets/graphics/pixil/item-sprite/LIGHTNING_ESSENCE.pixil"
+    luck_essence = "game-assets/graphics/pixil/item-sprite/LUCK_ESSENCE.pixil"
+    water_essence = "game-assets/graphics/pixil/item-sprite/WATER_ESSENCE.pixil"
+    dungeon_essence = "game-assets/graphics/pixil/item-sprite/DUNGEON_ESSENCE.pixil"
 
 
     

@@ -4,7 +4,7 @@ from typing import Any
 from pygame import Event
 import pygame
 from config.constant import SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE
-from entities.items.item_type import ActivationType, ItemCategory
+from entities.items.item_type import ActivationType, ItemCategory, Rarity
 from ui.elements.button import ButtonElement
 from ui.elements.image import ImageElement
 from ui.screens.state import State
@@ -32,12 +32,12 @@ class ItemInfoPopup(State):
         self.bg_rect = self.bg.get_rect(center=((SCREEN_WIDTH_TILES/2)*TILE_SIZE, (SCREEN_HEIGHT_TILES/2)*TILE_SIZE))
 
         # rarity display
-        match self.item_entity.item_type.rarity.value:
-            case "Common":
+        match self.item_entity.item_type.rarity:
+            case Rarity.COMMON:
                 self.rarity = Pixil.load("game-assets/graphics/pixil/RARITY_TAGS.pixil", 3).frames[0]
-            case "Uncommon":
+            case Rarity.UNCOMMON:
                 self.rarity = Pixil.load("game-assets/graphics/pixil/RARITY_TAGS.pixil", 3).frames[1]
-            case "Rare":
+            case Rarity.RARE:
                 self.rarity = Pixil.load("game-assets/graphics/pixil/RARITY_TAGS.pixil", 3).frames[2]
 
         self.rarity_sprite = ImageElement((SCREEN_WIDTH_TILES/2)*TILE_SIZE, self.bg_rect.top + 3*TILE_SIZE, self.rarity)
@@ -46,7 +46,7 @@ class ItemInfoPopup(State):
         # if self.item_entity.image:
         #     scaled_image = pygame.transform.scale(self.item_entity.image, (self.item_entity.image.get_width()*6, self.item_entity.image.get_height()*6))
         #     self.item_sprite = ImageElement(self.bg_rect.midleft[0]+6*TILE_SIZE, self.bg_rect.midleft[1]-5*TILE_SIZE-4, scaled_image)
-        self.item_image = Pixil.load(item_entity.item_type.texture.pixil_path, 6).frames[0]
+        self.item_image = Pixil.load(item_entity.item_type.texture.pixil_path, 3).frames[item_entity.item_type.texture.stack_frame]
         self.item_sprite = ImageElement(self.bg_rect.midleft[0]+6*TILE_SIZE, self.bg_rect.midleft[1]-5*TILE_SIZE-4, self.item_image)
 
         # item category display
