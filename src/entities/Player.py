@@ -321,7 +321,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self.time_die += Share.clock.get_time() / 1000
             for block in self.blocks:
                 block: SnakeBlock
-                block.image.fill((200, 200, 200)) # type: ignore
+                block.image.fill((255, 255, 255)) # type: ignore
             if self.time_die > 0.05:
                 self.die()
                 self.time_die = 0
@@ -379,7 +379,7 @@ class Snake(pygame.sprite.AbstractGroup):
         for i, block in enumerate(self.blocks[index:]):
             # block.is_severed = True
             block.sever("COIN", 2 + 0.1 * i)
-            block.image.fill((200, 200, 200)) # type: ignore
+            block.image.fill((255, 255, 255)) # type: ignore
 
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]

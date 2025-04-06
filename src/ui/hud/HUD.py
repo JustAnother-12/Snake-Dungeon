@@ -1,5 +1,4 @@
 import pygame
-from entities.items.TestItem import ShieldStack
 from ui.elements.image import ImageElement
 from ui.elements.item_slot import ItemSlot
 from ui.elements.text import TextElement

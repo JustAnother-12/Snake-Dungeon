@@ -14,17 +14,17 @@ class TitleScreen(State):
         super().__init__(game)
         self.game = game
         
-        self.text = TextElement(message, "white", 35, constant.SCREEN_WIDTH_TILES / 2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE, "center")
-        self.couldown = TextElement("Starting in 3", "white", 35, constant.SCREEN_WIDTH_TILES / 2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE + 50, "center")
+        # self.text = TextElement(message, "white", 35, constant.SCREEN_WIDTH_TILES / 2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE, "center")
+        self.count = TextElement("Starting in 3", "white", 30, constant.SCREEN_WIDTH_TILES / 2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE, "center")
         self.level_ = level_
         self.duration = 3
     
-        self.add(self.text)
-        self.add(self.couldown)
+        # self.add(self.text)
+        self.add(self.count)
     
     def update(self):
         self.duration -= Share.clock.get_time() / 1000
-        self.couldown.set_text(f"Starting in {int(self.duration) + 1}")
+        self.count.set_text(f"Starting in {int(self.duration) + 1}")
         if self.duration <= 0:
             self.game.state_stack.pop()
             from levels.level import LevelStatus

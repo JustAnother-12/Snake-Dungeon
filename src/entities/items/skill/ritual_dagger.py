@@ -41,8 +41,8 @@ class RitualDaggerStack(ItemStack):
         # snake.level.item_group.add(FakeSnakeBlock(snake.level, pos, block.color))
     
     def use(self, snake: Snake):
-        if len(snake.blocks) <= 4:
-            return False
+        # if len(snake.blocks) <= 4:
+        #     return False
         return super().use(snake)
     
     def get_item_entity_class(self):

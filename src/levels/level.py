@@ -5,7 +5,7 @@ import pygame
 import config.constant as constant
 from entities.Monster import Monster
 from entities.Player import Snake
-from entities.items.TestItem import ShieldEntity
+from entities.items.skill.ghost_body import GhostEntity
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
@@ -15,7 +15,7 @@ from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
 from entities.items.reverse import ReverseEntity
-from entities.items.ritual_dagger import RitualDaggerEntity
+from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
@@ -135,11 +135,11 @@ class Level(State):
             food = FoodEntity(self)
             self.item_group.add(food)
         
-        for i in range(5):
+        for i in range(2):
             gale_essence = GaleEssenceEntity(self)
             self.item_group.add(gale_essence)
 
-        for i in range(5):
+        for i in range(2):
             water_essence = WaterEssenceEntity(self)
             self.item_group.add(water_essence)
             
@@ -151,17 +151,17 @@ class Level(State):
             bomb = BombEntity(self, quantity=random.randint(2,4))
             self.item_group.add(bomb)
         
-        for i in range(3):
-            item = ShieldEntity(self)
+        for i in range(1):
+            item = GhostEntity(self)
             self.item_group.add(item)
-        for i in range(3):
+        for i in range(2):
             self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
         
-        for i in range(3):
+        for i in range(1):
             self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
-        for i in range(3):
+        for i in range(2):
             self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):

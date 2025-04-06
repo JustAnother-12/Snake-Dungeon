@@ -10,7 +10,7 @@ class ItemSlot(pygame.sprite.Sprite):
     from entities.items.item_stack import ItemStack
     def __init__(self, x_pos, y_pos, scale=1, item_stack: ItemStack | None = None):
         super().__init__()
-        self._image = pixil.Pixil.load("game-assets/graphics/pixil/EQUIPMENT_SLOTS.pixil", scale).frames[0]
+        self.Img_scale = scale
         self._empty_slot = pixil.Pixil.load("game-assets/graphics/pixil/EMPTY_SLOTS.pixil", scale).frames[0]
         self.image = self._empty_slot.copy()
         self.rect = self.image.get_rect(center=(x_pos, y_pos))
@@ -36,14 +36,27 @@ class ItemSlot(pygame.sprite.Sprite):
                 self.item_img = pixil.Pixil.load(item_stack.item_type.texture.pixil_path, 4).frames[item_stack.item_type.texture.stack_frame]
         else:
             self.item_img = None
-    
     def update(self, *args: Any, **kwargs: Any) -> None:
         self.image.fill((0,0,0,0)) # type: ignore
         if self.item_stack is None:
             self.image.blit(self._empty_slot) # type: ignore
         else:
-            # self.image.blit(self._image) # type: ignore
-            pass
+            if not self.item_stack.active:
+                match self.item_stack.item_type.category:
+                    case ItemCategory.CONSUMABLE:
+                        self._image = pixil.Pixil.load("game-assets/graphics/pixil/CONSUMABLE_SLOTS.pixil", self.Img_scale).frames[0]
+                    case ItemCategory.EQUIPMENT:
+                        self._image = pixil.Pixil.load("game-assets/graphics/pixil/EQUIPMENT_SLOTS.pixil", self.Img_scale).frames[0]
+                    case ItemCategory.SKILL:
+                        self._image = pixil.Pixil.load("game-assets/graphics/pixil/SKILL_SLOT.pixil", self.Img_scale).frames[0]
+            else:
+                match self.item_stack.item_type.category:
+                    case ItemCategory.CONSUMABLE:
+                        self._image = pixil.Pixil.load("game-assets/graphics/pixil/CONSUMABLE_SLOTS.pixil", self.Img_scale).frames[1]
+                    case ItemCategory.SKILL:
+                        self._image = pixil.Pixil.load("game-assets/graphics/pixil/SKILL_SLOT.pixil", self.Img_scale).frames[1]
+            self.image.blit(self._image) # type: ignore
+            # pass
         if not self.item_img: 
             super().update(*args, **kwargs)
             return
