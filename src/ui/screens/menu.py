@@ -24,4 +24,3 @@ class Menu(State):
         if (event.type == pygame.KEYDOWN):
             if event.key in self.keymap.keys():
                 self.buttons[self.keymap[event.key]].on_click()
-

@@ -32,6 +32,7 @@ from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
 from ui.screens.title_screen import TitleScreen
+from utils.help import Share
 
 
 class LevelStatus(Enum):
@@ -198,8 +199,10 @@ class Level(State):
             self.is_finished = False
         
         self.handle_input()
-
+        t = self.snake._will_go_out_of_bounds
         super().update()
+        if self.snake._will_go_out_of_bounds and not t:
+            Share.audio.play_sound('hit_hurt', 1)
     
     def check_room_cleared(self):
         pass

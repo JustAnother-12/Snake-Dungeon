@@ -86,6 +86,7 @@ class Bomb(pygame.sprite.Sprite):
             if self.time > self.key_time[BombState.ACTIVE]:
                 self.state = BombState.EXPLOSION
                 self.time = 0
+                Share.audio.play_sound("bomb", 1)
         
         if self.state == BombState.EXPLOSION:
             frame = self.animation_sheet.frames[
