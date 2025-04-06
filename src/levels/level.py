@@ -102,6 +102,7 @@ class Level(State):
         region_generator = RegionGenerator()
         # Make wall
 
+        self.wave_manager.generate_waves()
         
         # Make obstacle
         self.obstacle_group.empty()
