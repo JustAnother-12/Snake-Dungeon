@@ -48,7 +48,7 @@ class ItemStack:
                 
         return True
     
-    def apply_effect(self, snake):
+    def apply_effect(self, snake: "Player.Snake"):
         """Áp dụng hiệu ứng của item - được ghi đè bởi lớp con"""
         pass
 

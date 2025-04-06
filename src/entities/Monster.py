@@ -156,12 +156,12 @@ class Monster(Snake):
             self.add(block)
 
     def die(self):
-        loot_pool = LootPool((5, 10, 7, 3, 0, 0, 0))
-        if len(self.sprites()) == 0:
+        if len(self.blocks) == 0:
             self.level.snake_group.remove(self)
             return
-        block = self.sprites()[-1]
-        block.kill()
+        loot_pool = LootPool((5, 10, 7, 3, 0, 0, 0))
+        block = self.blocks.pop(0)
+        self._block_positions.pop(0)
         item = loot_pool.get_item()
         if item == LootItem.COIN:
             self.level.item_group.add(CoinEntity(self.level, block.rect, 1, random.randint(10, 15)))
@@ -171,3 +171,4 @@ class Monster(Snake):
             pass
         else:
             print(f"[{item.value}]: Instant item")
+        block.kill()

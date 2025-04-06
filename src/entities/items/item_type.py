@@ -1,10 +1,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from tkinter import NO
-from unicodedata import category
 
-from utils import pixil
 
 
 class Rarity(Enum):
@@ -49,7 +46,7 @@ class ItemType:
     name: str
     category: ItemCategory
     rarity: Rarity
-    texture: ItemTexture
+    texture: ItemTexture = ItemTexture("game-assets/graphics/pixil/item-sprite/DEFAULT.pixil")
     description: str = ""
     max_stack: int = 1
     value: int = 1

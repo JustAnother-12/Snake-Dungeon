@@ -22,7 +22,7 @@ from ui.screens.Stats_Menu import base_stats_value
 
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, layer, pos: tuple[int, int], color: pygame.Color) -> None:
-        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.color = color
@@ -38,6 +38,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.time_severed = 0
         self.is_severed = False  # Tracks if this block is severed from the snake's main body
         self.transform_type = None
+        self.can_collide = False
 
     @property
     def is_head(self):
@@ -404,7 +405,8 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def _is_collide_with_self(self, position):
         if self.is_curling: return False
-        for block in self.blocks[1:]:
+        for block in self.sprites():
+            if block == self.blocks[0]: continue
             if block.rect.colliderect(
                 (
                     position[0],
@@ -413,6 +415,11 @@ class Snake(pygame.sprite.AbstractGroup):
                     constant.TILE_SIZE,
                 )
             ):
+                if block.can_collide: 
+                    # code ở đây tệ vl
+                    block.kill()
+                    self.grow_up(1)
+                    continue
                 return True
         return False
 
@@ -462,7 +469,7 @@ class Snake(pygame.sprite.AbstractGroup):
             snake: Snake
             if snake == self: continue
             if snake.is_dead: continue
-            for block in snake.blocks:
+            for block in snake.sprites():
                 if block.rect.colliderect(
                     (
                         position[0],
