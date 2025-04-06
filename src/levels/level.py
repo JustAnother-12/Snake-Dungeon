@@ -14,6 +14,8 @@ from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
+from entities.items.reverse import ReverseEntity
+from entities.items.ritual_dagger import RitualDaggerEntity
 from levels.components.bomb import Bomb, BombGroup
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
@@ -75,7 +77,6 @@ class Level(State):
         # self.item_group.add(ShieldEntity(self))
         
         # Generate level components
-        self.generator()
         
         # Add all components to the level
         self.add(
@@ -90,6 +91,8 @@ class Level(State):
             self.hud,
             self.bomb_group
         )
+
+        self.generator()
         
     def generator(self):
 
@@ -128,7 +131,7 @@ class Level(State):
             coin = CoinEntity(self)
             self.item_group.add(coin)
         
-        for i in range(20):
+        for i in range(10):
             food = FoodEntity(self)
             self.item_group.add(food)
         
@@ -153,8 +156,13 @@ class Level(State):
             self.item_group.add(item)
         for i in range(3):
             self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
+        
+        for i in range(3):
+            self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
+        for i in range(3):
+            self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()
