@@ -7,7 +7,6 @@ from config import constant
 from entities.Monster import Monster
 from levels.components.bomb import Bomb, BombState
 from levels.components.trap import Trap
-from levels.level import LevelStatus
 from utils.help import Share
 
 
@@ -163,13 +162,12 @@ class WaveManager:
         """Check if all monsters in the wave are defeated"""
         # Count alive monsters from this wave
         active_monsters = [e for e in wave.spawned_entities 
-                         if isinstance(e, Monster) and e.alive()]
+                         if isinstance(e, Monster) and e.is_dead == False]
         return len(active_monsters) == 0
     
     def _handle_all_waves_completed(self):
         """Handle completion of all waves"""
         self.running = False
-        self.level.level_status = LevelStatus.ROOM_CLEARED
     
     def _play_wave_cleared_sound(self):
         """Play sound when a wave is cleared"""
