@@ -25,6 +25,7 @@ from levels.components.trap import Trap
 from levels.components.wall import Wall, Walls
 from stats import Stats
 from systems.interaction_manager import InteractionManager
+from systems.wave_manager import WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
 from ui.screens.game_over import GameOver_menu
@@ -32,6 +33,7 @@ from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
 from ui.screens.title_screen import TitleScreen
+from utils.help import Share
 
 
 class LevelStatus(Enum):
@@ -64,6 +66,7 @@ class Level(State):
 
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
+        self.wave_manager = WaveManager(self)
         
         # Environment groups
         self.wall_group = Walls()
@@ -191,18 +194,25 @@ class Level(State):
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
         
         self.__dev_test()
+
+        if self.level_status == LevelStatus.PLAYING:
+            self.wave_manager.update(Share.clock.get_time() / 1000)
+            self.check_room_cleared()
+            self.handle_input()
+            t = self.snake._will_go_out_of_bounds
+            super().update()
+            if self.snake._will_go_out_of_bounds and not t:
+                Share.audio.play_sound('hit_hurt', 1)
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
             self.game.state_stack.append(RoomCleared(self.game))
             self.snake.auto_state = False
             self.is_finished = False
-        
-        self.handle_input()
-
-        super().update()
     
     def check_room_cleared(self):
-        pass
+        if self.wave_manager.is_complete():
+            self.level_status = LevelStatus.ROOM_CLEARED
+            self.snake.auto_state = False
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")

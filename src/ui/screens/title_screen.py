@@ -32,6 +32,7 @@ class TitleScreen(State):
             self.level_.snake.auto_state = True
             self.level_.snake.is_curling = False
             self.level_.snake.direction = pygame.Vector2(0, -1)
+            self.level_.wave_manager.start()
             # print(self.level_.snake.direction)
             self.game.state_stack[-1].visible = True
 
@@ -45,6 +46,7 @@ class TitleScreen(State):
                 self.level_.snake.auto_state = True
                 self.level_.snake.is_curling = False
                 self.game.state_stack[-1].visible = True
+                self.level_.wave_manager.start()
         
         if keys[pygame.K_ESCAPE]:
             self.game.state_stack.append(Pause_menu(self.game))

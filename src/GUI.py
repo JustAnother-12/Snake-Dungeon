@@ -23,12 +23,18 @@ class Game:
         self.clock = Share.clock
         self.running, self.playing = True, True
         self.selectBtnMode = "mouse"
+        self.audio = Share.audio
 
+        self.load_audio()
         self.state_stack: list[State] = []
         self.load_states()
     
     def update(self):
         self.state_stack[-1].update()
+    
+    def load_audio(self):
+        self.audio.load_all_music('game-assets/audio/music')
+        self.audio.load_all_sounds('game-assets/audio/sfx')
 
     def get_events(self):
         for event in EventManager.get_events():

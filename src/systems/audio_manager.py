@@ -1,6 +1,5 @@
 import pygame
 import os
-from utils.help import Share
 
 class AudioManager:
     def __init__(self):
@@ -68,10 +67,13 @@ class AudioManager:
             print(f"Sound {name} not found")
             return None
     
-    def stop_sound(self, name):
+    def stop_sound(self, name, fade_ms=0):
         """Stop a specific sound effect"""
         if name in self.sound_channels and self.sound_channels[name].get_busy():
-            self.sound_channels[name].stop()
+            if fade_ms > 0:
+                self.sound_channels[name].fadeout(fade_ms)
+            else:
+                self.sound_channels[name].stop()
             return True
         return False
     
@@ -107,9 +109,12 @@ class AudioManager:
         else:
             print(f"Music {name} not found")
     
-    def stop_music(self):
+    def stop_music(self, fade_ms=0):
         """Stop current music playback"""
-        pygame.mixer.music.stop()
+        if fade_ms > 0:
+            pygame.mixer.music.fadeout(fade_ms)
+        else:
+            pygame.mixer.music.stop()
         self.current_music = None
     
     def pause_music(self):

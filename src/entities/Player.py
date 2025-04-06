@@ -291,7 +291,7 @@ class Snake(pygame.sprite.AbstractGroup):
         if self._is_collide(self._block_positions[0]) :
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
-                print("Snake died after", self.base_stats.resistance, "out of bounds!")
+                # print("Snake died after", self.base_stats.resistance, "out of bounds!")
                 self._out_of_bounds_time = 0
             self._will_go_out_of_bounds = True
             return
@@ -302,7 +302,6 @@ class Snake(pygame.sprite.AbstractGroup):
             self._block_positions.pop()
 
     def handle_collision(self):
-
         self._collide_with_active_trap()
         self._collide_with_bomb()
 
