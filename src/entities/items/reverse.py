@@ -32,11 +32,9 @@ class ReverseStack(ItemStack):
         print(v)
         snake._last_direction = -v
         snake.direction = v
-        
 
     def get_item_entity_class(self):
         return ReverseEntity
-
 
 class ReverseEntity(ItemEntity):
     def __init__(self, level, area=None, r=2, quantity=1):
