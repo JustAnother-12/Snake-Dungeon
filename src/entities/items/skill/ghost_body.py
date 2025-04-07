@@ -10,17 +10,17 @@ from config import constant
 
 
 GHOST_TYPE = ItemType(
-    id="shield",
-    name="Shield",
+    id="ghost_like_body",
+    name="Ghost Like Body",
     category=ItemCategory.SKILL,
-    rarity=Rarity.RARE,
+    rarity=Rarity.COMMON,
     texture=ItemTexture(
         "game-assets/graphics/pixil/item-sprite/GHOST_LIKE_BODY.pixil",
         0,
     ),
     cooldown=7.0,
     description="Temporary invincibility for 3 seconds",
-    price=150,  # Shield is valuable!
+    price=50,
     energy_usage= 30
 )
 

@@ -15,6 +15,7 @@ from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
 from entities.items.reverse import ReverseEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
+from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.chest import ChestGroup
 from levels.components.floor_tile import Floor
@@ -119,10 +120,10 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
-        # tạo bom
-        self.bomb_group.empty()
-        for i in range(3):
-            self.bomb_group.add(Bomb(self))
+        # # tạo bom
+        # self.bomb_group.empty()
+        # for i in range(3):
+        #     self.bomb_group.add(Bomb(self))
             
         # tạo monster
         from entities.Monster import Monster
