@@ -4,12 +4,15 @@ import random
 import pygame
 
 import config.constant as constant
+from entities.items.comsumalbe.energy_drink import EnergyDrinkEntity
+from entities.items.comsumalbe.resistance_potion import ResistancePotionEntity
 from entities.items.skill.ghost_body import GhostEntity
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.instant.key import KeyEntity
 from entities.items.equipment.ouroboros import OuroborosEntity
+from entities.items.comsumalbe.celestine_fragment import CelestineFragmentEntity
 from entities.items.equipment.time_efficiency import TimeEfficiencyEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
@@ -168,8 +171,11 @@ class Level(State):
         #     self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
+        self.item_group.add(CelestineFragmentEntity(self))
+        self.item_group.add(EnergyDrinkEntity(self))
         for i in range(2):
             self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
+            self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()

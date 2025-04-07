@@ -68,7 +68,7 @@ class InventoryManager:
     def update(self):
         for value in self.slots:
             if value is None: continue
-            value.update()
+            value.update(self)
 
     def _check_item_exits(self, item: ItemStack):
         '''chả về vị trị của item đó trong mảng Không thấy thì nó trả về -1'''

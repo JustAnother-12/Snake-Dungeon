@@ -39,6 +39,8 @@ class ItemRegistry:
                 'bomb_item': 'BombEntity',
                 'reverse': 'ReverseEntity',
                 'speed_potion': 'SpeedPotionEntity',
+                'energy_drink': 'EnergyDrinkEntity',
+                'resistance_potion': 'ResistancePotionEntity',
             },
             Rarity.UNCOMMON: {},
             Rarity.RARE: {},

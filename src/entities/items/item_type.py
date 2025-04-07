@@ -77,9 +77,9 @@ class ItemType:
                 case ItemCategory.CONSUMABLE | ItemCategory.SKILL:
                     self.activation_type = ActivationType.ON_USE
 
-        # chỉ có SKILL mới có energy_usage
-        if self.category != ItemCategory.SKILL and self.energy_usage:
-            raise ValueError("Chỉ có skill mới có energu_usage")
+        # # chỉ có SKILL mới có energy_usage
+        # if self.category != ItemCategory.SKILL and self.energy_usage:
+        #     raise ValueError("Chỉ có skill mới có energu_usage")
             
         # Tự động gán giá dựa trên rarity nếu chưa được chỉ định
         if self.price == 0:

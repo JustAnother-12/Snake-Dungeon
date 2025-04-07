@@ -44,9 +44,7 @@ class ItemStack:
         # Giảm số lượng nếu là consumable
         if self.item_type.category == ItemCategory.CONSUMABLE:
             self.quantity -= 1
-            if self.quantity <= 0:
-                snake.inventory.remove_item(self)
-                
+            
         return True
     
     def apply_effect(self, snake: "Player.Snake"):
@@ -98,6 +96,8 @@ class ItemStack:
         from entities.items.item_entity import ItemEntity
         return ItemEntity
 
-    def update(self):
+    def update(self, inventory_manager):
         self.cool_down = max(0, self.cool_down - Share.clock.get_time() / 1000)
+        if self.quantity <= 0 and self.cool_down <= 0:
+                inventory_manager.remove_item(self)
     

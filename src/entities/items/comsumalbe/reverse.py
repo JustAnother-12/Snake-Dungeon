@@ -1,10 +1,11 @@
 
 
 import pygame
+from config import constant
 from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
-from entities.items.item_type import ItemCategory, ItemType, Rarity
+from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 
 
 REVERSE_TYPE = ItemType(
@@ -12,6 +13,9 @@ REVERSE_TYPE = ItemType(
     "Reverse",
     ItemCategory.CONSUMABLE,
     Rarity.COMMON,
+    ItemTexture(
+        constant.Texture.reverse,
+    ),
     description="Reverse head and tail after 3 seconds come back to normal",
     max_stack=3,
     cooldown=1,

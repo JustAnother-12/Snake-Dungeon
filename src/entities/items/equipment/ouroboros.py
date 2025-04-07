@@ -15,7 +15,6 @@ OUROBOROS_TYPE = ItemType(
         constant.Texture.ouroboros
     ),
     description="Saves the Player from  death on collision and consumes 1 body part (-1 Length). -50 Resistance when holding on this Equipment",
-    price=150,
 )
 
 class OuroborosStack(ItemStack):

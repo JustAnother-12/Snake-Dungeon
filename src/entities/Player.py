@@ -258,7 +258,7 @@ class Snake(pygame.sprite.AbstractGroup):
         for key, direction in key_map.items():
             if (
                 keys[key]
-                and self._last_direction != direction
+                and self._last_direction != -direction
             ):  
                 self.direction = direction
                 is_pressed = True
@@ -278,7 +278,6 @@ class Snake(pygame.sprite.AbstractGroup):
                 return
 
         if self.is_dead: return
-        self._last_direction = self.direction
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
@@ -292,6 +291,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self._will_go_out_of_bounds = True
             return
 
+        self._last_direction = self.direction
         self._will_go_out_of_bounds = False
 
         if len(self._block_positions) > len(self.blocks):
