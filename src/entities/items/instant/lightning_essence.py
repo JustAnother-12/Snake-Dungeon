@@ -12,9 +12,7 @@ LIGHTNING_ESSENCE_TYPE = ItemType(
     ItemTexture(
         constant.Texture.lightning_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 energy regen",
     activation_type=ActivationType.ON_PICKUP
 )
 

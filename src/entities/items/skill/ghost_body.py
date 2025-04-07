@@ -10,17 +10,17 @@ from config import constant
 
 
 GHOST_TYPE = ItemType(
-    id="shield",
-    name="Shield",
+    id="ghost_like_body",
+    name="Ghost Like Body",
     category=ItemCategory.SKILL,
-    rarity=Rarity.RARE,
+    rarity=Rarity.COMMON,
     texture=ItemTexture(
-        "game-assets/graphics/pixil/item-sprite/GHOST_LIKE_BODY.pixil",
+        constant.Texture.ghost_like_body,
         0,
     ),
     cooldown=7.0,
-    description="Temporary invincibility for 3 seconds",
-    price=150,  # Shield is valuable!
+    description="Upon activation, makes the body intangible for 3s. Consumes 30 Energy, 5s cooldown",
+    price=50,
     energy_usage= 30
 )
 
@@ -33,17 +33,18 @@ class GhostStack(ItemStack):
     def apply_effect(self, snake):
         self.active_time = self.active_duration
         snake.stamina -= self.item_type.energy_usage
+        self.default_color = pygame.Color(snake.color)
+        snake.color = pygame.Color(255, 255, 255, 80)
         snake.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE), pygame.SRCALPHA)
-        snake.headImg.fill((255, 255, 255, 80))
+        snake.headImg.fill(snake.color)
         pygame.draw.rect(snake.headImg, (255, 255, 255), (3, 3, 2, 4))
         pygame.draw.rect(snake.headImg, (255, 255, 255), (11, 3, 2, 4))
         for block in snake.blocks:
-            self.default_color = block.color
             block.color = pygame.Color(255, 255, 255, 80)
-        self.add_runtime_overriding(snake, '_is_collide_with_orther_snake', 'after', self.prevent_damage)
-        self.add_runtime_overriding(snake, '_collide_with_active_trap', 'after', self.prevent_damage)
-        self.add_runtime_overriding(snake, '_is_collide_with_self', 'after', self.prevent_damage)
-        self.add_runtime_overriding(snake, '_is_collide_with_obstacle', 'after', self.prevent_damage)
+        self.add_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.prevent_damage)
+        self.add_runtime_overriding(snake, 'handle_collision', 'return', self.prevent_damage)
+        self.add_runtime_overriding(snake, '_is_collide_with_self', 'return', self.prevent_damage)
+        self.add_runtime_overriding(snake, '_is_collide_with_obstacle', 'return', self.prevent_damage)
     
     def use(self, snake: Snake):
         if snake.stamina < self.item_type.energy_usage:
@@ -58,12 +59,13 @@ class GhostStack(ItemStack):
     def prevent_damage(self, snake, *args, **kwargs):
         if self.active_time <= 0:
             snake.headImg = Pixil.load(constant.Texture.snake_head, 1).frames[0]
+            snake.color = self.default_color
             for block in snake.blocks:
-                block.color = pygame.Color(self.default_color)
-            self.remove_runtime_overriding(snake, '_is_collide_with_orther_snake', 'after', self.prevent_damage)
-            self.remove_runtime_overriding(snake, '_collide_with_active_trap', 'after', self.prevent_damage)
-            self.remove_runtime_overriding(snake, '_is_collide_with_self', 'after', self.prevent_damage)
-            self.remove_runtime_overriding(snake, '_is_collide_with_obstacle', 'after', self.prevent_damage)
+                block.color = self.default_color
+            self.remove_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.prevent_damage)
+            self.remove_runtime_overriding(snake, 'handle_collision', 'return', self.prevent_damage)
+            self.remove_runtime_overriding(snake, '_is_collide_with_self', 'return', self.prevent_damage)
+            self.remove_runtime_overriding(snake, '_is_collide_with_obstacle', 'return', self.prevent_damage)
             return False 
         else:
             return False

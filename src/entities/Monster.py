@@ -170,5 +170,6 @@ class Monster(Snake):
         elif item == LootItem.EMPTY:
             pass
         else:
-            print(f"[{item.value}]: Instant item")
+            from entities.items.item_registry import ItemRegistry
+            ItemRegistry.create_item(item, rarity, self.level, block.rect)
         block.kill()

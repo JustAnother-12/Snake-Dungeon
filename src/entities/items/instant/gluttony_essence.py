@@ -12,9 +12,7 @@ GLUTTONY_ESSENCE_TYPE = ItemType(
     ItemTexture(
         constant.Texture.gluttony_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 food potency",
     activation_type=ActivationType.ON_PICKUP
 )
 

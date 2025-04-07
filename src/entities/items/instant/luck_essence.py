@@ -12,9 +12,7 @@ LUCK_ESSENCE_TYPE = ItemType(
     ItemTexture(
         constant.Texture.luck_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 luck",
     activation_type=ActivationType.ON_PICKUP
 )
 

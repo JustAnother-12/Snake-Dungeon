@@ -12,9 +12,7 @@ EARTH_ESSENCE_TYPE = ItemType(
     ItemTexture(
         constant.Texture.earth_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 resistance",
     activation_type=ActivationType.ON_PICKUP
 )
 

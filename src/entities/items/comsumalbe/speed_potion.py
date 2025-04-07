@@ -1,4 +1,5 @@
 from pygame import Rect
+from config import constant
 from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
@@ -13,7 +14,7 @@ SPEED_BOOT_TYPE = ItemType(
     ItemCategory.CONSUMABLE,
     Rarity.COMMON,
     ItemTexture(
-        'game-assets/graphics/pixil/item-sprite/SPEED_POTION.pixil',
+        constant.Texture.speed_potion,
         0
     ),
     description="gives x1.5 speed boost for 5s, 7s cooldown",
