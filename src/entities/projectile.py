@@ -69,5 +69,6 @@ class Projectile(pygame.sprite.Sprite):
         if (current_distance > self.max_range or
             self.rect.right < MAP_LEFT or self.rect.left > MAP_RIGHT or #type: ignore
             self.rect.bottom < MAP_TOP or self.rect.top > MAP_BOTTOM): #type: ignore
+            # TODO: code vậy hơi cứng quá, cần làm mềm hơn
             self.level.bomb_group.add(Bomb(self.level, self.rect.center, BombState.ACTIVE)) #type: ignore
             self.kill()

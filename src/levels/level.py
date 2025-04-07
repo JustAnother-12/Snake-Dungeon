@@ -121,7 +121,7 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
-        # # tạo bom
+        # tạo bom
         # self.bomb_group.empty()
         # for i in range(3):
         #     self.bomb_group.add(Bomb(self))
@@ -154,9 +154,9 @@ class Level(State):
         #     key = KeyEntity(self)
         #     self.item_group.add(key)
 
-        # for i in range(3):
-        #     bomb = BombEntity(self, quantity=random.randint(2,4))
-        #     self.item_group.add(bomb)
+        for i in range(3):
+            bomb = BombEntity(self, quantity=random.randint(2,4))
+            self.item_group.add(bomb)
         
         # for i in range(1):
         #     item = GhostEntity(self)

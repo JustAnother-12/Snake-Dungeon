@@ -1,4 +1,3 @@
-from tkinter import N
 from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
