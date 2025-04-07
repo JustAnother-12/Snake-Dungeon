@@ -255,12 +255,11 @@ class Snake(pygame.sprite.AbstractGroup):
             pygame.K_s: Vector2(0, 1),
             pygame.K_w: Vector2(0, -1),
         }
-
+        
         for key, direction in key_map.items():
             if (
                 keys[key]
                 and self._last_direction != direction
-                and self._last_direction != -direction
             ):  
                 self.direction = direction
                 is_pressed = True

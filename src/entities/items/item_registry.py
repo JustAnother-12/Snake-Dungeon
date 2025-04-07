@@ -1,5 +1,3 @@
-from tkinter import E
-
 
 class ItemRegistry:
     from entities.items.item_type import ItemCategory, Rarity

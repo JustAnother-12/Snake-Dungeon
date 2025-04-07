@@ -119,55 +119,55 @@ class Level(State):
         for x, y in region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
-        # tạo bom
-        self.bomb_group.empty()
-        for i in range(3):
-            self.bomb_group.add(Bomb(self))
+        # # tạo bom
+        # self.bomb_group.empty()
+        # for i in range(3):
+        #     self.bomb_group.add(Bomb(self))
             
-        # tạo monster
-        from entities.Monster import Monster
-        for i in range(3):
-            monster = Monster(self, random.randint(5, 8))
-            monster.set_player_reference(self.snake)
-            self.snake_group.add(monster)
+        # # tạo monster
+        # from entities.Monster import Monster
+        # for i in range(3):
+        #     monster = Monster(self, random.randint(5, 8))
+        #     monster.set_player_reference(self.snake)
+        #     self.snake_group.add(monster)
         
-        # tạo item
-        for i in range(10):
-            coin = CoinEntity(self)
-            self.item_group.add(coin)
+        # # tạo item
+        # for i in range(10):
+        #     coin = CoinEntity(self)
+        #     self.item_group.add(coin)
         
-        for i in range(10):
-            food = FoodEntity(self)
-            self.item_group.add(food)
+        # for i in range(10):
+        #     food = FoodEntity(self)
+        #     self.item_group.add(food)
         
-        for i in range(2):
-            gale_essence = GaleEssenceEntity(self)
-            self.item_group.add(gale_essence)
+        # for i in range(2):
+        #     gale_essence = GaleEssenceEntity(self)
+        #     self.item_group.add(gale_essence)
 
-        for i in range(2):
-            water_essence = WaterEssenceEntity(self)
-            self.item_group.add(water_essence)
+        # for i in range(2):
+        #     water_essence = WaterEssenceEntity(self)
+        #     self.item_group.add(water_essence)
             
-        for i in range(3):
-            key = KeyEntity(self)
-            self.item_group.add(key)
+        # for i in range(3):
+        #     key = KeyEntity(self)
+        #     self.item_group.add(key)
 
-        for i in range(3):
-            bomb = BombEntity(self, quantity=random.randint(2,4))
-            self.item_group.add(bomb)
+        # for i in range(3):
+        #     bomb = BombEntity(self, quantity=random.randint(2,4))
+        #     self.item_group.add(bomb)
         
-        for i in range(1):
-            item = GhostEntity(self)
-            self.item_group.add(item)
-        for i in range(2):
-            self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
+        # for i in range(1):
+        #     item = GhostEntity(self)
+        #     self.item_group.add(item)
+        # for i in range(2):
+        #     self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
         
-        for i in range(1):
-            self.item_group.add(RitualDaggerEntity(self))
+        # for i in range(1):
+        #     self.item_group.add(RitualDaggerEntity(self))
 
-        self.item_group.add(OuroborosEntity(self))
-        for i in range(2):
-            self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
+        # self.item_group.add(OuroborosEntity(self))
+        # for i in range(2):
+        #     self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
         self.init()
