@@ -11,9 +11,10 @@ BOMB_TYPE = ItemType(
     ItemCategory.CONSUMABLE,
     Rarity.COMMON,
     ItemTexture(
-        'game-assets/graphics/pixil/item-sprite/BOMB_ITEM.pixil',
+        constant.Texture.bomb,
         0
     ),
+    'throws a bomb behind the player',
     max_stack=10,
     cooldown=3.0
 )

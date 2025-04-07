@@ -12,7 +12,7 @@ KEY_TYPE = ItemType(
     ItemTexture(
         "game-assets/graphics/pixil/KEY_SPRITE.pixil",
     ),
-    "",
+    "key for locked chests",
     activation_type=ActivationType.ON_COLLISION      
 )
 

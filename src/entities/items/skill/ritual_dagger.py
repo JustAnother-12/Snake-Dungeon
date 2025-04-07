@@ -1,5 +1,6 @@
 
 
+from config import constant
 from entities.Player import Snake, SnakeBlock
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
@@ -12,9 +13,9 @@ RITUAL_DAGGER_TYPE = ItemType(
     ItemCategory.SKILL,
     Rarity.COMMON,
     ItemTexture(
-        "game-assets/graphics/pixil/item-sprite/RITUAL_DAGGER.pixil",
+        constant.Texture.ritual_dagger,
     ),
-    "",
+    "Upon activation, cuts 1 body part of the Player. That body part stays on the field for 5s and can be consume. Consumes 10 Energy, 3s cooldown",
     activation_type=ActivationType.ON_USE,
     cooldown=3,
     energy_usage=10

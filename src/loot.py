@@ -13,7 +13,7 @@ class LootItem(Enum):
     EMPTY = 1
     COIN = 2
     FOOD = 3
-    ITEM_INSTANT = 4
+    INSTANT = 4
     CONSUMABLE = 5
     EQUIPMENT = 6
     SKILL = 7
@@ -37,7 +37,7 @@ class LootPool:
             LootItem.EMPTY: item_rate[0],
             LootItem.COIN: item_rate[1],
             LootItem.FOOD: item_rate[2],
-            LootItem.ITEM_INSTANT: item_rate[3],
+            LootItem.INSTANT: item_rate[3],
             LootItem.CONSUMABLE: item_rate[4],
             LootItem.EQUIPMENT: item_rate[5],
             LootItem.SKILL: item_rate[6]
@@ -82,7 +82,7 @@ class LootPool:
         values = list(self.loot_table.values())
         choices = random.choices(keys, values, k = 1 + Stats.getValue(StatType.LUCK)//10)
         result = sorted(choices, key = lambda x: x.value, reverse=True)[0]
-        if result == LootItem.ITEM_INSTANT or result == LootItem.CONSUMABLE or result == LootItem.EQUIPMENT or result == LootItem.SKILL:
+        if result == LootItem.INSTANT or result == LootItem.CONSUMABLE or result == LootItem.EQUIPMENT or result == LootItem.SKILL:
             # Chọn ngẫu nhiên độ hiếm của ITEM_INSTANT
             rarity = random.choices(list(self.rarity_table.keys()), list(self.rarity_table.values()))[0]
             return result, rarity

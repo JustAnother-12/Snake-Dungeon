@@ -11,8 +11,7 @@ FOOD_TYPE = ItemType(
     ItemTexture(
         constant.Texture.apple,
     ),
-    "",
-    1,
+    "helps you grow",
     activation_type=ActivationType.ON_COLLISION
 )
 

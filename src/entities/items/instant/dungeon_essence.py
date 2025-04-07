@@ -6,15 +6,13 @@ from stats import StatType, Stats
 
 DUNGEON_ESSENCE_TYPE = ItemType(
     'dungeon_essence',
-    'Dungeon Essence', 
+    'Essence of The Dungeon', 
     ItemCategory.INSTANT, 
     Rarity.RARE,
     ItemTexture(
         constant.Texture.dungeon_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 Every stats (Length excluded)",
     activation_type=ActivationType.ON_PICKUP
 )
 

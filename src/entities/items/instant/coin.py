@@ -10,8 +10,7 @@ COIN_TYPE = ItemType(
     ItemTexture(
         "game-assets/graphics/pixil/GOLD_LEVEL.pixil",
     ),
-    "",
-    1,
+    "gives 10 gold",
     activation_type=ActivationType.ON_COLLISION,
 )
 

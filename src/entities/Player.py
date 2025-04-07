@@ -132,7 +132,6 @@ class SnakeBlock(pygame.sprite.Sprite):
             self.kill()
     
     def sever(self, type, delay):
-        print("severed")
         self.is_severed = True
         self.time_severed = delay
         self.transform_type = type
@@ -372,10 +371,10 @@ class Snake(pygame.sprite.AbstractGroup):
             for i in self.blocks[0].groups():
                 i.add(newBlock)  # type: ignore
 
-    def split(self, index):
+    def split(self, index, transform_type='COIN'):
         for i, block in enumerate(self.blocks[index:]):
             # block.is_severed = True
-            block.sever("COIN", 2 + 0.1 * i)
+            block.sever(transform_type, 2 + 0.1 * i)
             block.image.fill((255, 255, 255)) # type: ignore
 
         self.blocks = self.blocks[:index]
@@ -462,8 +461,6 @@ class Snake(pygame.sprite.AbstractGroup):
                     pos = i if pos == None else pos
         if pos != None:
             self.split(pos)
-        pass
-        # TODO: xiu nghĩ: để bomb trong nhóm nào là hợp lý hay tạo một nhóm mới luân
     
     def _is_collide_with_orther_snake(self, position):
         for snake in self.level.snake_group._sub_group__: # type: ignore

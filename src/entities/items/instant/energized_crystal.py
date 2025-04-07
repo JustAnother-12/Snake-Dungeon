@@ -4,22 +4,22 @@ from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, 
 from stats import StatType, Stats
 
 
-GREEN_JADE_TYPE = ItemType(
-    'green_jade',
-    'Green Jade Pellet',
+ENERGIZED_CRYSTAL_TYPE = ItemType(
+    'energized_crystal',
+    'Energized Crystal',
     ItemCategory.INSTANT, 
     Rarity.UNCOMMON,
     ItemTexture(
-        constant.Texture.green_jade,
+        constant.Texture.energized_crystal
     ),
-    "+10 luck, +5 treasury",
+    "+10 energy cap, +10 energy regen",
     activation_type=ActivationType.ON_PICKUP
 )
 
-class GreenJadeEntity(ItemEntity):
+class EnergizedCrystalEntity(ItemEntity):
     def __init__(self, level, area=None, r=2, quantity=1):
-        super().__init__(level, GREEN_JADE_TYPE, area, r, quantity)
+        super().__init__(level, ENERGIZED_CRYSTAL_TYPE, area, r, quantity)
     
     def apply_instant_effect(self):
-        Stats.increaseValue(StatType.LUCK, self.quantity * 10)
-        Stats.increaseValue(StatType.TREASURY, self.quantity * 5)
+        Stats.increaseValue(StatType.ENERGY_CAPACITY, self.quantity * 10)
+        Stats.increaseValue(StatType.ENERGY_REGEN, self.quantity * 10)
