@@ -10,10 +10,11 @@ from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.instant.key import KeyEntity
 from entities.items.equipment.ouroboros import OuroborosEntity
+from entities.items.equipment.time_efficiency import TimeEfficiencyEntity
 from entities.items.comsumalbe.bomb_item import BombEntity
 from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
-from entities.items.reverse import ReverseEntity
+from entities.items.comsumalbe.reverse import ReverseEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
@@ -167,6 +168,7 @@ class Level(State):
             self.item_group.add(RitualDaggerEntity(self))
 
         self.item_group.add(OuroborosEntity(self))
+        self.item_group.add(TimeEfficiencyEntity(self))
         for i in range(2):
             self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
 

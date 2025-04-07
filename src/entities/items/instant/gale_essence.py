@@ -12,9 +12,7 @@ GALE_ESSENCE_TYPE = ItemType(
     ItemTexture(
         constant.Texture.gale_essence,
     ),
-    "",
-    1,
-    price=10,
+    "+5 speed",
     activation_type=ActivationType.ON_PICKUP
 )
 

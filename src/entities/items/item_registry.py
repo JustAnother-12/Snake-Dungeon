@@ -1,45 +1,77 @@
-from tkinter import E
-
+from entities.items.item_type import ItemCategory, Rarity
 
 class ItemRegistry:
-    from entities.items.item_type import ItemCategory, Rarity
 
     item_registry = {
         ItemCategory.INSTANT: {
             Rarity.COMMON: {
-                'dungeon_essence': 'DungeonEssenceEntity',
-                'earth_essence': 'EarthEssenceEntity',
-                'gale_essence': 'GaleEssenceEntity',
-                'gluttony_essence': 'GluttonyEssenceEntity',
-                'gold_essence': 'GoldEssenceEntity',
-                'lightning_essence': 'LightningEssenceEntity',
-                'luck_essence': 'LuckEssenceEntity',
-                'water_essence': 'WaterEssenceEntity',
+                "dungeon_essence": "DungeonEssenceEntity",
+                "earth_essence": "EarthEssenceEntity",
+                "gale_essence": "GaleEssenceEntity",
+                "gluttony_essence": "GluttonyEssenceEntity",
+                "gold_essence": "GoldEssenceEntity",
+                "lightning_essence": "LightningEssenceEntity",
+                "luck_essence": "LuckEssenceEntity",
+                "water_essence": "WaterEssenceEntity",
+            },
+            Rarity.UNCOMMON: {
+                "energized_crystal": "EnergizedCrystalEntity",
+                "green_jade": "GreenJadeEntity",
+                "appetite_stimulant": "AppetiteStimulantEntity",
+                "aerolite_plate": "AerolitePlateEntity",
+            },
+            Rarity.RARE: {
+                "dungeon_essence": "DungeonEssenceEntity",
+                "adrenaline_syringe": "AdrenalineSyringeEntity",
+            },
+        },
+        ItemCategory.EQUIPMENT: {
+            Rarity.COMMON: {
+                "time_efficiency": "TimeEfficiencyEntity",
+            },
+            Rarity.UNCOMMON: {},
+            Rarity.RARE: {
+                "ouroboros": "OuroborosEntity",
+            },
+        },
+        ItemCategory.CONSUMABLE: {
+            Rarity.COMMON: {
+                'bomb_item': 'BombEntity',
+                'reverse': 'ReverseEntity',
+                'speed_potion': 'SpeedPotionEntity',
             },
             Rarity.UNCOMMON: {},
             Rarity.RARE: {},
         },
-        ItemCategory.EQUIPMENT: {
-            Rarity.COMMON: {},
-            Rarity.UNCOMMON: {},
-            Rarity.RARE: {},
-        },
-        ItemCategory.CONSUMABLE: {
-            Rarity.COMMON: {},
-            Rarity.UNCOMMON: {},
-            Rarity.RARE: {},
-        },
         ItemCategory.SKILL: {
-            Rarity.COMMON: {},
+            Rarity.COMMON: {
+                "ritual_dagger": "RitualDaggerEntity",
+            },
             Rarity.UNCOMMON: {},
-            Rarity.RARE: {},
+            Rarity.RARE: {
+                "ghost_body": "GhostEntity",
+            },
         },
     }
 
     @staticmethod
-    def create_item(item_category: ItemCategory, rarity: Rarity, level, *args, **kwargs):
+    def create_item(item_category, rarity: Rarity, level, *args, **kwargs):
+        '''
+        Tạo item từ item_category và rarity
+        - item_category: loại item (ItemCategory | LootItem)
+        - rarity: độ hiếm của item (Rarity)
+        '''
         import random
+        from loot import LootItem
+        if isinstance(item_category, LootItem):
+            category_name = item_category.name
+            if hasattr(ItemCategory, category_name):
+                item_category = getattr(ItemCategory, category_name)
+            else: 
+                return None
         file_name, class_name = random.choice(list(ItemRegistry.item_registry[item_category][rarity].items()))
+        if file_name == None or class_name == None:
+            return None
         try: 
             import importlib
             module = importlib.import_module(f"entities.items.{item_category.value}.{file_name}")
