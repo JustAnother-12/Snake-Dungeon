@@ -19,9 +19,11 @@ from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
 from entities.items.comsumalbe.reverse import ReverseEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
+from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
-from levels.components.chest import ChestGroup
+from levels.components.chest import Chest
+from levels.components.door import Door
 from levels.components.floor_tile import Floor
 from levels.components.obstacle import Obstacle
 from levels.components.pot import Pot
@@ -29,7 +31,8 @@ from levels.components.trap import Trap
 from levels.components.wall import Walls
 from stats import Stats
 from systems.interaction_manager import InteractionManager
-from systems.wave_manager import WaveManager
+from systems.level_manager import LevelConfig, LevelManager
+from systems.wave_manager import Wave, WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
 from ui.screens.game_over import GameOver_menu
@@ -46,47 +49,40 @@ class LevelStatus(Enum):
     GAME_OVER = 2
     ROOM_CLEARED = 3
     PAUSED = 4
+    ROOM_COMPLETED = 5
 
 # làm cho nó gọn để kế thừa
 class Level(State):
     def __init__(self, game) -> None:
         super().__init__(game)
-        self.init()
-        
-
-    def init(self):
         from entities.Player import Snake
+        self.level_manager = LevelManager()
+        self.level_manager.generate_game(10)
+        self.snake_history: list[Snake] = []
 
-        # Clear previous state
-        self.empty()
-        self.remove(self.sprites())
-        
-        # Game state
-        self.level_status = LevelStatus.CREATED
-        
-        # Main entities
-        self.snake_group = NestedGroup()
-        self.snake = Snake(self, 5)
-        self.snake_group.add(self.snake)
-
-        self.hud = HUD(self)
-        self.interaction_manager = InteractionManager(self)
-        self.wave_manager = WaveManager(self)
-        
-        # Environment groups
         self.wall_group = Walls()
         self.obstacle_group = pygame.sprite.Group()
         self.trap_group = pygame.sprite.Group()
         self.pot_group = pygame.sprite.Group()
         self.bomb_group = pygame.sprite.Group()
-        
-        # Items
         self.item_group = pygame.sprite.Group()
-        # self.item_group.add(ShieldEntity(self))
-        
-        # Generate level components
-        
-        # Add all components to the level
+        self.snake_group = NestedGroup()
+        self.bomb_group = pygame.sprite.Group()
+        self.snake = Snake(self, 5)
+        # TODO: nhớ xóa
+        self.snake.inventory.add_item(ThanosItemStack(1))
+
+        self.hud = HUD(self)
+        self.interaction_manager = InteractionManager(self)
+
+        self.snake_group.add(self.snake)
+        self.wave_manager = WaveManager(self)
+
+        room_config = self.level_manager.get_current_config()
+        if not room_config is None:
+            self.create_config_room(room_config)
+            self.generator()
+
         self.add(
             Floor(),
             self.wall_group,
@@ -94,91 +90,85 @@ class Level(State):
             self.trap_group,
             self.pot_group,
             # self.snake,
-            self.snake_group,
             self.item_group,
+            self.snake_group,
             self.hud,
             self.bomb_group
         )
+    
+    def create_config_room(self, room_config: LevelConfig):
+        # self.snake_history.append(self.snake.copy())
+        # room_config = self.level_manager.get_current_config()
+        # if room_config is None:
+        #     return
+        region_generator = room_config.region_generator
+        self.region_generator = RegionGenerator(
+            has_trap=random.random() < region_generator.has_trap,
+            has_obstacle=random.random() < region_generator.has_obstacle,
+            has_pot=random.random() < region_generator.has_pot,
+            has_chest=random.random() < region_generator.has_chest,
+        )
 
-        self.generator()
+        self.wave_manager = WaveManager(self)
+        wave_config = room_config.wave_manager
+        print(wave_config)
+
+        for i in range(wave_config.max_wave_count):
+            entities_config = {
+                "monster": 0,
+                "bomb": 0,
+                "trap": 0,
+                "obstacle": 0,
+            }
+
+            enemy_count = random.randint(0, wave_config.max_wave_entities)
+            for _ in range(enemy_count):
+                entity_type = random.choice(list(entities_config.keys()))
+                entities_config[entity_type] += 1
+            
+
+            wave = Wave(
+                entities_config=entities_config,
+                delay=wave_config.wave_interval
+            )
+            self.wave_manager.add_wave(wave)
+
         
     def generator(self):
+        self.level_status = LevelStatus.CREATED
 
-        region_generator = RegionGenerator()
+        self.region_generator = RegionGenerator()
         # Make wall
-
-        self.wave_manager.generate_waves()
         
         # Make obstacle
         self.obstacle_group.empty()
-        for x, y in region_generator.obstacles_initpos:
+        for x, y in self.region_generator.obstacles_initpos:
             self.obstacle_group.add(Obstacle(self, (x, y)))
         
         # Make trap
         self.trap_group.empty()
-        for x, y in region_generator.traps_initpos:
+        for x, y in self.region_generator.traps_initpos:
             self.trap_group.add(Trap(self, (x, y)))
         
         # Make pot
         self.pot_group.empty()
-        for x, y in region_generator.pots_initpos:
+        for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
-
-        # tạo bom
-        # self.bomb_group.empty()
-        # for i in range(3):
-        #     self.bomb_group.add(Bomb(self))
-            
-        # # tạo monster
-        # from entities.Monster import Monster
-        # for i in range(3):
-        #     monster = Monster(self, random.randint(5, 8))
-        #     monster.set_player_reference(self.snake)
-        #     self.snake_group.add(monster)
-        
-        # # tạo item
-        # for i in range(10):
-        #     coin = CoinEntity(self)
-        #     self.item_group.add(coin)
-        
-        # for i in range(10):
-        #     food = FoodEntity(self)
-        #     self.item_group.add(food)
-        
-        # for i in range(2):
-        #     gale_essence = GaleEssenceEntity(self)
-        #     self.item_group.add(gale_essence)
-
-        # for i in range(2):
-        #     water_essence = WaterEssenceEntity(self)
-        #     self.item_group.add(water_essence)
-            
-        # for i in range(3):
-        #     key = KeyEntity(self)
-        #     self.item_group.add(key)
 
         for i in range(3):
             bomb = BombEntity(self, quantity=random.randint(2,4))
             self.item_group.add(bomb)
         
-        # for i in range(1):
-        #     item = GhostEntity(self)
-        #     self.item_group.add(item)
-        # for i in range(2):
-        #     self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
-        
-        # for i in range(1):
-        #     self.item_group.add(RitualDaggerEntity(self))
-
         self.item_group.add(OuroborosEntity(self))
         self.item_group.add(CelestineFragmentEntity(self))
         self.item_group.add(EnergyDrinkEntity(self))
+        # self.item_group.add(ThanosEntity(self))
         for i in range(2):
             self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
             self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
-        self.init()
+        pass
 
     def __dev_test(self):
         # TODO: nhớ bỏ cái này nếu test xong
@@ -208,21 +198,52 @@ class Level(State):
         if self.level_status == LevelStatus.PLAYING:
             self.wave_manager.update(Share.clock.get_time() / 1000)
             self.check_room_cleared()
-            self.handle_input()
-            t = self.snake._will_go_out_of_bounds
-            super().update()
-            if self.snake._will_go_out_of_bounds and not t:
-                Share.audio.play_sound('hit_hurt', 1)
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
             self.game.state_stack.append(RoomCleared(self.game))
-            self.snake.auto_state = False
-            self.is_finished = False
+            doors = self.level_manager.complete_level()
+            print(doors)
+            if len(doors) == 0:
+                self.level_status = LevelStatus.ROOM_CLEARED
+                return 
+            d = constant.MAP_RIGHT - constant.MAP_LEFT
+            ix = 0
+            for i in range(constant.MAP_LEFT, constant.MAP_RIGHT ,d // len(doors)):
+                door = Door(self, (i, constant.MAP_TOP), ix)
+                self.add(door)
+                ix += 1
+                if ix >= len(doors):
+                    break
+
+            self.level_status = LevelStatus.ROOM_COMPLETED
+            print(self.region_generator.chests_initpos)
+            for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
+                self.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
+            # self.snake.auto_state = False
+        
+        self.handle_input()
+        t = self.snake._will_go_out_of_bounds
+        super().update()
+        if self.snake._will_go_out_of_bounds and not t:
+            Share.audio.play_sound('hit_hurt', 1)
     
     def check_room_cleared(self):
         if self.wave_manager.is_complete():
             self.level_status = LevelStatus.ROOM_CLEARED
             self.snake.auto_state = False
+    
+    def next_level(self, index: int):
+        self.obstacle_group.empty()
+        self.trap_group.empty()
+        self.pot_group.empty()
+        self.bomb_group.empty()
+        self.item_group.empty()
+        next_ = self.level_manager.choose_door(index)
+        print(next_)
+        if next_ is None:
+            return
+        self.create_config_room(next_)
+        self.generator()
 
     def draw_grid(self, surface: pygame.Surface):
         surface.fill("black")

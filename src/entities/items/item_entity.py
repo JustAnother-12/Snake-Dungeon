@@ -111,13 +111,16 @@ class ItemEntity(pygame.sprite.Sprite):
 
     def check_pos(self, image):
         """Kiểm tra vị trí item có hợp lệ không"""
-        if self.pos.x < constant.MAP_LEFT or self.pos.x > constant.MAP_RIGHT - image.get_width() or self.pos.y < constant.MAP_TOP or self.pos.y > constant.MAP_BOTTOM - image.get_height():
-            return False
-        for sprite in self.level.obstacle_group.sprites():
-            if sprite.rect.colliderect(pygame.Rect(self.pos.x, self.pos.y, image.get_width(), image.get_height())):
+        try:
+            if self.pos.x < constant.MAP_LEFT or self.pos.x > constant.MAP_RIGHT - image.get_width() or self.pos.y < constant.MAP_TOP or self.pos.y > constant.MAP_BOTTOM - image.get_height():
                 return False
-        
-        return True
+            for sprite in self.level.obstacle_group.sprites():
+                if sprite.rect.colliderect(pygame.Rect(self.pos.x, self.pos.y, image.get_width(), image.get_height())):
+                    return False
+            
+            return True
+        except Exception as e:
+            return True
     
     def on_collision(self):
         """Xử lý khi va chạm với rắn"""

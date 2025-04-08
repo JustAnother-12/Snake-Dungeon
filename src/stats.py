@@ -10,6 +10,7 @@ class StatType(Enum):
     TREASURY = "TREASURY"
     LUCK = "LUCK"
     FOOD_POTENCY = "FOOD POTENCY"
+    
 class Stats:
     stats = {
         StatType.SPEED: {

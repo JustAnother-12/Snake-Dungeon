@@ -1,15 +1,20 @@
 import random
 from config.constant import TILE_SIZE
 import config.constant as constant
+from entities.items.instant.coin import CoinEntity
+from entities.items.instant.food import FoodEntity
+from entities.items.item_registry import ItemRegistry
+from loot import LootItem, LootPool
 from ui.elements.text import TextElement
 import utils.pixil as pixil
 from time import time
 import pygame
 
 class Chest(pygame.sprite.Sprite):
-    def __init__(self, level, pos, isLocked = None) -> None:
+    from levels import level
+    def __init__(self, _level: "level.Level", pos, isLocked = None) -> None:
         super().__init__()
-        self.level = level
+        self._level = _level
         self.isLocked = isLocked if isLocked != None else random.choice([True, False])
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
@@ -75,12 +80,20 @@ class Chest(pygame.sprite.Sprite):
 
 
     def __is_collision_with_snake(self):
-        return self.rect and not self.level.snake.is_death and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and not self._level.snake.is_dead and self.rect.colliderect(self._level.snake.blocks[0].rect)
     
     def OpenChest(self):
         self.isClosed = False
-        print("Open chest")
-        self.level.coins.add_coin(random.randint(7, 15), self)
+        item, rarity = LootPool((0, 0, 0, 0, 300, 300, 300)).get_item()
+        if item == LootItem.COIN:
+            self._level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
+        elif item == LootItem.FOOD:
+            self._level.item_group.add(FoodEntity(self.level, self.rect, 1))
+        elif item == LootItem.EMPTY:
+            print("Empty pot")
+        # else:
+            # ItemRegistry.create_item(item, rarity, self.level, self.rect)
+
         self.collision_time = time()
 
     def on_collision(self):
@@ -88,20 +101,9 @@ class Chest(pygame.sprite.Sprite):
             if not self.isLocked:
                 self.OpenChest()
             else:
-                if self.level.snake.keys > 0:
-                    self.level.snake.keys -= 1
+                if self._level.snake.keys > 0:
+                    self._level.snake.keys -= 1
                     self.OpenChest()
                 else:
-                    self.level.add(self.LockedText)
+                    self._level.add(self.LockedText)
                     self.TextTime = time()
-
-class ChestGroup(pygame.sprite.AbstractGroup):
-    def __init__(self, level, chests_pos) -> None:
-        super().__init__()
-        self.empty()
-        for x,y in chests_pos:
-            self.add(Chest(level, (x-TILE_SIZE,y-TILE_SIZE)))
-
-    def update(self) -> None:
-        for chest in self.sprites():
-            chest.update()

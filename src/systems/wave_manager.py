@@ -188,8 +188,7 @@ class WaveManager:
         
         # Simple template-based generation
         if difficulty <= 1.0:  # Easy
-            self.add_wave(Wave({"monster": 2}, delay=2.0))
-            self.add_wave(Wave({"monster": 3}, delay=5.0))
+            self.add_wave(Wave({"monster": 1}, delay=2.0))
             
         elif difficulty <= 2.0:  # Medium
             self.add_wave(Wave({"monster": 3}, delay=1.5))
