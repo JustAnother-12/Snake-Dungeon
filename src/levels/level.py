@@ -57,7 +57,7 @@ class Level(State):
         super().__init__(game)
         from entities.Player import Snake
         self.level_manager = LevelManager()
-        self.level_manager.generate_game(10)
+        self.level_manager.generate_game(5)
         self.snake_history: list[Snake] = []
 
         self.wall_group = Walls()
@@ -160,29 +160,21 @@ class Level(State):
         for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
 
-        for i in range(3):
-            bomb = BombEntity(self, quantity=random.randint(2,4))
-            self.item_group.add(bomb)
+        # for i in range(3):
+        #     bomb = BombEntity(self, quantity=random.randint(2,4))
+        #     self.item_group.add(bomb)
         
-        self.item_group.add(OuroborosEntity(self))
-        self.item_group.add(CelestineFragmentEntity(self))
-        self.item_group.add(EnergyDrinkEntity(self))
-        # self.item_group.add(ThanosEntity(self))
-        for i in range(2):
-            self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
-            self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
+        # self.item_group.add(OuroborosEntity(self))
+        # self.item_group.add(CelestineFragmentEntity(self))
+        # self.item_group.add(EnergyDrinkEntity(self))
+        # # self.item_group.add(ThanosEntity(self))
+        # for i in range(2):
+        #     self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
+        #     self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
-        pass
-
-    def __dev_test(self):
-        # TODO: nhớ bỏ cái này nếu test xong
-        # tự tạo lại map khi nhấn phím
-        # keys = pygame.key.get_just_pressed()
-        # if keys[pygame.K_r]:
-        #     # self.generator()
-        #     self.is_finished = True
-        pass
+        self.game.state_stack.pop()
+        self.game.state_stack.append(Level(self.game))
 
     def handle_input(self):
         keys = pygame.key.get_just_pressed()
@@ -197,8 +189,6 @@ class Level(State):
         if self.level_status == LevelStatus.CREATED:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
-        
-        self.__dev_test()
 
         if self.level_status == LevelStatus.PLAYING:
             self.wave_manager.update(Share.clock.get_time() / 1000)
@@ -209,7 +199,8 @@ class Level(State):
             doors = self.level_manager.complete_level()
             print(doors)
             if len(doors) == 0:
-                self.level_status = LevelStatus.ROOM_CLEARED
+                self.game.state_stack[-1].visible = False
+                self.game.state_stack.append(GameOver_menu(self.game))
                 return 
             d = constant.MAP_RIGHT - constant.MAP_LEFT
             ix = 0
@@ -251,6 +242,7 @@ class Level(State):
                 i.kill()
 
         next_ = self.level_manager.choose_door(index)
+    
         print(next_)
         if next_ is None:
             return

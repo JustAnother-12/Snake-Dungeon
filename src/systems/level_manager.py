@@ -146,7 +146,7 @@ class LevelManager:
                     enemy_types={
                         'weak_monster': 0.1,
                         'bomb': 0.3,
-                        'strong_monster': 0.6
+                        # 'strong_monster': 0.6
                     }
                 ),
                 loot_pool=LootPoolConfig(
