@@ -37,7 +37,7 @@ class TitleScreen(State):
             self.game.state_stack[-1].visible = True
 
         allow_key = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
-        keys = pygame.key.get_pressed()
+        keys = pygame.key.get_just_pressed()
         for key in allow_key:
             if keys[key]:
                 self.game.state_stack.pop()

@@ -138,6 +138,11 @@ class Level(State):
         self.level_status = LevelStatus.CREATED
 
         self.region_generator = RegionGenerator()
+        self.snake.is_curling = True
+        for i, v in enumerate(self.snake._block_positions):
+            self.snake._block_positions[i] = pygame.Vector2((constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE, constant.MAP_BOTTOM - constant.TILE_SIZE)
+            self.snake.blocks[i].pos = self.snake._block_positions[i]
+
         # Make wall
         
         # Make obstacle
@@ -233,11 +238,18 @@ class Level(State):
             self.snake.auto_state = False
     
     def next_level(self, index: int):
+        # xóa những phần tử cũ đi
         self.obstacle_group.empty()
         self.trap_group.empty()
         self.pot_group.empty()
         self.bomb_group.empty()
         self.item_group.empty()
+
+        # xóa cửa
+        for i in self.sprites():
+            if isinstance(i, Door):
+                i.kill()
+
         next_ = self.level_manager.choose_door(index)
         print(next_)
         if next_ is None:

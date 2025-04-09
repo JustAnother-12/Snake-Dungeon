@@ -90,13 +90,13 @@ class LevelManager:
                     has_pot=0.8          # Nhiều bình
                 ),
                 wave_manager=WaveManagerConfig(
-                    wave_interval=5,     # 5 giây giữa các đợt
-                    max_wave_count=2,    # Tối đa 2 đợt
-                    max_wave_entities=4, # Tối đa 4 quái mỗi đợt
+                    wave_interval=2,     # 2 giây giữa các đợt
+                    max_wave_count=5,    # Tối đa 2 đợt
+                    max_wave_entities=29, # Tối đa 4 quái mỗi đợt
                     enemy_types={
                         'weak_monster': 0.7,
                         'bomb': 0.3,
-                        'strong_monster': 0.0
+                        # 'strong_monster': 0.0
                     }
                 ),
                 loot_pool=LootPoolConfig(
@@ -115,13 +115,13 @@ class LevelManager:
                     has_pot=0.6
                 ),
                 wave_manager=WaveManagerConfig(
-                    wave_interval=4,
+                    wave_interval=1,
                     max_wave_count=3,
-                    max_wave_entities=5,
+                    max_wave_entities=10,
                     enemy_types={
                         'weak_monster': 0.4,
                         'bomb': 0.3,
-                        'strong_monster': 0.3
+                        # 'strong_monster': 0.3
                     }
                 ),
                 loot_pool=LootPoolConfig(
@@ -142,7 +142,7 @@ class LevelManager:
                 wave_manager=WaveManagerConfig(
                     wave_interval=3,
                     max_wave_count=4,
-                    max_wave_entities=6,
+                    max_wave_entities=10,
                     enemy_types={
                         'weak_monster': 0.1,
                         'bomb': 0.3,
