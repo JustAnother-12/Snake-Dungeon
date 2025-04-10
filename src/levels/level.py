@@ -173,6 +173,7 @@ class Level(State):
         #     self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
 
     def reset(self):
+        Stats.reset()
         self.game.state_stack.pop()
         self.game.state_stack.append(Level(self.game))
 

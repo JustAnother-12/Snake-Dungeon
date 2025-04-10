@@ -64,3 +64,4 @@ class Texture:
     ritual_dagger = "game-assets/graphics/pixil/item-sprite/RITUAL_DAGGER.pixil"
     speed_potion = "game-assets/graphics/pixil/item-sprite/SPEED_POTION.pixil"
     reverse = "game-assets/graphics/pixil/item-sprite/REVERSE.pixil"
+    infinity_gauntlet = "game-assets/graphics/pixil/item-sprite/INFINITY_GAUNTLET.pixil"

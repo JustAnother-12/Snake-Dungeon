@@ -1,18 +1,22 @@
 
 
 from pygame import Rect
+from config import constant
 from entities import Monster
 from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
-from entities.items.item_type import ItemCategory, ItemType, Rarity
+from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 
 
 THANOS_TYPE = ItemType(
     "thanos",
     "Thanos",
     ItemCategory.SKILL,
-    Rarity.COMMON
+    Rarity.RARE,
+    ItemTexture(
+        constant.Texture.infinity_gauntlet
+    ),
 )
 
 

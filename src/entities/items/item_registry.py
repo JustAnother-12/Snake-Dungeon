@@ -71,7 +71,11 @@ class ItemRegistry:
                 item_category = getattr(ItemCategory, category_name)
             else: 
                 return None
-        file_name, class_name = random.choice(list(ItemRegistry.item_registry[item_category][rarity].items()))
+            
+        list_item = list(ItemRegistry.item_registry[item_category][rarity].items())
+        if len(list_item) == 0:
+            return None
+        file_name, class_name = random.choice(list_item)
         if file_name == None or class_name == None:
             return None
         try: 

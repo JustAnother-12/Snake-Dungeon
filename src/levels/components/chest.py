@@ -84,16 +84,11 @@ class Chest(pygame.sprite.Sprite):
     
     def OpenChest(self):
         self.isClosed = False
-        item, rarity = LootPool((0, 0, 0, 0, 300, 300, 300)).get_item()
-        if item == LootItem.COIN:
-            self._level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
-        elif item == LootItem.FOOD:
-            self._level.item_group.add(FoodEntity(self.level, self.rect, 1))
-        elif item == LootItem.EMPTY:
-            print("Empty pot")
-        # else:
-            # ItemRegistry.create_item(item, rarity, self.level, self.rect)
-
+        item, rarity = LootPool((0, 0, 0, 35, 25, 25, 15), (0, 6, 4)).get_item()
+        coin_count = random.randint(10, 15)
+        for _ in range(coin_count):
+            self._level.item_group.add(CoinEntity(self._level, self.rect)) 
+        ItemRegistry.create_item(item, rarity, self._level, self.rect)
         self.collision_time = time()
 
     def on_collision(self):
