@@ -1,6 +1,7 @@
 from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity
+from utils.help import Share
 
 
 FOOD_TYPE = ItemType(
@@ -21,6 +22,7 @@ class FoodEntity(ItemEntity):
         self.eaten_by = self.level.snake
     
     def apply_instant_effect(self):
+        Share.audio.play_sound("eat")
         self.eaten_by.grow_up(self.quantity) # type: ignore
 
     def update(self):

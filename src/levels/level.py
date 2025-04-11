@@ -6,24 +6,26 @@ import pygame
 import config.constant as constant
 from entities.items.comsumalbe.energy_drink import EnergyDrinkEntity
 from entities.items.comsumalbe.resistance_potion import ResistancePotionEntity
-from entities.items.skill.ghost_body import GhostEntity
+from entities.items.comsumalbe.celestine_fragment import CelestineFragmentEntity
+from entities.items.comsumalbe.bomb_item import BombEntity
+from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
+from entities.items.comsumalbe.reverse import ReverseEntity
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.instant.key import KeyEntity
-from entities.items.equipment.ouroboros import OuroborosEntity
-from entities.items.comsumalbe.celestine_fragment import CelestineFragmentEntity
-from entities.items.equipment.time_efficiency import TimeEfficiencyEntity
-from entities.items.comsumalbe.bomb_item import BombEntity
-from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
-from entities.items.comsumalbe.reverse import ReverseEntity
+from entities.items.equipment.time_efficiency import TimeEfficiencyEntity
+from entities.items.equipment.ouroboros import OuroborosEntity
+from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity
+from entities.items.skill.ghost_body import GhostEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.chest import Chest
 from levels.components.door import Door
+from levels.components.fire_tile import Fire_Group
 from levels.components.floor_tile import Floor
 from levels.components.obstacle import Obstacle
 from levels.components.pot import Pot
@@ -68,6 +70,7 @@ class Level(State):
         self.item_group = pygame.sprite.Group()
         self.snake_group = NestedGroup()
         self.bomb_group = pygame.sprite.Group()
+        self.fire_group = Fire_Group(self)
         self.snake = Snake(self, 5)
         # TODO: nhớ xóa
         self.snake.inventory.add_item(ThanosItemStack(1))
@@ -89,7 +92,7 @@ class Level(State):
             self.obstacle_group,
             self.trap_group,
             self.pot_group,
-            # self.snake,
+            self.fire_group,
             self.item_group,
             self.snake_group,
             self.hud,
@@ -159,12 +162,14 @@ class Level(State):
         self.pot_group.empty()
         for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
-
+            
+        self.fire_group.addComponents(constant.MAP_LEFT, constant.MAP_BOTTOM - 3 * constant.TILE_SIZE, 3, 3, 7000)
+                
+        self.item_group.add(BloodBombDevilEntity(self))
         # for i in range(3):
         #     bomb = BombEntity(self, quantity=random.randint(2,4))
         #     self.item_group.add(bomb)
         
-        # self.item_group.add(OuroborosEntity(self))
         # self.item_group.add(CelestineFragmentEntity(self))
         # self.item_group.add(EnergyDrinkEntity(self))
         # # self.item_group.add(ThanosEntity(self))

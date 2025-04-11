@@ -65,3 +65,4 @@ class Texture:
     speed_potion = "game-assets/graphics/pixil/item-sprite/SPEED_POTION.pixil"
     reverse = "game-assets/graphics/pixil/item-sprite/REVERSE.pixil"
     infinity_gauntlet = "game-assets/graphics/pixil/item-sprite/INFINITY_GAUNTLET.pixil"
+    celestine_amulet = "game-assets/graphics/pixil/item-sprite/CELESTINE_FRAGMENT.pixil"

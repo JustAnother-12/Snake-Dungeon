@@ -51,10 +51,10 @@ class GhostStack(ItemStack):
             return False
         return super().use(snake)
     
-    def update(self):
+    def update(self, inventory_manager):
         if self.active_time >= 0: 
             self.active_time -= Share.clock.get_time() / 1000
-        return super().update() 
+        return super().update(inventory_manager) 
     
     def prevent_damage(self, snake, *args, **kwargs):
         if self.active_time <= 0:

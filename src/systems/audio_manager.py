@@ -125,11 +125,18 @@ class AudioManager:
         """Unpause current music playback"""
         pygame.mixer.music.unpause()
     
-    def set_sound_volume(self, volume):
+    def set_all_sound_volume(self, volume):
         """Set volume for sound effects (0.0 to 1.0)"""
         self.sound_volume = max(0.0, min(1.0, volume))
         for sound in self.sounds.values():
             sound.set_volume(self.sound_volume)
+            
+    def set_sound_volume(self, name, volume):
+        """Set volume for a specific sound effect (0.0 to 1.0)"""
+        if name in self.sounds:
+            self.sounds[name].set_volume(max(0.0, min(1.0, volume)))
+        else:
+            print(f"Sound {name} not found")
     
     def set_music_volume(self, volume):
         """Set volume for music (0.0 to 1.0)"""

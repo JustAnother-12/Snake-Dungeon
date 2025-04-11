@@ -3,6 +3,7 @@ import pygame
 from ui.elements.button import ButtonElement
 from ui.elements.text import TextElement
 from ui.screens.menu import Menu
+from utils.help import Share
 
 class GameOver_menu(Menu):
     def __init__(self, game) -> None:
@@ -19,6 +20,7 @@ class GameOver_menu(Menu):
 
         # self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
         self.add(self.Gamer_over_text, self.restart_button, self.main_menu_button)
+        Share.audio.play_sound("screaming")
 
     def update(self):
         return super().update()

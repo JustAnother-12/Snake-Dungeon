@@ -143,7 +143,6 @@ class ItemInfoPopup(State):
         self.level.game.state_stack.pop()
     
     def get_event(self, event: Event):
-        # TODO: sửa lại
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.confirm_btn.isHovered():
                 if not self.check_for_slots(): # type:ignore

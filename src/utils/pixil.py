@@ -12,7 +12,7 @@ class Pixil:
         self.padding = padding
 
     @classmethod
-    def load(cls, path: str, scale: int = 0, padding: int = 0):
+    def load(cls, path: str, scale: int = 1, padding: int = 0):
         with open(path) as file:
             # pixil_file = PixilType.from_dict(json.loads(file.read()))
             pixil_file = json.loads(file.read())

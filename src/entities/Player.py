@@ -37,11 +37,22 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.is_severed = False  # Tracks if this block is severed from the snake's main body
         self.transform_type = None
         self.can_collide = False
+        self.health = 3
+        self.is_burning = False
+        self.burning_time = 2
+        self.take_damage_delay = 0.3
+        self.time = 0
 
     @property
     def is_head(self):
         return self.__is_head
-
+    
+    def take_fire_damage(self, damage):
+        if self.time >= self.take_damage_delay: # NOTE: nhận sát thương khi hết delay
+            self.time = 0
+            self.is_burning = True
+            self.health -= damage
+            
     @is_head.setter
     def is_head(self, value):
         self.__is_head = value
@@ -121,14 +132,22 @@ class SnakeBlock(pygame.sprite.Sprite):
         return True
     
     def update(self):
+        self.time += Share.clock.get_time() / 1000
+        if self.is_burning:
+            if self.time >= self.burning_time: # NOTE: thời gian để thoát khỏi trạng thái đốt
+                self.is_burning = False
+                self.time = 0
+
         if self.is_severed:
             self.time_severed -= Share.clock.get_time() / 1000
             if self.time_severed >= 0:
                 return
+            snake = self.groups()[0]
             if self.transform_type == "COIN":
-                snake = self.groups()[0]
                 for _ in range(random.randint(5, 10)):
                     snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2)) # type: ignore
+            elif self.transform_type == "BOMB":
+                snake.level.bomb_group.add(Bomb(snake.level, self.rect.topleft, BombState.ACTIVE)) # type: ignore
             self.kill()
     
     def sever(self, type, delay):
@@ -338,6 +357,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_speed_boost()
         self.handle_collision()
         self.handle_skills(dt)
+        self.check_blocks_health()
         self.inventory.update()
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
@@ -369,6 +389,12 @@ class Snake(pygame.sprite.AbstractGroup):
             self._block_positions.append(newBlock.pos.copy())
             for i in self.blocks[0].groups():
                 i.add(newBlock)  # type: ignore
+                
+    def check_blocks_health(self):
+        # print(len(self.sprites()), list(sprite.health for sprite in self.sprites()))
+        for index, block in enumerate(self.sprites()):
+            if block.health <= 0:
+                self.split(index, '')
 
     def split(self, index, transform_type='COIN'):
         for i, block in enumerate(self.blocks[index:]):
