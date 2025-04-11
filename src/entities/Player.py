@@ -40,7 +40,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.health = 3
         self.is_burning = False
         self.burning_time = 2
-        self.take_damage_delay = 0.3
+        self.take_damage_delay = 0.5
         self.time = 0
 
     @property

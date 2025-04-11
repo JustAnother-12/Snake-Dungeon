@@ -22,7 +22,7 @@ class Bomb(pygame.sprite.Sprite):
         self.image = self.bomb_sheet.frames[0]
         self.state = state
         self.pos = pos if pos != None else self.random_pos()
-        self.rect = self.image.get_rect(topleft=self.pos)
+        self.rect = self.image.get_rect(center=self.pos)
         self.time = 0
         self.animation_sheet = pixil.Pixil.load(
             "game-assets/graphics/pixil/EXPLOSION_ANIMATION.pixil", 1
@@ -45,7 +45,7 @@ class Bomb(pygame.sprite.Sprite):
                     - constant.WALL_TILES
                 ),
             )
-            * TILE_SIZE,
+            * TILE_SIZE + TILE_SIZE // 2,
             random.randint(
                 constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
                 (
@@ -55,7 +55,7 @@ class Bomb(pygame.sprite.Sprite):
                     - constant.WALL_TILES
                 ),
             )
-            * TILE_SIZE,
+            * TILE_SIZE + TILE_SIZE // 2,
         )
 
         return self.pos
