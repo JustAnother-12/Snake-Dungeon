@@ -13,35 +13,43 @@ class FIRE_STATE(Enum):
     DISAPPEAR = 3
     
 class Fire_Tile(pygame.sprite.Sprite):
-    def __init__(self, level, pos, burn_time) -> None:
+    def __init__(self, level, pos, width_tile, height_tile, burn_time) -> None:
         super().__init__()
         self.level = level
-        self.fireImgs = pixil.Pixil.load("game-assets/graphics/pixil/FIRE_ANIMATION.pixil").frames
+        self.width_tile = width_tile
+        self.height_tile = height_tile
+        self.frames = pixil.Pixil.load("game-assets/graphics/pixil/FIRE_ANIMATION.pixil").frames
         self.frame_duration = 0.1
         self.frame_index = 0
-        self.image = self.fireImgs[self.frame_index]
-        self.image.set_alpha(0)
+        self.image = pygame.Surface((constant.TILE_SIZE*width_tile, constant.TILE_SIZE*height_tile), pygame.SRCALPHA)
         self.pos = pos
-        self.rect = self.image.get_rect(topleft=self.pos)
+        self.rect = self.image.get_rect(center=self.pos)
         self.time_animation = 0
         self.state_time = 0
         self.state = FIRE_STATE.APPEAR
         self.state_duration = {
-            FIRE_STATE.APPEAR: 500,
+            FIRE_STATE.APPEAR: 0.5,
             FIRE_STATE.ACTIVE: burn_time,
-            FIRE_STATE.DISAPPEAR: 500,
+            FIRE_STATE.DISAPPEAR: 0.5,
         }        
-    def update(self):
         
-        dt = Share.clock.get_time()
+    def draw_img(self):
+        if self.image is None: return
+        
+        for x in range(self.width_tile):
+            for y in range(self.height_tile):
+                self.image.blit(self.frames[self.frame_index], (x*constant.TILE_SIZE, y*constant.TILE_SIZE))
+        
+    def update(self):
+        if self.image is None: return
+        self.draw_img()
+        dt = Share.clock.get_time() / 1000
         self.time_animation += dt
         self.state_time += dt
         
         if self.time_animation >= self.frame_duration:
             self.time_animation = 0
-            self.frame_index = (self.frame_index + 1) % len(self.fireImgs)
-            
-        self.image = self.fireImgs[self.frame_index]
+            self.frame_index = (self.frame_index + 1) % len(self.frames)
         
         if self.state == FIRE_STATE.APPEAR:
             alpha = int(150 * (self.state_time/self.state_duration[FIRE_STATE.APPEAR]))
@@ -51,7 +59,7 @@ class Fire_Tile(pygame.sprite.Sprite):
                 
         if self.state == FIRE_STATE.ACTIVE:
             if Share.audio.is_sound_playing('burning-sound') == False:
-                Share.audio.play_sound('burning-sound',maxtime=max(0, self.state_duration[FIRE_STATE.ACTIVE]- self.state_time))
+                Share.audio.play_sound('burning-sound',maxtime=max(0, int((self.state_duration[FIRE_STATE.ACTIVE] - self.state_time) * 1000)))
                 Share.audio.set_sound_volume('burning-sound', 0.5)
             self.image.set_alpha(random.randint(150, 200))
             # TODO: Implement burn logic
@@ -61,7 +69,7 @@ class Fire_Tile(pygame.sprite.Sprite):
                 self.change_state(FIRE_STATE.DISAPPEAR)
                 
         if self.state == FIRE_STATE.DISAPPEAR:
-            Share.audio.stop_sound('burning-sound', self.state_duration[FIRE_STATE.DISAPPEAR])
+            Share.audio.stop_sound('burning-sound', int(self.state_duration[FIRE_STATE.DISAPPEAR]*1000))
             alpha = int(150 * (1 - max(self.state_time/self.state_duration[FIRE_STATE.DISAPPEAR], 0)))
             self.image.set_alpha(alpha)
             if self.state_time >= self.state_duration[FIRE_STATE.DISAPPEAR]:
@@ -78,14 +86,14 @@ class Fire_Tile(pygame.sprite.Sprite):
                 sprite.take_fire_damage(1)
         
 
-class Fire_Group(pygame.sprite.AbstractGroup):
-    def __init__(self, level) -> None:
-        super().__init__()
-        self.level = level
+# class Fire_Group(pygame.sprite.AbstractGroup):
+#     def __init__(self, level) -> None:
+#         super().__init__()
+#         self.level = level
         
 
-    def addComponents(self, x: int, y: int, width_tile: int, height_tile: int, burn_time) -> None:
-        for i in range(0, width_tile):
-            for j in range(0, height_tile):
-                fire_tile = Fire_Tile(self.level, (i*constant.TILE_SIZE + x, j*constant.TILE_SIZE + y), burn_time)
-                self.add(fire_tile)
+#     def addComponents(self, x: int, y: int, width_tile: int, height_tile: int, burn_time) -> None:
+#         for i in range(0, width_tile):
+#             for j in range(0, height_tile):
+#                 fire_tile = Fire_Tile(self.level, (i*constant.TILE_SIZE + x, j*constant.TILE_SIZE + y), burn_time)
+#                 self.add(fire_tile)
