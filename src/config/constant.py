@@ -65,4 +65,7 @@ class Texture:
     speed_potion = "game-assets/graphics/pixil/item-sprite/SPEED_POTION.pixil"
     reverse = "game-assets/graphics/pixil/item-sprite/REVERSE.pixil"
     infinity_gauntlet = "game-assets/graphics/pixil/item-sprite/INFINITY_GAUNTLET.pixil"
-    celestine_amulet = "game-assets/graphics/pixil/item-sprite/CELESTINE_FRAGMENT.pixil"
+    celestine_amulet = "game-assets/graphics/pixil/item-sprite/CELESTINE_AMULET.pixil"
+    bomb_devil_blood = "game-assets/graphics/pixil/item-sprite/BOMB_DEVIL_BLOOD.pixil"
+    midas_blood = "game-assets/graphics/pixil/item-sprite/MIDAS_BLOOD.pixil"
+    hephaestus_blood = "game-assets/graphics/pixil/item-sprite/HEPHAESTUS_BLOOD.pixil"

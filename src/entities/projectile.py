@@ -1,7 +1,8 @@
+from numpy import True_
 import pygame
 import math
 from collections import deque
-from config.constant import MAP_TOP, MAP_BOTTOM, MAP_LEFT, MAP_RIGHT
+from config.constant import MAP_TOP, MAP_BOTTOM, MAP_LEFT, MAP_RIGHT, TILE_SIZE
 from levels.components.bomb import Bomb
 from levels.components.fire_tile import Fire_Tile
 
@@ -25,6 +26,8 @@ class Projectile(pygame.sprite.Sprite):
         self.image = pygame.Surface((100, 100), pygame.SRCALPHA)
         self.base_color = color
         pygame.draw.circle(self.image, color, (50, 50), 5)  
+        self.img_rect = pygame.Rect(x_pos+5, y_pos+5, 10,10)
+        # self.rect = 
         self.rect = self.image.get_rect()
         self.rect.center = (x_pos, y_pos)
         self.speed = speed
@@ -44,6 +47,18 @@ class Projectile(pygame.sprite.Sprite):
         distance = math.hypot(dx, dy)
         self.dx = dx / distance * speed if distance != 0 else 0
         self.dy = dy / distance * speed if distance != 0 else 0
+
+    def handle_collision(self):
+        for group in self.level.snake_group._sub_group__:
+            if group is self.level.snake:
+                return False
+            for sprite in group.sprites():
+                if pygame.sprite.collide_rect(self, sprite):
+                    # sprite.take_fire_damage(1)
+                    # self.kill()
+                    group.is_dead = True
+                    return True
+        return False
 
     def update(self):
         if not self.rect or not self.image:
@@ -73,8 +88,8 @@ class Projectile(pygame.sprite.Sprite):
             self.rect.centerx - self.start_pos[0], self.rect.centery - self.start_pos[1]
         )
 
-        if (
-            current_distance > self.max_range
+        if (self.handle_collision() 
+            or current_distance > self.max_range
             or self.rect.right < MAP_LEFT
             or self.rect.left > MAP_RIGHT
             or self.rect.bottom < MAP_TOP
@@ -82,6 +97,7 @@ class Projectile(pygame.sprite.Sprite):
         ):
 
             # Tạo object khi hết tầm, truyền tham số tự động
+            self.rect.center = ((self.rect.center[0]//TILE_SIZE)*TILE_SIZE+8,(self.rect.center[1]//TILE_SIZE)*TILE_SIZE+8)
             expire_obj = self.on_expire_class(
                 self.level, self.rect.center, **self.on_expire_kwargs
             )

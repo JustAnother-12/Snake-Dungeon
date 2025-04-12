@@ -18,7 +18,9 @@ from entities.items.instant.key import KeyEntity
 from entities.items.instant.water_essence import WaterEssenceEntity
 from entities.items.equipment.time_efficiency import TimeEfficiencyEntity
 from entities.items.equipment.ouroboros import OuroborosEntity
-from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity
+from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity, BloodBombDevilStack
+from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
+from entities.items.equipment.midas_blood import MidasBloodStack
 from entities.items.skill.ghost_body import GhostEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
@@ -76,6 +78,8 @@ class Level(State):
         self.snake.inventory.add_item(ThanosItemStack(1))
         self.snake.inventory.add_item(BombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
+        # self.snake.inventory.add_item(BloodBombDevilStack())
+        # self.snake.inventory.add_item(MidasBloodStack())
 
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
@@ -169,7 +173,8 @@ class Level(State):
         # for i in range(3):
         #     bomb = BombEntity(self, quantity=random.randint(2,4))
         #     self.item_group.add(bomb)
-        
+        self.item_group.add(RitualDaggerEntity(self))
+        self.item_group.add(HephaestusBloodEntity(self))
         # self.item_group.add(CelestineFragmentEntity(self))
         # self.item_group.add(EnergyDrinkEntity(self))
         # # self.item_group.add(ThanosEntity(self))
