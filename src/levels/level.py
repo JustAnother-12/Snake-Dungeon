@@ -21,9 +21,12 @@ from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity, BloodBombDevilStack
 from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.midas_blood import MidasBloodStack
+from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
+from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.skill.ghost_body import GhostEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
+from entities.items.skill.gun_devil_contract import GunEntity
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.chest import Chest
@@ -78,8 +81,6 @@ class Level(State):
         self.snake.inventory.add_item(ThanosItemStack(1))
         self.snake.inventory.add_item(BombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
-        # self.snake.inventory.add_item(BloodBombDevilStack())
-        # self.snake.inventory.add_item(MidasBloodStack())
 
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
@@ -175,6 +176,9 @@ class Level(State):
         #     self.item_group.add(bomb)
         self.item_group.add(RitualDaggerEntity(self))
         self.item_group.add(HephaestusBloodEntity(self))
+        self.item_group.add(FireGemAmuletEntity(self))
+        self.item_group.add(GunEntity(self))
+        self.item_group.add(FlameTrailEntity(self))
         # self.item_group.add(CelestineFragmentEntity(self))
         # self.item_group.add(EnergyDrinkEntity(self))
         # # self.item_group.add(ThanosEntity(self))
@@ -232,6 +236,7 @@ class Level(State):
         t = self.snake._will_go_out_of_bounds
         super().update()
         if self.snake._will_go_out_of_bounds and not t:
+            Share.audio.set_sound_volume("hit_hurt", 0.5)
             Share.audio.play_sound('hit_hurt', 1)
     
     def check_room_cleared(self):

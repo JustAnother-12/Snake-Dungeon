@@ -5,7 +5,7 @@ STAMINA_DECREASE = 1
 STAMINA_RECOVERY = 0.5 
 BOOST_MULTIPLIER = 2
 BASE_SPEED = 16
-DEATH_DELAY = 1
+DEATH_DELAY = 0.6
 LEFT_RIGHT_BORDER_TILES = 9
 TOP_BOTTOM_BORDER_TILES = 5
 WALL_TILES = 4
@@ -69,3 +69,6 @@ class Texture:
     bomb_devil_blood = "game-assets/graphics/pixil/item-sprite/BOMB_DEVIL_BLOOD.pixil"
     midas_blood = "game-assets/graphics/pixil/item-sprite/MIDAS_BLOOD.pixil"
     hephaestus_blood = "game-assets/graphics/pixil/item-sprite/HEPHAESTUS_BLOOD.pixil"
+    fire_gem = "game-assets/graphics/pixil/item-sprite/FIRE_GEM_AMULET.pixil"
+    hand_gun = "game-assets/graphics/pixil/item-sprite/HANDGUN.pixil"
+    trail_of_flame = "game-assets/graphics/pixil/item-sprite/TRAIL_OF_FLAME.pixil"

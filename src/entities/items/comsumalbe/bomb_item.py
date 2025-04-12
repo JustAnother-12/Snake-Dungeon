@@ -4,7 +4,7 @@ from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 from levels.components.bomb import Bomb, BombState
-from entities.projectile import Projectile
+from entities.throw_projectile import Throw_projectile
 
 
 BOMB_TYPE = ItemType(
@@ -27,16 +27,18 @@ class BombStack(ItemStack):
 
     def apply_effect(self, snake):
         mouse_pos = pygame.mouse.get_pos()
-        projectile = Projectile(snake.level,
-                                snake.blocks[0].rect.x, 
-                                snake.blocks[0].rect.y, mouse_pos[0],
-                                  mouse_pos[1], 
-                                  'white', 
-                                  8*constant.TILE_SIZE, 
-                                  5,
-                                  on_expire_class=Bomb,
-                                  on_expire_kwargs={'state': BombState.ACTIVE}
-                                  )
+        projectile = Throw_projectile(
+                                    snake.level,
+                                    snake.blocks[0].rect.x, 
+                                    snake.blocks[0].rect.y, mouse_pos[0],
+                                    mouse_pos[1], 
+                                    'white', 
+                                    8*constant.TILE_SIZE, 
+                                    5,
+                                    4,
+                                    on_expire_class=Bomb,
+                                    on_expire_kwargs={'state': BombState.ACTIVE}
+                                    )
         snake.level.add(projectile)
         # projectile.draw_trail()
 
