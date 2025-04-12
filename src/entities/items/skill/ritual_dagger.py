@@ -34,12 +34,7 @@ class RitualDaggerStack(ItemStack):
 
     def apply_effect(self, snake):
         print("ok")
-        block = snake.blocks.pop()
-        pos = snake._block_positions.pop()
-        # snake.remove(block)
-        block.can_collide = True
-        block.sever("", 5)
-        # snake.level.item_group.add(FakeSnakeBlock(snake.level, pos, block.color))
+        snake.split(-1, delay=5)
     
     def use(self, snake: Snake):
         # if len(snake.blocks) <= 4:

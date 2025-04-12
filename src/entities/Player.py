@@ -6,6 +6,7 @@ from pygame.math import Vector2
 
 from entities.items.instant.coin import CoinEntity
 from levels.components.bomb import Bomb, BombState
+from levels.components.fire_tile import Fire_Tile
 from levels.components.trap import TrapState
 from ui.screens.game_over import GameOver_menu
 from utils.help import Share
@@ -141,13 +142,17 @@ class SnakeBlock(pygame.sprite.Sprite):
         if self.is_severed:
             self.time_severed -= Share.clock.get_time() / 1000
             if self.time_severed >= 0:
+                if self.time_severed <=0.2:
+                    self.image.fill((255,255,255))  # type: ignore
                 return
             snake = self.groups()[0]
             if self.transform_type == "COIN":
-                for _ in range(random.randint(5, 10)):
+                for _ in range(random.randint(6, 8)):
                     snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2)) # type: ignore
             elif self.transform_type == "BOMB":
                 snake.level.bomb_group.add(Bomb(snake.level, self.rect.topleft, BombState.ACTIVE)) # type: ignore
+            elif self.transform_type == "FIRE":
+                snake.level.fire_group.add(Fire_Tile(snake.level, self.rect.center,2,2,5)) # type: ignore
             self.kill()
     
     def sever(self, type, delay):
@@ -394,13 +399,13 @@ class Snake(pygame.sprite.AbstractGroup):
         # print(len(self.sprites()), list(sprite.health for sprite in self.sprites()))
         for index, block in enumerate(self.sprites()):
             if block.health <= 0:
-                self.split(index, '')
+                self.split(index)
 
-    def split(self, index, transform_type='COIN'):
+    def split(self, index,transform_type='', delay = 2):
         for i, block in enumerate(self.blocks[index:]):
             # block.is_severed = True
-            block.sever(transform_type, 2 + 0.1 * i)
-            block.image.fill((255, 255, 255)) # type: ignore
+            block.sever(transform_type, delay + 0.1 * i)
+            # block.image.fill((255, 255, 255)) # type: ignore
 
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
@@ -440,7 +445,7 @@ class Snake(pygame.sprite.AbstractGroup):
                     constant.TILE_SIZE,
                 )
             ):
-                if block.can_collide: 
+                if block.is_severed: 
                     # code ở đây tệ vl
                     block.kill()
                     self.grow_up(1)

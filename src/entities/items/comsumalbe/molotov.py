@@ -16,7 +16,7 @@ MOLOTOV_TYPE = ItemType(
     ItemTexture(
         constant.Texture.molotov
     ),
-    'makes a small fire hazard that last for 7s, 12s cooldown',
+    'Makes a small fire hazard that last for 7s, 12s cooldown',
     max_stack=5,
     cooldown=12.0,
 )
@@ -29,14 +29,15 @@ class MolotovStack(ItemStack):
         mouse_pos = pygame.mouse.get_pos()
         projectile = Projectile(snake.level,
                                 snake.blocks[0].rect.x, 
-                                snake.blocks[0].rect.y, mouse_pos[0],
-                                  mouse_pos[1], 
-                                  'white', 
-                                  8*constant.TILE_SIZE, 
-                                  5,
-                                  on_expire_class=Fire_Tile,
-                                  on_expire_kwargs={'width_tile': 3, 'height_tile': 3, 'burn_time': 7}
-                                  )
+                                snake.blocks[0].rect.y, 
+                                mouse_pos[0],
+                                mouse_pos[1], 
+                                'white', 
+                                8*constant.TILE_SIZE, 
+                                5,
+                                on_expire_class=Fire_Tile,
+                                on_expire_kwargs={'width_tile': 3, 'height_tile': 3, 'burn_time': 7}
+                                )
         snake.level.add(projectile)
 
     def get_item_entity_class(self):

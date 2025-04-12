@@ -63,7 +63,7 @@ class Fire_Tile(pygame.sprite.Sprite):
                 Share.audio.set_sound_volume('burning-sound', 0.5)
             self.image.set_alpha(random.randint(150, 200))
             # TODO: Implement burn logic
-            self.handle_collision(self.level.snake)
+            self.handle_collision()
             
             if self.state_time >= self.state_duration[FIRE_STATE.ACTIVE]:
                 self.change_state(FIRE_STATE.DISAPPEAR)
@@ -80,10 +80,11 @@ class Fire_Tile(pygame.sprite.Sprite):
         self.state = new_state
         self.state_time = 0
         
-    def handle_collision(self, player):
-        for sprite in player.sprites():
-            if pygame.sprite.collide_rect(self, sprite):
-                sprite.take_fire_damage(1)
+    def handle_collision(self):
+        for group in self.level.snake_group._sub_group__:
+            for sprite in group.sprites():
+                if pygame.sprite.collide_rect(self, sprite):
+                    sprite.take_fire_damage(1)
         
 
 # class Fire_Group(pygame.sprite.AbstractGroup):
