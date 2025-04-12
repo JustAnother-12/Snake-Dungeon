@@ -13,11 +13,9 @@ BLOOD_BOMB_DEVIL = ItemType(
     category=ItemCategory.EQUIPMENT,
     rarity=Rarity.RARE,
     texture=ItemTexture(
-        constant.Texture.bomb,
+        constant.Texture.bomb_devil_blood,
     ),
-    description="Upon activation, makes the player explode and deals 100 damage to all snakes in the area. Consumes 50 Energy, 5s cooldown",
-    cooldown=5.0,
-    energy_usage=50
+    description="Severed body parts turns into a bomb"
 )
 
 class BloodBombDevilStack(ItemStack):
