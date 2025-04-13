@@ -61,6 +61,8 @@ class Trap(pygame.sprite.Sprite):
         elif new_state == TrapState.WAITING:
             self.image = self.sprite_sheet.frames[0]
         elif new_state == TrapState.ACTIVATED:
+            Share.audio.set_sound_volume("stabbed", 0.6)
+            Share.audio.play_sound("stabbed")
             self.image = self.sprite_sheet.frames[1]
     
     def __is_collision_with_snake(self):

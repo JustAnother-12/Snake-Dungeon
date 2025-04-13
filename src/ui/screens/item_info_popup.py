@@ -9,6 +9,7 @@ from ui.elements.button import ButtonElement
 from ui.elements.image import ImageElement
 from ui.screens.state import State
 from ui.elements.text import TextElement
+from utils.help import Share
 from utils.pixil import Pixil
 # from entities.items.item_entity import ItemEntity
 
@@ -50,7 +51,7 @@ class ItemInfoPopup(State):
         self.category_text = TextElement(str(self.item_entity.item_type.category.name), 'white', 11, self.bg_rect.midright[0]-6*TILE_SIZE, self.bg_rect.midright[1]-8*TILE_SIZE, 'center')
 
         # item's name display
-        self.item_name = TextElement(item_entity.item_type.name.upper(), 'white', 20, self.bg_rect.midleft[0]+12*TILE_SIZE, self.bg_rect.midleft[1]-9*TILE_SIZE, 'topleft')
+        self.item_name = TextElement(item_entity.item_type.name.upper(), 'white', 20, self.bg_rect.midleft[0]+12*TILE_SIZE, self.bg_rect.midleft[1]-9*TILE_SIZE, 'topleft', 400)
 
         # item's description display
         self.description_text = TextElement(item_entity.item_type.description.upper(), 'white', 14, self.bg_rect.midleft[0]+2*TILE_SIZE, self.bg_rect.midleft[1]+TILE_SIZE,'topleft',width=42*TILE_SIZE)
@@ -144,12 +145,14 @@ class ItemInfoPopup(State):
     
     def get_event(self, event: Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
+            Share.audio.play_sound("click")
             if self.confirm_btn.isHovered():
                 if not self.check_for_slots(): # type:ignore
                     self.getItem()
                 else: 
                     self.print_message(self.check_for_slots())
             if self.sell_btn.isHovered():
+                Share.audio.play_sound("sell-reroll")
                 self.sellItem()
         elif event.type == pygame.KEYDOWN:
             key = event.key

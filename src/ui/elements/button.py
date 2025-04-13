@@ -4,6 +4,7 @@ import pygame
 import config.constant as constant
 
 
+from utils.help import Share
 import utils.pixil as pixil
 pygame.init()
 
@@ -41,6 +42,7 @@ class ButtonElement(pygame.sprite.Sprite):
         return self.rect.collidepoint(pygame.mouse.get_pos())
     
     def on_click(self) -> None:
+        Share.audio.play_sound("click")
         if self.callback != None:
             self.callback()
     

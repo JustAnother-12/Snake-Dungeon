@@ -477,7 +477,6 @@ class Snake(pygame.sprite.AbstractGroup):
                     pos = i
                 break
         if pos != None:
-            Share.audio.play_sound("stabbed")
             self.split(pos)
 
     def _collide_with_bomb(self):

@@ -1,4 +1,4 @@
-from pygame import Rect
+from pygame import KEYDOWN, Rect
 import pygame
 from config import constant
 from entities.Player import Snake

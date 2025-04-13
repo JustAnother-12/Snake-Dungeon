@@ -24,16 +24,6 @@ class Bullet_projectile(Projectile):
                     return True
         return False
     
-    def handle_wall_collision(self):
-        for sprite in self.level.wall_group.sprites():
-            if self.hitbox_rect.colliderect(sprite.rect):
-                self.kill()
-
-    def handle_obstacle_collision(self):
-        for sprite in self.level.obstacle_group.sprites():
-            if self.hitbox_rect.colliderect(sprite.rect):
-                self.kill()
-    
     def handle_pot_collision(self):
         for sprite in self.level.pot_group.sprites():
             if self.hitbox_rect.colliderect(sprite.rect):

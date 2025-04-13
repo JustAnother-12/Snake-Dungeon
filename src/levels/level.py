@@ -232,6 +232,8 @@ class Level(State):
                 self.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
             # self.snake.auto_state = False
         
+        # self.check_for_secret_input()
+        
         self.handle_input()
         t = self.snake._will_go_out_of_bounds
         super().update()
@@ -264,25 +266,40 @@ class Level(State):
             return
         self.create_config_room(next_)
         self.generator()
+    
+    def check_for_secret_input(self):
+        SECRET_IMPUTS = [
+            pygame.K_t, pygame.K_h, pygame.K_a, pygame.K_n,pygame.K_o,pygame.K_s
+        ]
+        input_keys = []
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                input_keys.append(event.key)
 
-    def draw_grid(self, surface: pygame.Surface):
-        surface.fill("black")
-        pygame.draw.rect(
-            surface,
-            (51, 54, 71),
-            (
-                constant.MAP_LEFT,
-                constant.MAP_TOP,
-                constant.MAP_WIDTH,
-                constant.MAP_HEIGHT,
-            ),
-        )
-        for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
-        for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
+        if len(input_keys) > len(SECRET_IMPUTS):
+            input_keys.pop(0)
+        if input_keys == SECRET_IMPUTS:
+            print("test")
+            input_keys.clear()
+
+    # def draw_grid(self, surface: pygame.Surface):
+    #     surface.fill("black")
+    #     pygame.draw.rect(
+    #         surface,
+    #         (51, 54, 71),
+    #         (
+    #             constant.MAP_LEFT,
+    #             constant.MAP_TOP,
+    #             constant.MAP_WIDTH,
+    #             constant.MAP_HEIGHT,
+    #         ),
+    #     )
+    #     for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
+    #     for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:

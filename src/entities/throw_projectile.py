@@ -1,6 +1,6 @@
 import pygame
 import math
-from config.constant import MAP_TOP, MAP_BOTTOM, MAP_LEFT, MAP_RIGHT, TILE_SIZE
+from config.constant import TILE_SIZE
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.fire_tile import Fire_Tile
@@ -10,6 +10,8 @@ class Throw_projectile(Projectile):
     def __init__(self, level, x_pos, y_pos, target_x, target_y, color, max_range, speed,size, on_expire_class, on_expire_kwargs=None) -> None:
         super().__init__(level, x_pos, y_pos, target_x, target_y, color, max_range, speed, size)
 
+        Share.audio.set_sound_volume("throw", 0.45)
+        Share.audio.play_sound("throw")
         # Customizable on-expire behavior
         self.on_expire_class = on_expire_class
         self.on_expire_kwargs = on_expire_kwargs or {}
@@ -21,6 +23,12 @@ class Throw_projectile(Projectile):
             for sprite in group.sprites():
                 if self.hitbox_rect.colliderect(sprite.rect):
                     return True
+        return False
+    
+    def handle_wall_collision(self):
+        for sprite in self.level.wall_group.sprites():
+            if self.hitbox_rect.colliderect(sprite.rect):
+                return True
         return False
 
     def update(self):
@@ -53,10 +61,7 @@ class Throw_projectile(Projectile):
         )
         if (self.handle_enemy_collision() 
             or current_distance > self.max_range
-            or self.rect.right < MAP_LEFT+64
-            or self.rect.left > MAP_RIGHT-64
-            or self.rect.bottom < MAP_TOP+64
-            or self.rect.top > MAP_BOTTOM-64
+            or self.handle_wall_collision()
         ):
             # Tạo object khi hết tầm, truyền tham số tự động
             self.rect.center = ((self.rect.center[0]//TILE_SIZE)*TILE_SIZE+8,(self.rect.center[1]//TILE_SIZE)*TILE_SIZE+8)
@@ -71,7 +76,9 @@ class Throw_projectile(Projectile):
                 self.level.bomb_group.add(expire_obj)
             if hasattr(self.level, "fire_group") and isinstance(
                 expire_obj, Fire_Tile
-            ):
+            ):  
+                Share.audio.set_sound_volume("glass-break", 0.5)
+                Share.audio.play_sound("glass-break")
                 Share.audio.set_sound_volume("short-fire-burst", 0.5)
                 Share.audio.play_sound("short-fire-burst")
                 self.level.fire_group.add(expire_obj)

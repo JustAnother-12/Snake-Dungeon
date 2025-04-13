@@ -55,6 +55,20 @@ class Projectile(pygame.sprite.Sprite):
                 if self.hitbox_rect.colliderect(sprite.rect):
                     return True
         return False
+    
+    def handle_wall_collision(self):
+        for sprite in self.level.wall_group.sprites():
+            if self.hitbox_rect.colliderect(sprite.rect):
+                self.kill()
+                return True
+        return False
+
+    def handle_obstacle_collision(self):
+        for sprite in self.level.obstacle_group.sprites():
+            if self.hitbox_rect.colliderect(sprite.rect):
+                self.kill()
+                return True
+        return False
 
     def update(self):
         # if not self.rect or not self.image:
