@@ -86,7 +86,7 @@ class ItemType:
                 Rarity.RARE: 150,
             }
             category = {
-                ItemCategory.INSTANT: -30,
+                ItemCategory.INSTANT: -35,
                 ItemCategory.CONSUMABLE: 0,
                 ItemCategory.EQUIPMENT: +20,
                 ItemCategory.SKILL: +50

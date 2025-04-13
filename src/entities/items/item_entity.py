@@ -20,7 +20,8 @@ class ItemEntity(pygame.sprite.Sprite):
         self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.entity_frame]
         self.image = self._image.copy()
         self.random_pos(area, r)
-        self.rect = self.image.get_rect(topleft=self.pos)    
+        self.rect = self.image.get_rect(topleft=self.pos)
+        self.shop_item = False 
         
         # Interaction properties
         self.interaction_radius = constant.TILE_SIZE * 2  # 2 tiles radius
@@ -49,7 +50,7 @@ class ItemEntity(pygame.sprite.Sprite):
             color, 
             (0, 0, self.highlight_effect.get_width(), self.highlight_effect.get_height()),
             border_radius=5
-        )    
+        )
 
     def random_pos(self, area: pygame.Rect | None, r = 2):
 

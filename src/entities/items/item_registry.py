@@ -1,3 +1,6 @@
+import pygame
+from config.constant import TILE_SIZE
+from ui.elements.text import TextElement
 from entities.items.item_type import ItemCategory, Rarity
 
 class ItemRegistry:
@@ -28,10 +31,16 @@ class ItemRegistry:
         ItemCategory.EQUIPMENT: {
             Rarity.COMMON: {
                 "time_efficiency": "TimeEfficiencyEntity",
+                'fire_gem_amulet': 'FireGemAmuletEntity',
             },
-            Rarity.UNCOMMON: {},
+            Rarity.UNCOMMON: {
+                'trail_of_flame': 'FlameTrailEntity',
+                'midas_blood': 'MidasBloodEntity',
+                'hephaestus_blood': 'HephaestusBloodEntity',
+            },
             Rarity.RARE: {
                 "ouroboros": "OuroborosEntity",
+                'blood_bomb_devil': 'BloodBombDevilEntity',
             },
         },
         ItemCategory.CONSUMABLE: {
@@ -41,17 +50,22 @@ class ItemRegistry:
                 'speed_potion': 'SpeedPotionEntity',
                 'energy_drink': 'EnergyDrinkEntity',
                 'resistance_potion': 'ResistancePotionEntity',
+                'molotov': 'MolotovEntity',
             },
             Rarity.UNCOMMON: {},
-            Rarity.RARE: {},
+            Rarity.RARE: {
+                'celestine_fragment': 'CelestineFragmentEntity',
+            },
         },
         ItemCategory.SKILL: {
             Rarity.COMMON: {
                 "ritual_dagger": "RitualDaggerEntity",
+                "ghost_body": "GhostEntity",
             },
             Rarity.UNCOMMON: {},
             Rarity.RARE: {
-                "ghost_body": "GhostEntity",
+                'celestine_amulet': 'CelestineAmuletEntity',
+                'gun_devil_contract': 'GunEntity',
             },
         },
     }
@@ -83,8 +97,19 @@ class ItemRegistry:
             module = importlib.import_module(f"entities.items.{item_category.value}.{file_name}")
             if hasattr(module, class_name):
                 cls = getattr(module, class_name)
-                try: 
-                    level.item_group.add(cls(level, *args, **kwargs))
+                try:
+                    kwargs_copy = kwargs.copy()
+                    pos = kwargs_copy.pop('pos', None) 
+                    item = cls(level, *args, **kwargs_copy)
+                    if pos is not None:
+                        item.pos = pygame.Vector2(pos)
+                        item.rect = item.image.get_rect(topleft=item.pos)
+                        price_text = TextElement(str(item.item_type.price), 'yellow', 10, pos[0] + TILE_SIZE, pos[1] + 3*TILE_SIZE, 'center')
+                        level.add(price_text)
+
+                        if not item.check_pos(item.image):
+                            item.random_pos(None, r=2)
+                    level.item_group.add(item)
                 except Exception as e:
                     print(f"Error creating item: {e}")
                     return None

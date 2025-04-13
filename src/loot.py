@@ -18,7 +18,7 @@ class LootItem(Enum):
     EQUIPMENT = 6
     SKILL = 7
 class LootPool:
-    def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (50, 35, 15)):
+    def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (45, 35, 20)):
         """Khởi tạo LootPool với tỉ lệ xuất hiện của các vật phẩm
         - item_rate: tuple chứa tỉ lệ xuất hiện của các vật phẩm trong loot pool
             + item_rate[0]: EMPTY

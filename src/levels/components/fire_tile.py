@@ -45,6 +45,7 @@ class Fire_Tile(pygame.sprite.Sprite):
             FIRE_STATE.DISAPPEAR: 0.5,
         }    
         if self.image is None: return
+        
         self.image = pygame.Surface((constant.TILE_SIZE*self.width_tile, constant.TILE_SIZE*self.height_tile), pygame.SRCALPHA)
         self.draw_img()
         dt = Share.clock.get_time() / 1000
