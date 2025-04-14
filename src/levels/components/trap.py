@@ -60,7 +60,6 @@ class Trap(pygame.sprite.Sprite):
             Share.audio.set_sound_volume("stabbed", 0.6)
             Share.audio.play_sound("stabbed")
             self.image = self.sprite_sheet.frames[1]
-            Share.audio.play_sound('trap')
     
     def __is_collision_with_snake(self):
         for snake in self._level.snake_group._sub_group__:

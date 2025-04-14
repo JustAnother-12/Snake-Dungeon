@@ -5,6 +5,7 @@ import pygame
 
 import config.constant as constant
 from entities.items.consumable.energy_drink import EnergyDrinkEntity
+from entities.items.consumable.fire_bomb_item import FireBombStack
 from entities.items.consumable.resistance_potion import ResistancePotionEntity
 from entities.items.consumable.celestine_fragment import CelestineFragmentEntity
 from entities.items.consumable.bomb_item import BombEntity, BombStack
@@ -27,6 +28,7 @@ from entities.items.skill.ghost_body import GhostEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
 from entities.items.skill.gun_devil_contract import GunEntity
+from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.chest import Chest
@@ -75,12 +77,11 @@ class Level(State):
         self.bomb_group = pygame.sprite.Group()
         self.item_group = pygame.sprite.Group()
         self.snake_group = NestedGroup()
-        self.bomb_group = pygame.sprite.Group()
         self.fire_group = pygame.sprite.Group()
         self.snake = Snake(self, 5)
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(ThanosItemStack(1))
-        self.snake.inventory.add_item(BombStack(5))
+        self.snake.inventory.add_item(DragonBreathStack())
+        self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
 
         self.hud = HUD(self)
@@ -192,6 +193,9 @@ class Level(State):
         Stats.reset()
         self.game.state_stack.pop()
         self.game.state_stack.append(Level(self.game))
+        
+    def get_event(self, event: pygame.Event):
+        self.snake.inventory.handle_key_event(event)
 
     def handle_input(self):
         keys = pygame.key.get_just_pressed()

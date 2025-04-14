@@ -7,7 +7,7 @@ from utils.help import Share
 CELESTINE_AMULET_TYPE = ItemType(
     'celestine_amulet',
     'The Celestine Amulet',
-    ItemCategory.CONSUMABLE,
+    ItemCategory.SKILL,
     Rarity.RARE,
     ItemTexture(
         constant.Texture.celestine_amulet

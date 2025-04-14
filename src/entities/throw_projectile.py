@@ -3,6 +3,7 @@ import math
 from config.constant import TILE_SIZE
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
+from levels.components.fire_bomb import FireBomb
 from levels.components.fire_tile import Fire_Tile
 from utils.help import Share
 
@@ -70,10 +71,11 @@ class Throw_projectile(Projectile):
             )
 
             # Tự động thêm vào group nếu có thuộc tính group
-            if hasattr(self.level, "bomb_group") and isinstance(
-                expire_obj, Bomb
-            ):
-                self.level.bomb_group.add(expire_obj)
+            if hasattr(self.level, "bomb_group"):
+                if isinstance(expire_obj, Bomb):
+                    self.level.bomb_group.add(expire_obj)
+                elif isinstance(expire_obj, FireBomb):
+                    self.level.bomb_group.add(expire_obj)
             if hasattr(self.level, "fire_group") and isinstance(
                 expire_obj, Fire_Tile
             ):  

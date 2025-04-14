@@ -13,7 +13,7 @@ class FIRE_STATE(Enum):
     DISAPPEAR = 3
     
 class Fire_Tile(pygame.sprite.Sprite):
-    def __init__(self, level, pos, width_tile, height_tile, burn_time, damage = 1) -> None:
+    def __init__(self, level, pos, width_tile, height_tile, burn_time, damage = 1.0) -> None:
         super().__init__()
         self.level = level
         self.width_tile = width_tile
