@@ -4,13 +4,13 @@ import random
 import pygame
 
 import config.constant as constant
-from entities.items.comsumalbe.energy_drink import EnergyDrinkEntity
-from entities.items.comsumalbe.resistance_potion import ResistancePotionEntity
-from entities.items.comsumalbe.celestine_fragment import CelestineFragmentEntity
-from entities.items.comsumalbe.bomb_item import BombEntity, BombStack
-from entities.items.comsumalbe.speed_potion import SpeedPotionEntity
-from entities.items.comsumalbe.reverse import ReverseEntity
-from entities.items.comsumalbe.molotov import MolotovStack
+from entities.items.consumable.energy_drink import EnergyDrinkEntity
+from entities.items.consumable.resistance_potion import ResistancePotionEntity
+from entities.items.consumable.celestine_fragment import CelestineFragmentEntity
+from entities.items.consumable.bomb_item import BombEntity, BombStack
+from entities.items.consumable.speed_potion import SpeedPotionEntity
+from entities.items.consumable.reverse import ReverseEntity
+from entities.items.consumable.molotov import MolotovStack
 from entities.items.instant.gale_essence import GaleEssenceEntity
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
@@ -21,9 +21,12 @@ from entities.items.equipment.ouroboros import OuroborosEntity
 from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity, BloodBombDevilStack
 from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.midas_blood import MidasBloodStack
+from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
+from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.skill.ghost_body import GhostEntity
 from entities.items.skill.ritual_dagger import RitualDaggerEntity
 from entities.items.skill.thanos import ThanosEntity, ThanosItemStack
+from entities.items.skill.gun_devil_contract import GunEntity
 from entities.projectile import Projectile
 from levels.components.bomb import Bomb
 from levels.components.chest import Chest
@@ -45,6 +48,7 @@ from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
 from ui.screens.title_screen import TitleScreen
 from utils.help import Share
+from levels.shop import Shop_level
 
 
 class LevelStatus(Enum):
@@ -78,14 +82,13 @@ class Level(State):
         self.snake.inventory.add_item(ThanosItemStack(1))
         self.snake.inventory.add_item(BombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
-        # self.snake.inventory.add_item(BloodBombDevilStack())
-        # self.snake.inventory.add_item(MidasBloodStack())
 
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
 
         self.snake_group.add(self.snake)
         self.wave_manager = WaveManager(self)
+        self.shop = Shop_level(self)
 
         room_config = self.level_manager.get_current_config()
         if not room_config is None:
@@ -175,6 +178,9 @@ class Level(State):
         #     self.item_group.add(bomb)
         self.item_group.add(RitualDaggerEntity(self))
         self.item_group.add(HephaestusBloodEntity(self))
+        self.item_group.add(FireGemAmuletEntity(self))
+        self.item_group.add(GunEntity(self))
+        self.item_group.add(FlameTrailEntity(self))
         # self.item_group.add(CelestineFragmentEntity(self))
         # self.item_group.add(EnergyDrinkEntity(self))
         # # self.item_group.add(ThanosEntity(self))
@@ -192,6 +198,11 @@ class Level(State):
         if keys[pygame.K_ESCAPE]:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Pause_menu(self.game))
+        # TODO: test xong thì xóa   
+        if keys[pygame.K_p]:
+            self.to_shop()
+        if keys[pygame.K_r]:
+            self.shop.reStock()
         
         self.interaction_manager.handle_input()
         
@@ -202,7 +213,7 @@ class Level(State):
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
         if self.level_status == LevelStatus.PLAYING:
-            self.wave_manager.update(Share.clock.get_time() / 1000)
+            # self.wave_manager.update(Share.clock.get_time() / 1000)
             self.check_room_cleared()
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
@@ -228,16 +239,38 @@ class Level(State):
                 self.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
             # self.snake.auto_state = False
         
+        # self.check_for_secret_input()
+        
         self.handle_input()
         t = self.snake._will_go_out_of_bounds
         super().update()
         if self.snake._will_go_out_of_bounds and not t:
+            Share.audio.set_sound_volume("hit_hurt", 0.5)
             Share.audio.play_sound('hit_hurt', 1)
     
     def check_room_cleared(self):
         if self.wave_manager.is_complete():
             self.level_status = LevelStatus.ROOM_CLEARED
             self.snake.auto_state = False
+
+    def to_shop(self):
+        self.snake.auto_state = False
+        # xóa những phần tử cũ đi
+        self.obstacle_group.empty()
+        self.trap_group.empty()
+        self.pot_group.empty()
+        self.bomb_group.empty()
+        self.item_group.empty()
+
+        self.shop.init_Stock()
+        self.shop.display_Stock()
+
+        # # xóa cửa
+        # for i in self.sprites():
+        #     if isinstance(i, Door):
+        #         i.kill()
+
+        # next_ = self.level_manager.choose_door(index)
     
     def next_level(self, index: int):
         # xóa những phần tử cũ đi
@@ -259,25 +292,40 @@ class Level(State):
             return
         self.create_config_room(next_)
         self.generator()
+    
+    def check_for_secret_input(self):
+        SECRET_IMPUTS = [
+            pygame.K_t, pygame.K_h, pygame.K_a, pygame.K_n,pygame.K_o,pygame.K_s
+        ]
+        input_keys = []
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                input_keys.append(event.key)
 
-    def draw_grid(self, surface: pygame.Surface):
-        surface.fill("black")
-        pygame.draw.rect(
-            surface,
-            (51, 54, 71),
-            (
-                constant.MAP_LEFT,
-                constant.MAP_TOP,
-                constant.MAP_WIDTH,
-                constant.MAP_HEIGHT,
-            ),
-        )
-        for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
-        for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
-            pygame.draw.line(surface, (100, 100, 100),
-                             (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
+        if len(input_keys) > len(SECRET_IMPUTS):
+            input_keys.pop(0)
+        if input_keys == SECRET_IMPUTS:
+            print("test")
+            input_keys.clear()
+
+    # def draw_grid(self, surface: pygame.Surface):
+    #     surface.fill("black")
+    #     pygame.draw.rect(
+    #         surface,
+    #         (51, 54, 71),
+    #         (
+    #             constant.MAP_LEFT,
+    #             constant.MAP_TOP,
+    #             constant.MAP_WIDTH,
+    #             constant.MAP_HEIGHT,
+    #         ),
+    #     )
+    #     for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
+    #     for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
+    #         pygame.draw.line(surface, (100, 100, 100),
+    #                          (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:

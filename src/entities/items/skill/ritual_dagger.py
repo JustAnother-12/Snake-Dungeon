@@ -5,6 +5,7 @@ from entities.Player import Snake, SnakeBlock
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity
+from utils.help import Share
 
 
 RITUAL_DAGGER_TYPE = ItemType(
@@ -33,8 +34,9 @@ class RitualDaggerStack(ItemStack):
         super().__init__(RITUAL_DAGGER_TYPE, quantity)
 
     def apply_effect(self, snake):
-        print("ok")
+        Share.audio.play_sound("blade-slice")
         snake.split(-1, delay=5)
+        Share.audio.play_sound("body_part_cutoff")
     
     def use(self, snake: Snake):
         # if len(snake.blocks) <= 4:

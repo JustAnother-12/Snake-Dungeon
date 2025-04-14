@@ -20,7 +20,6 @@ GHOST_TYPE = ItemType(
     ),
     cooldown=7.0,
     description="Upon activation, makes the body intangible for 3s. Consumes 30 Energy, 5s cooldown",
-    price=50,
     energy_usage= 30
 )
 

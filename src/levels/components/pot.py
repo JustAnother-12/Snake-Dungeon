@@ -4,6 +4,7 @@ from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.item_registry import ItemRegistry
 from entities.items.item_type import ItemCategory, Rarity
+from utils.help import Share
 import utils.pixil as pixil
 from time import time
 import pygame
@@ -54,6 +55,9 @@ class Pot(pygame.sprite.Sprite):
 
     def on_collision(self):
         if self.isClosed:
+            Share.audio.set_sound_volume("pot-break", 0.3)
+            Share.audio.set_sound_volume("pot-break2", 0.3)
+            Share.audio.play_sound("pot-break") if random.randint(0,1) == 0 else  Share.audio.play_sound("pot-break2")
             self.open()
 
 class Pot_group(pygame.sprite.AbstractGroup):
