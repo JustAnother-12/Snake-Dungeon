@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2
 
 from config import constant
-from entities.Monster import Monster
+from entities.Monster import BombMonster, Monster
 from levels.components.bomb import Bomb, BombState
 from levels.components.trap import Trap
 from utils.help import Share
@@ -139,8 +139,9 @@ class WaveManager:
                 constant.MAP_TOP + constant.TILE_SIZE*2,
                 constant.MAP_BOTTOM - constant.TILE_SIZE*2
             )
-            bomb = Bomb(self.level, Vector2(x, y), BombState.ACTIVE)
-            self.level.bomb_group.add(bomb)
+            bomb = BombMonster(self.level, 4, Vector2(x, y))
+            bomb.set_player_reference(self.level.snake)
+            self.level.snake_group.add(bomb)
             return bomb
             
         elif entity_type == "trap":

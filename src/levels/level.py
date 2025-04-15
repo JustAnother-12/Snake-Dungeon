@@ -4,6 +4,7 @@ import random
 import pygame
 
 import config.constant as constant
+from entities.Monster import BombMonster
 from entities.items.consumable.energy_drink import EnergyDrinkEntity
 from entities.items.consumable.fire_bomb_item import FireBombStack
 from entities.items.consumable.resistance_potion import ResistancePotionEntity
@@ -173,18 +174,20 @@ class Level(State):
         for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
                 
-        self.item_group.add(BloodBombDevilEntity(self))
+        # a = BombMonster(self, 5)
+        # a.set_player_reference(self.snake)
+        # self.snake_group.add(a)
         # for i in range(3):
         #     bomb = BombEntity(self, quantity=random.randint(2,4))
         #     self.item_group.add(bomb)
-        self.item_group.add(RitualDaggerEntity(self))
+        # self.item_group.add(RitualDaggerEntity(self))
         self.item_group.add(HephaestusBloodEntity(self))
         self.item_group.add(FireGemAmuletEntity(self))
         self.item_group.add(GunEntity(self))
         self.item_group.add(FlameTrailEntity(self))
         # self.item_group.add(CelestineFragmentEntity(self))
         # self.item_group.add(EnergyDrinkEntity(self))
-        # # self.item_group.add(ThanosEntity(self))
+        self.item_group.add(ThanosEntity(self))
         # for i in range(2):
         #     self.item_group.add(ReverseEntity(self, quantity=random.randint(2,4)))
         #     self.item_group.add(SpeedPotionEntity(self, quantity=random.randint(2,4)))
@@ -217,7 +220,7 @@ class Level(State):
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
         if self.level_status == LevelStatus.PLAYING:
-            # self.wave_manager.update(Share.clock.get_time() / 1000)
+            self.wave_manager.update(Share.clock.get_time() / 1000)
             self.check_room_cleared()
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
