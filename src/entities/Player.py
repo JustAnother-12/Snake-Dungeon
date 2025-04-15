@@ -36,6 +36,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         self.__is_head = False
         self.time_severed = 0
         self.is_severed = False  # Tracks if this block is severed from the snake's main body
+        self.is_edible = False
         self.transform_type = None
         self.can_collide = False
         self.health = 3
@@ -445,7 +446,7 @@ class Snake(pygame.sprite.AbstractGroup):
                     constant.TILE_SIZE,
                 )
             ):
-                if block.is_severed: 
+                if block.is_edible: 
                     # code ở đây tệ vl
                     block.kill()
                     self.grow_up(1)

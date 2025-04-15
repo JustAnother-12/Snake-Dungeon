@@ -35,6 +35,8 @@ class RitualDaggerStack(ItemStack):
 
     def apply_effect(self, snake):
         Share.audio.play_sound("blade-slice")
+        block = snake.blocks[-1]
+        block.is_edible = True
         snake.split(-1, delay=5)
         Share.audio.play_sound("body_part_cutoff")
     

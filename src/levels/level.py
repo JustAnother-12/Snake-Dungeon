@@ -213,7 +213,7 @@ class Level(State):
             self.game.state_stack.append(TitleScreen(self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
         if self.level_status == LevelStatus.PLAYING:
-            # self.wave_manager.update(Share.clock.get_time() / 1000)
+            self.wave_manager.update(Share.clock.get_time() / 1000)
             self.check_room_cleared()
         
         if self.level_status == LevelStatus.ROOM_CLEARED:
