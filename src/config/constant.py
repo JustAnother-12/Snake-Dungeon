@@ -73,3 +73,4 @@ class Texture:
     hand_gun = "game-assets/graphics/pixil/item-sprite/HANDGUN.pixil"
     trail_of_flame = "game-assets/graphics/pixil/item-sprite/TRAIL_OF_FLAME.pixil"
     dragon_breath = "game-assets/graphics/pixil/item-sprite/DRAGON_BREATH.pixil"
+    fire_breath = "game-assets/graphics/pixil/FIRE_BREATH.pixil"

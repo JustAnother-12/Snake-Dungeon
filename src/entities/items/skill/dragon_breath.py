@@ -2,13 +2,13 @@ from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
-from levels.components.fire_breath import FireBreak
+from levels.components.fire_breath import FireBreath
 from stats import StatType, Stats
 from utils.help import Share
 
 DRAGON_BREATH_TYPE = ItemType(
-    'dragon\'s_breath',
-    'Dragon\'s Breath',
+    r"dragon's_breath",
+    r"Dragon's Breath",
     ItemCategory.SKILL,
     Rarity.RARE,
     ItemTexture(
@@ -24,8 +24,8 @@ class DragonBreathStack(ItemStack):
         super().__init__(DRAGON_BREATH_TYPE, quantity)
         self.time = 0
         self.is_active = False
-        from levels.components.fire_breath import FireBreak
-        self.fire_breath: None | FireBreak = None
+        from levels.components.fire_breath import FireBreath
+        self.fire_breath: None | FireBreath = None
         
     def update(self, inventory_manager):
         self.time += Share.clock.get_time() / 1000
@@ -49,7 +49,7 @@ class DragonBreathStack(ItemStack):
         return True
     
     def apply_effect(self, snake):
-        self.fire_breath = FireBreak(snake.level)
+        self.fire_breath = FireBreath(snake.level)
         snake.level.add(self.fire_breath)
         self.is_active = True
         self.energy_regen_rate = Stats.getValue(StatType.ENERGY_REGEN)
@@ -74,7 +74,7 @@ class DragonBreathStack(ItemStack):
             self.remove_effect(snake)
             return
         
-        if self.fire_breath is not None:
+        if self.fire_breath is not None and (len(snake.blocks) > 0):
             self.fire_breath.update_pos(snake.blocks[0].rect.center, snake.direction)
             
     

@@ -90,16 +90,3 @@ class Fire_Tile(pygame.sprite.Sprite):
             for sprite in group.sprites():
                 if pygame.sprite.collide_rect(self, sprite):
                     sprite.take_fire_damage(self.damage)
-        
-
-# class Fire_Group(pygame.sprite.AbstractGroup):
-#     def __init__(self, level) -> None:
-#         super().__init__()
-#         self.level = level
-        
-
-#     def addComponents(self, x: int, y: int, width_tile: int, height_tile: int, burn_time) -> None:
-#         for i in range(0, width_tile):
-#             for j in range(0, height_tile):
-#                 fire_tile = Fire_Tile(self.level, (i*constant.TILE_SIZE + x, j*constant.TILE_SIZE + y), burn_time)
-#                 self.add(fire_tile)
