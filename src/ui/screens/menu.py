@@ -23,4 +23,5 @@ class Menu(State):
     def get_event(self, event):
         if (event.type == pygame.KEYDOWN):
             if event.key in self.keymap.keys():
+                pygame.event.clear(pygame.KEYDOWN)
                 self.buttons[self.keymap[event.key]].on_click()

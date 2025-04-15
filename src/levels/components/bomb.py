@@ -81,7 +81,7 @@ class Bomb(pygame.sprite.Sprite):
             self.image = self.bomb_sheet.frames[
                 int(self.time / (self.key_time[self.state] / 2) * len(self.bomb_sheet.frames)) % len(self.bomb_sheet.frames)
             ]
-            self.rect = self.image.get_rect(topleft=self.pos)
+            self.rect = self.image.get_rect(center=self.pos)
 
             if self.time > self.key_time[BombState.ACTIVE]:
                 self.state = BombState.EXPLOSION
@@ -93,7 +93,7 @@ class Bomb(pygame.sprite.Sprite):
                 min(int(self.time / self.key_time[self.state] * len(self.animation_sheet.frames)), len(self.animation_sheet.frames) - 1)
             ]
             self.image = frame
-            self.rect = self.image.get_rect(topleft=self.pos - pygame.Vector2(TILE_SIZE, TILE_SIZE))
+            self.rect = self.image.get_rect(center=self.pos)
             if self.time > self.key_time[BombState.EXPLOSION]:
                 self.state = BombState.DISAPPEAR
                 self.time = 0

@@ -293,8 +293,6 @@ class Snake(pygame.sprite.AbstractGroup):
         else:
             self.is_speed_boost = False
         
-
-        self.inventory.handle_input()
         return is_pressed
 
     def handle_movement(self):

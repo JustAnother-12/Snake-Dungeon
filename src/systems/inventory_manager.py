@@ -27,8 +27,9 @@ class InventoryManager:
             pygame.K_5,
             pygame.K_LCTRL
         ]
-        self.time_pess: list[float] = [0, 0, 0, 0, 0, 0]
-        self.pess_time = 0.5
+        self.keys_pressed = {key: False for key in self.keys_map}
+        self.time_press: list[float] = [0, 0, 0, 0, 0, 0]
+        self.press_time = 0.5
     
     def count_slots(self):
         skill_count=0
@@ -44,28 +45,44 @@ class InventoryManager:
                     skill_count+=1
         return skill_count, consumable_count, equipment_count
     
-    def handle_input(self):
-        keys = pygame.key.get_pressed()
-        for index, key in enumerate(self.keys_map):
-            if not self.slots[index] is None:
-                self.slots[index].active = False # type: ignore
-            if self.time_pess[index] == 0 and keys[key]:
-                self.time_pess[index] = time.time()
-            
-            elif self.time_pess[index] and keys[key]:
-                # print(time.time() - self.time_pess[index])
-                if not self.slots[index] is None:
-                    self.slots[index].active = True # type: ignore
-                    if time.time() - self.time_pess[index] > self.pess_time:
-                        self.drop(index)
+    def handle_key_event(self, event):
+        if event.type == pygame.KEYDOWN:
+            for index, key in enumerate(self.keys_map):
+                if event.key == key:
+                    self.keys_pressed[key] = True
+                    self.time_press[index] = time.time()
+                    # Đánh dấu item là active khi nhấn
+                    if not self.slots[index] is None:
+                        self.slots[index].active = True  # type: ignore
+        
+        elif event.type == pygame.KEYUP:
+            for index, key in enumerate(self.keys_map):
+                if event.key == key:
+                    self.keys_pressed[key] = False
+                    # Nếu thời gian nhấn ngắn, sử dụng item
+                    if self.time_press[index] > 0:
+                        press_duration = time.time() - self.time_press[index]
+                        if press_duration < self.press_time:
+                            if not self.slots[index] is None:
+                                self.slots[index].active = False  # type: ignore
+                                self.slots[index].use(self.snake)  # type: ignore
+                        self.time_press[index] = 0
 
-            elif self.time_pess[index] and not keys[key]:
-                if not self.slots[index] is None:
-                    self.slots[index].active = True # type: ignore
-                    self.slots[index].use(self.snake) # type: ignore
-                self.time_pess[index] = 0
-    
+    # Thay đổi phương thức update để kiểm tra phím giữ
     def update(self):
+        current_time = time.time()
+        for index, key in enumerate(self.keys_map):
+            # Kiểm tra nếu phím đang được giữ và đã giữ đủ lâu
+            if self.keys_pressed[key] and self.time_press[index] > 0:
+                if current_time - self.time_press[index] > self.press_time:
+                    # Drop item khi giữ phím đủ lâu
+                    if not self.slots[index] is None:
+                        self.drop(index)
+                        # Reset thời gian để tránh drop liên tục
+                        self.time_press[index] = 0
+                        self.keys_pressed[key] = False
+        
+        # Cập nhật các item trong inventory
         for value in self.slots:
             if value is None: continue
             value.update(self)

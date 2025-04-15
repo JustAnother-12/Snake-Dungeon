@@ -11,14 +11,15 @@ from levels.components.obstacle import Obstacle
 from levels.components.trap import TrapState
 from levels.components.wall import Wall
 from loot import LootItem, LootPool
-from levels.components.bomb import BombState
+from levels.components.bomb import Bomb, BombState
 from utils.help import Share
 
 class Monster(Snake):
     def __init__(self, level, init_len, pos = None):
         # Câu hình màu sắc và hình ảnh cho đầu rắn
         self.pos = pos if pos else random.choice([(constant.MAP_LEFT, constant.MAP_TOP), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_LEFT, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_TOP)])
-        self.color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        # self.color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.color = pygame.Color(0, 255, 0)
         self.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.headImg.fill(self.color)
         pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
@@ -173,3 +174,44 @@ class Monster(Snake):
             from entities.items.item_registry import ItemRegistry
             ItemRegistry.create_item(item, rarity, self.level, block.rect)
         block.kill()
+
+
+class BombMonster(Monster):
+    def __init__(self, level, init_len, pos = None):
+        super().__init__(level, init_len, pos)
+        self.color = pygame.Color(255, 0, 0)
+        self.headImg.fill(self.color)
+        pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
+        pygame.draw.rect(self.headImg, (255, 255, 255), (11, 3, 2, 4))
+        
+
+    def handle_ai_movement(self):
+        if not self.player is None and self.player.is_dead == False:
+            
+            d = self._block_positions[0] - self.player._block_positions[0]
+
+            if abs(d.x) > abs(d.y):
+                self.direction = Vector2(-1 if d.x > 0 else 1, 0)
+            else:
+                self.direction = Vector2(0, -1 if d.y > 0 else 1)
+            
+            # print(self.direction)
+        
+        # super().handle_ai_movement()
+
+    def update(self):
+        if not self.is_dead: 
+            
+            if self._is_collide_with_obstacle(self._block_positions[0]) or self._is_collide_with_orther_snake(self._block_positions[0]):
+                self.is_dead = True
+        super().update()
+            
+
+    
+    def die(self):
+        if len(self.blocks) == 0:
+            self.level.snake_group.remove(self)
+            return
+        block = self.blocks.pop(0)
+        if block:
+            self.level.bomb_group.add(Bomb(self.level, block.pos, BombState.EXPLOSION))

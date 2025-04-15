@@ -13,3 +13,7 @@ class EventManager:
     @staticmethod
     def get_events():
         return EventManager.__event
+    
+    @staticmethod
+    def clear_events():
+        EventManager.__event = []
