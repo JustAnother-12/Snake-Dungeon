@@ -4,14 +4,11 @@ from typing import Any
 import pygame
 from pygame.math import Vector2
 
-from entities.items.instant.coin import CoinEntity
 from levels.components.bomb import Bomb, BombState
 from levels.components.fire_tile import Fire_Tile
 from levels.components.trap import TrapState
 from ui.screens.game_over import GameOver_menu
 from utils.help import Share
-from systems.inventory_manager import InventoryManager
-import utils.pixil as pixil
 import config.constant as constant
 from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
@@ -173,6 +170,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
         
         # Item and skill management
+        from systems.inventory_manager import InventoryManager
         self.inventory = InventoryManager(self)
         from levels.level import Level
         self.level : Level= level

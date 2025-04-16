@@ -1,4 +1,4 @@
-import config.constant as constant
+# from entities.items.item_entity import ItemEntity
 from entities.items.item_entity import ItemEntity
 from entities.items.item_type import ActivationType, ItemCategory, ItemTexture, ItemType, Rarity
 from utils.help import Share

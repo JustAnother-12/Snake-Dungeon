@@ -15,8 +15,8 @@ class ItemStack:
         self.active = False
         self.cool_down = 0
 
-    from entities import Player
-    def use(self, snake: "Player.Snake"):
+    import entities.Player as P
+    def use(self, snake: "P.Snake"):
         """Sử dụng item"""
         self.last_use_time = Share.clock.get_time()
         self.active = True
@@ -47,7 +47,7 @@ class ItemStack:
             
         return True
     
-    def apply_effect(self, snake: "Player.Snake"):
+    def apply_effect(self, snake: "P.Snake"):
         """Áp dụng hiệu ứng của item - được ghi đè bởi lớp con"""
         pass
 

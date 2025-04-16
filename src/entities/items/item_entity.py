@@ -5,16 +5,16 @@ import pygame
 from config import constant
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ActivationType, ItemCategory
+from systems.interaction_manager import InteractionObject
 from ui.screens.item_info_popup import ItemInfoPopup
 from utils import pixil
 
 
-class ItemEntity(pygame.sprite.Sprite):
+class ItemEntity(InteractionObject):
     from entities.items.item_type import ItemType
     import levels.level
     def __init__(self, level: "levels.level.Level", item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
-        super().__init__()
-        self.level = level
+        super().__init__(level, item_type.name, constant.TILE_SIZE * 2)
         self.item_type = item_type
         self.quantity = quantity
         self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.entity_frame]
@@ -126,13 +126,6 @@ class ItemEntity(pygame.sprite.Sprite):
     def on_collision(self):
         """Xử lý khi va chạm với rắn"""
         self.apply_instant_effect()
-        # else:
-        #     # Các item khác - thêm vào inventory
-        #     item_stack = self.to_item_stack()
-        #     added = self.level.snake.add_item(item_stack)
-        #     if not added:
-        #         # Nếu inventory đầy, có thể hiển thị thông báo
-        #         pass
         self.kill()
     
     def apply_instant_effect(self):
@@ -145,8 +138,6 @@ class ItemEntity(pygame.sprite.Sprite):
     
     def update(self):
         """Update item state"""
-        if self.level.snake.is_dead or len(self.level.snake) ==0:
-            return
         
         # Không add vào inventory nếu item là ON_COLLISION
         if self.item_type.activation_type == ActivationType.ON_COLLISION:
@@ -154,23 +145,7 @@ class ItemEntity(pygame.sprite.Sprite):
                 self.on_collision()
             return
         
-        # For other items, check if in interaction range
-        head_pos = self.level.snake.blocks[0].rect.center
-        distance = pygame.math.Vector2(head_pos).distance_to(
-            pygame.math.Vector2(self.rect.center) # type: ignore
-        )
-        
-        # Check if snake is in range
-        was_in_range = self.in_range
-        self.in_range = distance <= self.interaction_radius
-        
-        # Just entered range - add to interaction manager
-        if self.in_range and not was_in_range:
-            self.level.interaction_manager.register_interact(self)
-            
-        # Just left range - remove from interaction manager
-        elif not self.in_range and was_in_range:
-            self.level.interaction_manager.unregister_interact(self)
+        super().update()
             
         # Animate highlight effect
         self.pulse_animation = (self.pulse_animation + 0.05) % (2 * 3.14159)
@@ -194,6 +169,9 @@ class ItemEntity(pygame.sprite.Sprite):
     def on_pickup(self):
         """Called when player picks up the item"""
         self.level.game.state_stack.append(ItemInfoPopup(self.level, self))
+
+    def on_interact(self):
+        self.on_pickup()
 
     def _is_collision_with_snake(self):
         return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
