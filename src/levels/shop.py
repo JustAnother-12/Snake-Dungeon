@@ -85,7 +85,10 @@ class Shop_level:
                                     equipandskill[1], 
                                     self.level, 
                                     pos=((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(index*3))*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE)
-                                    )    
+                                    )   
+
+        for item in self.level.item_group:
+            item.shop_item = True 
 
     def display_Stock(self):
         self.level.add(self.npc)

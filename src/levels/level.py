@@ -5,6 +5,7 @@ import pygame
 import config.constant as constant
 from entities.items.consumable.fire_bomb_item import FireBombStack
 from entities.items.consumable.molotov import MolotovStack
+from entities.items.equipment.credit_card import CreditCardStack
 from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
@@ -66,6 +67,7 @@ class Level(State):
         self.snake.inventory.add_item(DragonBreathStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
+        self.snake.inventory.add_item(CreditCardStack())
         # end todo
 
         self.hud = HUD(self)

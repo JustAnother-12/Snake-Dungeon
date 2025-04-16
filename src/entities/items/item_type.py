@@ -53,6 +53,7 @@ class ItemType:
     cooldown: float = 0
     price: int = 0
     energy_usage: int = 0
+    sale:int = 100
     activation_type: ActivationType = ActivationType.AUTO
     
     def __eq__(self, value: object) -> bool:

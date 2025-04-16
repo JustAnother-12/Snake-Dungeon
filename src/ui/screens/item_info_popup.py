@@ -83,7 +83,7 @@ class ItemInfoPopup(State):
         else:
             self.buy_btn = ButtonElement(self.bg_rect.centerx, self.bg_rect.centery + 13*TILE_SIZE, "BUY FOR", "white", 14, width=160, height=50)
             self.buy_key_text = TextElement("E",'yellow', 20, self.bg_rect.centerx-7*TILE_SIZE, self.bg_rect.centery + 13*TILE_SIZE)
-            self.price_text = TextElement(str(item_entity.item_type.price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-18*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
+            self.price_text = TextElement(str((int)(item_entity.item_type.price*(self.item_entity.item_type.sale/100)))+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-18*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
             self.add(
                     self.buy_btn,
                     self.buy_key_text,
@@ -113,7 +113,7 @@ class ItemInfoPopup(State):
             self.add(message)
 
     def check_for_slots(self):
-        if self.item_entity.shop_item and self.level.snake.gold < self.item_entity.item_type.price:
+        if self.item_entity.shop_item and self.level.snake.gold < (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100)):
             return 4
         
         if self.item_entity.item_type.category != ItemCategory.CONSUMABLE:
@@ -178,7 +178,7 @@ class ItemInfoPopup(State):
                 if self.buy_btn.isHovered():
                     if not self.check_for_slots(): # type:ignore
                         Share.audio.play_sound("sell-reroll")
-                        self.level.snake.gold -= self.item_entity.item_type.price
+                        self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())
@@ -198,7 +198,7 @@ class ItemInfoPopup(State):
                  if key == pygame.K_e:
                     if not self.check_for_slots():
                         Share.audio.play_sound("sell-reroll")
-                        self.level.snake.gold -= self.item_entity.item_type.price
+                        self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())

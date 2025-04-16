@@ -52,7 +52,9 @@ class ItemRegistry:
                 'resistance_potion': 'ResistancePotionEntity',
                 'molotov': 'MolotovEntity',
             },
-            Rarity.UNCOMMON: {},
+            Rarity.UNCOMMON: {
+                'fire_bomb_item': 'FireBombEntity'
+            },
             Rarity.RARE: {
                 'celestine_fragment': 'CelestineFragmentEntity',
             },
@@ -62,7 +64,9 @@ class ItemRegistry:
                 "ritual_dagger": "RitualDaggerEntity",
                 "ghost_body": "GhostEntity",
             },
-            Rarity.UNCOMMON: {},
+            Rarity.UNCOMMON: {
+                "dragon_breath": "DragonBreathEntity"
+            },
             Rarity.RARE: {
                 'celestine_amulet': 'CelestineAmuletEntity',
                 'gun_devil_contract': 'GunEntity',
@@ -104,7 +108,7 @@ class ItemRegistry:
                     if pos is not None:
                         item.pos = pygame.Vector2(pos)
                         item.rect = item.image.get_rect(topleft=item.pos)
-                        price_text = TextElement(str(item.item_type.price), 'yellow', 10, pos[0] + TILE_SIZE, pos[1] + 3*TILE_SIZE, 'center')
+                        price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))), 'yellow', 10, pos[0] + TILE_SIZE, pos[1] + 3*TILE_SIZE, 'center')
                         level.add(price_text)
 
                         if not item.check_pos(item.image):

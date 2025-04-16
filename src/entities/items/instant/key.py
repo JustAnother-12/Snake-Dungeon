@@ -8,7 +8,7 @@ KEY_TYPE = ItemType(
     'key',
     'Key',
     ItemCategory.INSTANT,
-    Rarity.COMMON,
+    Rarity.UNCOMMON,
     ItemTexture(
         "game-assets/graphics/pixil/KEY_SPRITE.pixil",
     ),

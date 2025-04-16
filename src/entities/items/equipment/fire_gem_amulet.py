@@ -1,9 +1,7 @@
 from config import constant
-from entities.Player import Snake
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
-from levels.components.fire_tile import Fire_Tile
 
 FIRE_GEM_AMULET = ItemType(
     id = 'fire_gem_amulet',
