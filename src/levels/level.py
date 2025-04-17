@@ -26,10 +26,11 @@ from systems.level_manager import LevelConfig, LootPoolConfig, RegionGeneratorCo
 from systems.wave_manager import Wave, WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
+from ui.screens.Instruction import Instruction
 from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
-from ui.screens.title_screen import TitleScreen
+from ui.screens.count_down import Count_down
 from utils.help import Share
 from levels.shop import Shop_level
 
@@ -201,8 +202,9 @@ class Level(State):
 
         if self.level_status == LevelStatus.CREATED:
             self.game.state_stack[-1].visible = False
-            self.game.state_stack.append(TitleScreen(
-                self.game, self, "PRESS MOVEMENT KEYS TO START"))
+            self.game.state_stack.append(Instruction(self.game, self))
+            # self.game.state_stack.append(Count_down(
+            #     self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
         if self.level_status == LevelStatus.PLAYING:
             self.wave_manager.update(Share.clock.get_time() / 1000)

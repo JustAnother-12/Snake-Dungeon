@@ -8,7 +8,7 @@ from ui.screens.state import State
 from utils.help import Share
 
 
-class TitleScreen(State):
+class Count_down(State):
     from levels import level
     def __init__(self, game, level_: "level.Level", message: str = "") -> None:
         super().__init__(game)
