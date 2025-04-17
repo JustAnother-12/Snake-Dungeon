@@ -324,8 +324,7 @@ class Snake(pygame.sprite.AbstractGroup):
             if not self._will_go_out_of_bounds:
                 # print("Snake died after", self.base_stats.resistance, "out of bounds!")
                 self._out_of_bounds_time = 0
-            if not self.auto_state:
-                self._will_go_out_of_bounds = True
+            self._will_go_out_of_bounds = True
             return
 
         self._last_direction = self.direction

@@ -22,6 +22,7 @@ class Monster(Snake):
         self.headImg.fill(self.color)
         pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
         pygame.draw.rect(self.headImg, (255, 255, 255), (11, 3, 2, 4))
+        self.auto_state = True
 
         super().__init__(level, init_len)
 
@@ -197,13 +198,8 @@ class BombMonster(Monster):
             else:
                 self.direction = Vector2(0, -1 if d.y > 0 else 1)
 
-            # print(self.direction)
-
-        # super().handle_ai_movement()
-
     def update(self):
         if not self.is_dead:
-
             if self._is_collide_with_obstacle(self._block_positions[0]) or self._is_collide_with_orther_snake(self._block_positions[0]):
                 self.is_dead = True
         super().update()
