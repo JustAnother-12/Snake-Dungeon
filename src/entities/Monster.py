@@ -1,5 +1,4 @@
 import random
-from time import sleep
 import pygame
 from pygame.math import Vector2
 
@@ -7,17 +6,16 @@ from config import constant
 from entities.Player import Snake, SnakeBlock
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
-from levels.components.obstacle import Obstacle
 from levels.components.trap import TrapState
-from levels.components.wall import Wall
 from loot import LootItem, LootPool
 from levels.components.bomb import Bomb, BombState
-from utils.help import Share
+
 
 class Monster(Snake):
-    def __init__(self, level, init_len, pos = None):
+    def __init__(self, level, init_len, pos=None):
         # Câu hình màu sắc và hình ảnh cho đầu rắn
-        self.pos = pos if pos else random.choice([(constant.MAP_LEFT, constant.MAP_TOP), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_LEFT, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_TOP)])
+        self.pos = pos if pos else random.choice([(constant.MAP_LEFT, constant.MAP_TOP), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_BOTTOM -
+                                                 constant.TILE_SIZE), (constant.MAP_LEFT, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_TOP)])
         # self.color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.color = pygame.Color(0, 255, 0)
         self.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
@@ -28,14 +26,15 @@ class Monster(Snake):
         super().__init__(level, init_len)
 
         self.player = None  # Reference to the player object
-        self.avoidance_radius = 5 * constant.TILE_SIZE  # Radius to avoid traps and obstacles
+        # Radius to avoid traps and obstacles
+        self.avoidance_radius = 5 * constant.TILE_SIZE
         self.direction = Vector2(0, 0)
         self.is_curling = True
         self.base_stats.speed = 12
 
     def set_player_reference(self, player: Snake):
         self.player = player
-    
+
     def update_stats(self):
         pass
 
@@ -68,39 +67,40 @@ class Monster(Snake):
             # Không đi ngược lại
             if move == -self.direction:
                 continue
-                
+
             new_head_pos = head_pos + move * constant.TILE_SIZE
-            
+
             # Kiểm tra va chạm trực tiếp
             if not self._is_collide(new_head_pos):
                 valid_moves.append(move)
                 move_weights.append(self._calculate_weight(move, new_head_pos))
 
         if len(valid_moves) > 0:
-            self.direction = random.choices(valid_moves, weights=move_weights)[0] 
+            self.direction = random.choices(
+                valid_moves, weights=move_weights)[0]
             self.is_curling = False
             # self._block_positions.insert(0, head_pos + self.direction * constant.TILE_SIZE)
         else:
             self.is_dead = True
             return
-            
+
     def _calculate_weight(self, move, position):
         weight = 100 if move == self.direction else 10
-                
+
         # Kiểm tra các trở ngại trong bán kính tránh
         trap_danger = self._calculate_trap_danger(position)
         bomb_danger = self._calculate_bomb_danger(position)
-        
+
         # Giảm trọng số nếu gần bẫy hoặc chướng ngại vật
         danger_factor = trap_danger + bomb_danger
         if danger_factor > 0:
             weight = max(1, weight / danger_factor)
-        
+
         # Ưu tiên di chuyển về phía đồ ăn hoặc vật phẩm
         food_attraction = self._calculate_food_attraction(position)
         if food_attraction > 0:
             weight *= (1 + food_attraction)
-        
+
         return weight
 
     def _calculate_trap_danger(self, position):
@@ -133,20 +133,21 @@ class Monster(Snake):
         """Tính toán độ hấp dẫn từ thức ăn hoặc vật phẩm."""
         attraction = 0
         pos_vector = Vector2(position)
-        
+
         # Tìm kiếm thức ăn gần đó
         for item in self.level.item_group:
             item_pos = Vector2(item.rect.x, item.rect.y)
             distance = (pos_vector - item_pos).length()
             if distance < self.avoidance_radius * 2:  # Phạm vi tìm kiếm thức ăn xa hơn
                 # Độ hấp dẫn tăng khi khoảng cách giảm
-                attraction += 0.5 * (1 - (distance / (self.avoidance_radius * 2)))   
+                attraction += 0.5 * \
+                    (1 - (distance / (self.avoidance_radius * 2)))
         return attraction
-    
+
     def _init_snake_blocks(self, init_len):
         x, y = self.pos
         for i in range(init_len):
-            block = SnakeBlock(int(i==0) ,(x, y), self.color)
+            block = SnakeBlock(int(i == 0), (x, y), self.color)
             self.blocks.append(block)
 
         self.blocks[0].is_head = True
@@ -165,53 +166,53 @@ class Monster(Snake):
         self._block_positions.pop(0)
         item, rarity = loot_pool.get_item()
         if item == LootItem.COIN:
-            self.level.item_group.add(CoinEntity(self.level, block.rect, 1, random.randint(10, 15)))
+            self.level.item_group.add(CoinEntity(
+                self.level, block.rect, 1, random.randint(10, 15)))
         elif item == LootItem.FOOD:
             self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
         elif item == LootItem.EMPTY:
             pass
         else:
             from entities.items.item_registry import ItemRegistry
-            ItemRegistry.create_item(item, rarity, self.level, block.rect)
+            self.level.item_group.add(ItemRegistry.create_item(
+                item, rarity, self.level, block.rect))
         block.kill()
 
 
 class BombMonster(Monster):
-    def __init__(self, level, init_len, pos = None):
+    def __init__(self, level, init_len, pos=None):
         super().__init__(level, init_len, pos)
         self.color = pygame.Color(255, 0, 0)
         self.headImg.fill(self.color)
         pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
         pygame.draw.rect(self.headImg, (255, 255, 255), (11, 3, 2, 4))
-        
 
     def handle_ai_movement(self):
         if not self.player is None and self.player.is_dead == False:
-            
+
             d = self._block_positions[0] - self.player._block_positions[0]
 
             if abs(d.x) > abs(d.y):
                 self.direction = Vector2(-1 if d.x > 0 else 1, 0)
             else:
                 self.direction = Vector2(0, -1 if d.y > 0 else 1)
-            
+
             # print(self.direction)
-        
+
         # super().handle_ai_movement()
 
     def update(self):
-        if not self.is_dead: 
-            
+        if not self.is_dead:
+
             if self._is_collide_with_obstacle(self._block_positions[0]) or self._is_collide_with_orther_snake(self._block_positions[0]):
                 self.is_dead = True
         super().update()
-            
 
-    
     def die(self):
         if len(self.blocks) == 0:
             self.level.snake_group.remove(self)
             return
         block = self.blocks.pop(0)
         if block:
-            self.level.bomb_group.add(Bomb(self.level, block.pos, BombState.EXPLOSION))
+            self.level.bomb_group.add(
+                Bomb(self.level, block.pos, BombState.EXPLOSION))

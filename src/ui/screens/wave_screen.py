@@ -8,17 +8,17 @@ from ui.screens.state import State
 from utils.help import Share
 
 
-class TitleScreen(State):
+class WaveScreen(State):
     from levels import level
 
     def __init__(self, game, level_: "level.Level", message: str = "") -> None:
         super().__init__(game)
         self.game = game
 
-        self.level_text = TextElement(f"Level {level_.current_level + 1}", "white", 35, constant.SCREEN_WIDTH_TILES /
+        self.level_text = TextElement(f"wave {level_.wave_manager.current_wave_index} / {level_.wave_manager.waves}", "white", 35, constant.SCREEN_WIDTH_TILES /
                                       2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE - 50, "center")
         # self.text = TextElement(message, "white", 35, constant.SCREEN_WIDTH_TILES / 2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE, "center")
-        self.count = TextElement("Starting in 3", "white", 20, constant.SCREEN_WIDTH_TILES /
+        self.count = TextElement("wave in 3", "white", 20, constant.SCREEN_WIDTH_TILES /
                                  2 * game.TILE_SIZE, constant.SCREEN_HEIGHT_TILES / 2 * game.TILE_SIZE, "center")
         self.level_ = level_
         self.duration = 3

@@ -1,4 +1,5 @@
 
+import random
 from typing import Any
 
 from loot import LootPool
@@ -7,6 +8,33 @@ from systems.level_manager import DifficultyLevel, DoorConfig, DoorType, LevelCo
 from utils import pixil
 
 
+# shope
+shope_template = LevelConfig(
+    region_generator=RegionGeneratorConfig(
+        has_trap=0.0,       # Không có bẫy
+        has_obstacle=0.0,    # Không có chướng ngại vật
+        has_chest=0.0,       # Không có rương
+        has_pot=0.0          # Không có bình
+    ),
+    wave_manager=WaveManagerConfig(
+        wave_interval=0,     # Không có đợt
+        max_wave_count=0,    # Không có đợt
+        max_wave_entities=0,  # Không có quái
+        enemy_types={
+            'weak_monster': 0.0,
+            'bomb': 0.0,
+            # 'strong_monster': 0.0
+        }
+    ),
+    loot_pool=LootPoolConfig(
+        chest=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
+        pot=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
+        enemy=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0))
+    ),
+    room_type=RoomType.SHOP
+)
+
+# cho nhung room nomal and boss
 template = {
     # Độ khó DỄ
     DifficultyLevel.EASY: LevelConfig(
@@ -112,27 +140,49 @@ template = {
 class Door(InteractionObject):
     import levels.level as L
 
-    def __init__(self, level: "L.Level", pos) -> None:
+    def __init__(self, level: "L.Level", pos, door_type: DoorType | None = None) -> None:
         super().__init__(level, 'door', 45)
-        self.image = pixil.Pixil.load(
-            r"game-assets/graphics/pixil/DOOR_SPRITE.pixil").frames[0]
-        self.rect = self.image.get_rect(topleft=pos)
+        # randome the door type
+        # if door type is normal, set randomw difficulty base on level
+        # if door type is boss, set difficulty to boss
+
+        door_difficulty = DifficultyLevel.EASY
+
+        if door_type is None:
+            choices = [DifficultyLevel.EASY]
+            # 3 so luong do kho
+            s = level.max_level // 3
+
+            if self.level.current_level < s:
+                choices.append(DifficultyLevel.NORMAL)
+            elif self.level.current_level < s * 2:
+                choices.append(DifficultyLevel.HARD)
+            else:
+                choices.append(DifficultyLevel.BOSS)
+
+            door_type = DoorType.NORMAL if self.level.current_level < s * 2 else DoorType.BOSS
+            door_difficulty = random.choice(choices)
+
         self.door_config: DoorConfig = DoorConfig(
-            difficulty=DifficultyLevel.NORMAL,
-            door_type=DoorType.NORMAL
+            difficulty=door_difficulty,
+            door_type=door_type
         )
+
+        if self.door_config.door_type == DoorType.SHOP:
+            self.image = pixil.Pixil.load(
+                r"game-assets/graphics/pixil/DOOR_SPRITE.pixil").frames[3]
+        else:
+            self.image = pixil.Pixil.load(
+                r"game-assets/graphics/pixil/DOOR_SPRITE.pixil").frames[0]
+
+        self.rect = self.image.get_rect(topleft=pos)
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         return super().update(*args, **kwargs)
 
     def on_interact(self):
-        if self.level.level_index < 3:
-            level_config = template[DifficultyLevel.EASY]
-        elif self.level.level_index < 6:
-            level_config = template[DifficultyLevel.NORMAL]
-        elif self.level.level_index < 9:
-            level_config = template[DifficultyLevel.HARD]
-        else:
-            level_config = template[DifficultyLevel.BOSS]
+        level_config = template[self.door_config.difficulty]
+        if self.door_config.door_type == DoorType.SHOP:
+            level_config = shope_template
 
         self.level.next_level(level_config)

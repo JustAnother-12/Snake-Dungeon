@@ -112,12 +112,8 @@ class ItemRegistry:
             if pos is not None:
                 item.pos = pygame.Vector2(pos)
                 item.rect = item.image.get_rect(topleft=item.pos)
-                # price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))), 'yellow', 10, pos[0] + TILE_SIZE, pos[1] + 3*TILE_SIZE, 'center')
-                # level.add(price_text)
-
                 if not item.check_pos(item.image):
                     item.random_pos(None, r=2)
-            # level.item_group.add(item)
             return item
         else:
             raise AttributeError(

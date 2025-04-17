@@ -22,7 +22,7 @@ from levels.components.wall import Walls
 from loot import LootPool
 from stats import Stats
 from systems.interaction_manager import InteractionManager
-from systems.level_manager import LevelConfig, LootPoolConfig, RegionGeneratorConfig, WaveManagerConfig
+from systems.level_manager import DoorType, LevelConfig, LootPoolConfig, RegionGeneratorConfig, RoomType, WaveManagerConfig
 from systems.wave_manager import Wave, WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
@@ -51,7 +51,7 @@ class Level(State):
         from entities.Player import Snake
         self.snake_history: list[Snake] = []
         self.max_level = 5
-        self.level_index = 0
+        self.current_level = 0
 
         self.wall_group = Walls()
         self.obstacle_group = pygame.sprite.Group()
@@ -78,7 +78,7 @@ class Level(State):
         self.shop = Shop_level(self)
 
         # level đầu tiên lúc nào cũng giống nhau
-        default_config: LevelConfig = LevelConfig(
+        self._config: LevelConfig = LevelConfig(
             region_generator=RegionGeneratorConfig(0, 0, 0, 0),
             wave_manager=WaveManagerConfig(5, 1, 1, {
                 "monster": 1
@@ -90,7 +90,7 @@ class Level(State):
             )
         )
 
-        self.create_config_room(default_config)
+        self.create_config_room(self._config)
         self.generator()
 
         self.add(
@@ -209,24 +209,34 @@ class Level(State):
             self.check_room_cleared()
 
         if self.level_status == LevelStatus.ROOM_CLEARED:
-            self.game.state_stack.append(RoomCleared(self.game))
+            if self._config.room_type != RoomType.SHOP:
+                self.game.state_stack.append(RoomCleared(self.game))
 
             # tạo cửa ở tường
 
             # tạo random từ 2 -> 3 cửa
-            doors = random.randint(2, 3) + 1
+            doors = random.randint(2, 3)
             # tạo random vị trí cửa
             # random vị trí cửa canh đề nhau phía trên
 
-            spacing = constant.MAP_WIDTH // (doors)
+            # chosen random door index shope
 
-            for i in range(constant.MAP_LEFT + spacing, constant.MAP_RIGHT - spacing, spacing):
-                door = Door(self, (i - 32, constant.MAP_TOP - 64))
+            shope_index = random.randint(0, doors - 1)
+            spacing = constant.MAP_WIDTH // (doors + 1)
+            print(shope_index, doors)
+
+            for index, x in enumerate(range(constant.MAP_LEFT + spacing, constant.MAP_RIGHT, spacing)):
+                if index >= doors:
+                    break
+                door = Door(self, (x - 32, constant.MAP_TOP - 64),
+                            DoorType.SHOP if index == shope_index else None)
+                print(door)
                 self.add(door)
 
             self.level_status = LevelStatus.ROOM_COMPLETED
             print(self.region_generator.chests_initpos)
-            for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
+            # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
+            for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
                 self.add(
                     Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
             # self.snake.auto_state = False
@@ -254,30 +264,35 @@ class Level(State):
         self.bomb_group.empty()
         self.item_group.empty()
 
+        self.region_generator = RegionGenerator(0, 0, 0, 0)
+
         self.shop.init_Stock()
         self.shop.display_Stock()
 
-        # # xóa cửa
-        # for i in self.sprites():
-        #     if isinstance(i, Door):
-        #         i.kill()
-
-        # next_ = self.level_manager.choose_door(index)
-
     def next_level(self, config: LevelConfig):
+        self._config = config
         # xóa những phần tử cũ đi
         self.obstacle_group.empty()
         self.trap_group.empty()
         self.pot_group.empty()
         self.bomb_group.empty()
         self.item_group.empty()
-        self.level_index += 1
+
+        # xoa shop
+        self.shop.remove_Stock()
 
         # xóa cửa
         for i in self.sprites():
             if isinstance(i, Door):
                 i.kill()
 
+        if config.room_type == RoomType.SHOP:
+            self.shop.init_Stock()
+            self.shop.display_Stock()
+            self.level_status = LevelStatus.PLAYING
+            return
+
+        self.current_level += 1
         self.create_config_room(config)
         self.generator()
 
