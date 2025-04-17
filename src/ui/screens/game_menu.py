@@ -17,10 +17,6 @@ class MainMenu(Menu):
         self.init(game)
 
     def init(self, game):
-        # self.music = pygame.mixer.music
-        # self.music.load('game-assets/audio/main_menu.wav')
-        # self.music.set_volume(0.6)
-        # self.music.play(-1)
         Share.audio.play_music('main_menu', -1)
 
         self.play_button = ButtonElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES/2*game.TILE_SIZE, "PLAY", "white", 30,self.play_button_event)
@@ -34,8 +30,6 @@ class MainMenu(Menu):
     def reset(self):
         Share.audio.stop_music()
         Share.audio.play_music('main_menu', -1)
-        # self.music.stop()
-        # self.music.play(-1)
 
     def get_event(self, event):
         super().get_event(event)
