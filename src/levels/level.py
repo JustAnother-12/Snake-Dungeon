@@ -1,16 +1,21 @@
 from enum import Enum
 import random
+from numpy import spacing
 import pygame
 
 import config.constant as constant
+from entities.items.consumable.bomb_item import BombStack
 from entities.items.consumable.fire_bomb_item import FireBombStack
 from entities.items.consumable.molotov import MolotovStack
+from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity
 from entities.items.equipment.credit_card import CreditCardStack
 from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
+from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.skill.gun_devil_contract import GunEntity
 from entities.items.skill.dragon_breath import DragonBreathStack
+from entities.items.skill.ritual_dagger import RitualDaggerStack
 from entities.items.skill.thanos import ThanosEntity
 from levels.components.chest import Chest
 from levels.components.door import Door
@@ -55,20 +60,22 @@ class Level(State):
         self.current_level = 0
 
         self.wall_group = Walls()
+        self.chest_group = pygame.sprite.Group()
         self.obstacle_group = pygame.sprite.Group()
         self.trap_group = pygame.sprite.Group()
         self.pot_group = pygame.sprite.Group()
         self.bomb_group = pygame.sprite.Group()
+        self.fire_bomb_group = pygame.sprite.Group()
         self.item_group = pygame.sprite.Group()
         self.snake_group = NestedGroup()
         self.fire_group = pygame.sprite.Group()
         self.snake = Snake(self, 5)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(DragonBreathStack())
+        self.snake.inventory.add_item(RitualDaggerStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
-        self.snake.inventory.add_item(CreditCardStack())
+        # self.snake.inventory.add_item(CreditCardStack())
         # end todo
 
         self.hud = HUD(self)
@@ -100,11 +107,13 @@ class Level(State):
             self.obstacle_group,
             self.trap_group,
             self.pot_group,
+            self.chest_group,
             self.fire_group,
             self.item_group,
             self.snake_group,
             self.hud,
-            self.bomb_group
+            self.bomb_group,
+            self.fire_bomb_group
         )
 
         # # remove this
@@ -152,7 +161,6 @@ class Level(State):
             self.snake._block_positions[i] = pygame.Vector2(
                 (constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE, constant.MAP_BOTTOM - constant.TILE_SIZE)
             self.snake.blocks[i].pos = self.snake._block_positions[i]
-
         # Make wall
 
         # Make obstacle
@@ -176,6 +184,8 @@ class Level(State):
         self.item_group.add(GunEntity(self))
         self.item_group.add(FlameTrailEntity(self))
         self.item_group.add(ThanosEntity(self))
+        self.item_group.add(MidasBloodEntity(self))
+        self.item_group.add(BloodBombDevilEntity(self))
 
     def reset(self):
         Stats.reset()
@@ -190,11 +200,6 @@ class Level(State):
         if keys[pygame.K_ESCAPE]:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Pause_menu(self.game))
-        # TODO: test xong thì xóa
-        if keys[pygame.K_p]:
-            self.to_shop()
-        if keys[pygame.K_r]:
-            self.shop.reStock()
 
         self.interaction_manager.handle_input()
 
@@ -224,13 +229,15 @@ class Level(State):
             # chosen random door index shope
 
             shope_index = random.randint(0, doors - 1)
-            spacing = constant.MAP_WIDTH // (doors + 1)
+            # spacing = constant.MAP_WIDTH // (doors + 1)
+            spacing = 128
+            print(spacing)
             print(shope_index, doors)
 
             for index, x in enumerate(range(constant.MAP_LEFT + spacing, constant.MAP_RIGHT, spacing)):
                 if index >= doors:
                     break
-                door = Door(self, (x - 32, constant.MAP_TOP - 64),
+                door = Door(self, (x, constant.MAP_TOP - 64),
                             DoorType.SHOP if index == shope_index else None)
                 print(door)
                 self.add(door)
@@ -239,7 +246,7 @@ class Level(State):
             print(self.region_generator.chests_initpos)
             # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
             for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
-                self.add(
+                self.chest_group.add(
                     Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
             # self.snake.auto_state = False
 
@@ -259,12 +266,6 @@ class Level(State):
 
     def to_shop(self):
         self.snake.auto_state = False
-        # xóa những phần tử cũ đi
-        self.obstacle_group.empty()
-        self.trap_group.empty()
-        self.pot_group.empty()
-        self.bomb_group.empty()
-        self.item_group.empty()
 
         self.region_generator = RegionGenerator(0, 0, 0, 0)
 
@@ -274,10 +275,12 @@ class Level(State):
     def next_level(self, config: LevelConfig):
         self._config = config
         # xóa những phần tử cũ đi
+        self.chest_group.empty()
         self.obstacle_group.empty()
         self.trap_group.empty()
         self.pot_group.empty()
         self.bomb_group.empty()
+        self.fire_bomb_group.empty()
         self.item_group.empty()
 
         # xoa shop
@@ -312,25 +315,6 @@ class Level(State):
         if input_keys == SECRET_IMPUTS:
             print("test")
             input_keys.clear()
-
-    # def draw_grid(self, surface: pygame.Surface):
-    #     surface.fill("black")
-    #     pygame.draw.rect(
-    #         surface,
-    #         (51, 54, 71),
-    #         (
-    #             constant.MAP_LEFT,
-    #             constant.MAP_TOP,
-    #             constant.MAP_WIDTH,
-    #             constant.MAP_HEIGHT,
-    #         ),
-    #     )
-    #     for x in range(constant.MAP_LEFT, constant.MAP_RIGHT + 1, constant.TILE_SIZE):
-    #         pygame.draw.line(surface, (100, 100, 100),
-    #                          (x, constant.MAP_TOP), (x, constant.MAP_BOTTOM))
-    #     for y in range(constant.MAP_TOP, constant.MAP_BOTTOM + 1, constant.TILE_SIZE):
-    #         pygame.draw.line(surface, (100, 100, 100),
-    #                          (constant.MAP_LEFT, y), (constant.MAP_RIGHT, y))
 
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
         # self.draw_grid(surface)

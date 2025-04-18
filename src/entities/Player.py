@@ -138,6 +138,7 @@ class SnakeBlock(pygame.sprite.Sprite):
         return True
 
     def update(self):
+        
         self.time += Share.clock.get_time() / 1000
         if self.is_burning:
             if self.time >= self.burning_time:  # NOTE: thời gian để thoát khỏi trạng thái đốt
@@ -152,17 +153,13 @@ class SnakeBlock(pygame.sprite.Sprite):
                 return
             snake = self.groups()[0]
             if self.transform_type == "COIN":
+                from entities.items.instant.coin import CoinEntity
                 for _ in range(random.randint(6, 8)):
-                    snake.level.item_group.add(CoinEntity(
-                        snake.level, self.rect, 2))  # type: ignore
+                    snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))  # type: ignore
             elif self.transform_type == "BOMB":
-                snake.level.bomb_group.add(
-                    # type: ignore
-                    Bomb(snake.level, self.rect.topleft, BombState.ACTIVE))
+                snake.level.bomb_group.add(Bomb(snake.level, self.rect.topleft, BombState.ACTIVE)) # type: ignore
             elif self.transform_type == "FIRE":
-                snake.level.fire_group.add(
-                    # type: ignore
-                    Fire_Tile(snake.level, self.rect.center, 2, 2, 5))
+                snake.level.fire_group.add(Fire_Tile(snake.level, self.rect.center, 2, 2, 5)) # type: ignore
             self.kill()
 
     def sever(self, type, delay):
@@ -443,8 +440,8 @@ class Snake(pygame.sprite.AbstractGroup):
     def _is_collide_with_obstacle(self, position):
         for obstacle in self.level.obstacle_group:
             obstacle: Obstacle
-            # type: ignore
-            if obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):
+            
+            if obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):# type: ignore
                 return True
         return False
 

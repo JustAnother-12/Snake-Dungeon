@@ -96,8 +96,7 @@ class InteractionManager:
             return
 
         # Draw interaction prompt
-        # prompt_text = f"Press E to pick up {closest_item.item_type.name}"
-        prompt_text = f"Press E to interact {closest_item.text}"
+        prompt_text = f"Press E to {closest_item.text}"
         text_surf = self.font.render(prompt_text, True, (255, 255, 255))
         text_rect = text_surf.get_rect(midbottom=(
             closest_item.rect.centerx,  # type: ignore

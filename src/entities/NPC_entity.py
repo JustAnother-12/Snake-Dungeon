@@ -5,7 +5,7 @@ from utils.pixil import Pixil
 
 class NPC(InteractionObject):
     def __init__(self, level, pos):
-        super().__init__(level, 'restock', 45)
+        super().__init__(level, f'restock ({5} Gold)', 45)
         self.pos = pos
         self.frame_index = 0
         self.frame_duration = 1

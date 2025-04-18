@@ -109,11 +109,15 @@ class ItemRegistry:
             kwargs_copy = kwargs.copy()
             pos = kwargs_copy.pop('pos', None)
             item = cls(level, *args, **kwargs_copy)
+            # set position nếu có truyền vào pos
             if pos is not None:
                 item.pos = pygame.Vector2(pos)
                 item.rect = item.image.get_rect(topleft=item.pos)
                 if not item.check_pos(item.image):
                     item.random_pos(None, r=2)
+            # set quantity nếu là consumables
+            if item_category is ItemCategory.CONSUMABLE:
+                item.quantity = random.randint(1, item.item_type.max_stack)
             return item
         else:
             raise AttributeError(

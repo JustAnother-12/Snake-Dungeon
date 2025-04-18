@@ -64,9 +64,10 @@ class InventoryManager:
                         press_duration = time.time() - self.time_press[index]
                         if press_duration < self.press_time:
                             if not self.slots[index] is None:
-                                self.slots[index].active = False  # type: ignore
                                 self.slots[index].use(self.snake)  # type: ignore
                         self.time_press[index] = 0
+                    if not self.slots[index] is None:
+                        self.slots[index].active = False # type: ignore
 
     # Thay đổi phương thức update để kiểm tra phím giữ
     def update(self):

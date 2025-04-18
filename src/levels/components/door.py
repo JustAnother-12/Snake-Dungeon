@@ -141,7 +141,7 @@ class Door(InteractionObject):
     import levels.level as L
 
     def __init__(self, level: "L.Level", pos, door_type: DoorType | None = None) -> None:
-        super().__init__(level, 'door', 45)
+        super().__init__(level, 'go in', 45)
         # randome the door type
         # if door type is normal, set randomw difficulty base on level
         # if door type is boss, set difficulty to boss

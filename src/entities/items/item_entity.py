@@ -14,7 +14,7 @@ class ItemEntity(InteractionObject):
     from entities.items.item_type import ItemType
     import levels.level
     def __init__(self, level: "levels.level.Level", item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
-        super().__init__(level, item_type.name, constant.TILE_SIZE * 2)
+        super().__init__(level, "pickup "+item_type.name, constant.TILE_SIZE * 2)
         self.item_type = item_type
         self.quantity = quantity
         self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.entity_frame]
