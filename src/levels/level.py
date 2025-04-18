@@ -1,20 +1,16 @@
 from enum import Enum
 import random
-from numpy import spacing
 import pygame
 
 import config.constant as constant
-from entities.items.consumable.bomb_item import BombStack
 from entities.items.consumable.fire_bomb_item import FireBombStack
 from entities.items.consumable.molotov import MolotovStack
 from entities.items.equipment.blood_bomb_devil import BloodBombDevilEntity
-from entities.items.equipment.credit_card import CreditCardStack
 from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.skill.gun_devil_contract import GunEntity
-from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.items.skill.ritual_dagger import RitualDaggerStack
 from entities.items.skill.thanos import ThanosEntity
 from levels.components.chest import Chest
@@ -35,7 +31,6 @@ from ui.screens.Instruction import Instruction
 from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
-from ui.screens.count_down import Count_down
 from utils.help import Share
 from levels.shop import Shop_level
 
@@ -229,6 +224,8 @@ class Level(State):
             # chosen random door index shope
 
             shope_index = random.randint(0, doors - 1)
+            if self._config.room_type == RoomType.SHOP:
+                shope_index = -1
             # spacing = constant.MAP_WIDTH // (doors + 1)
             spacing = 128
             print(spacing)
@@ -243,11 +240,12 @@ class Level(State):
                 self.add(door)
 
             self.level_status = LevelStatus.ROOM_COMPLETED
-            print(self.region_generator.chests_initpos)
-            # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
-            for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
-                self.chest_group.add(
-                    Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
+            if self._config.room_type != RoomType.SHOP:
+                print(self.region_generator.chests_initpos)
+                # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
+                for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
+                    self.chest_group.add(
+                        Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
             # self.snake.auto_state = False
 
         # self.check_for_secret_input()
