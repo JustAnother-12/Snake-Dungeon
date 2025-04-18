@@ -6,6 +6,7 @@ from ui.elements.text import TextElement
 from entities.NPC_entity import NPC
 from config import constant
 from loot import LootPool
+from utils.help import Share
 
 
 class Shop_level:
@@ -33,8 +34,6 @@ class Shop_level:
             [((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(i*3))*constant.TILE_SIZE,
               (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(3)]
         ]
-
-        self.reStockPrice = 20
 
     def init_Stock(self):
         '''
@@ -137,6 +136,7 @@ class Shop_level:
         self.equipAndSkillItems.clear()
 
     def display_Stock(self):
+        Share.audio.play_music('shop', -1, 5000)
         self.level.add(self.npc)
         self.level.add(*self.instantItems)
         self.level.add(*self.consumableItems)

@@ -10,6 +10,7 @@ from entities.items.instant.key import KeyEntity
 from levels.components.trap import TrapState
 from loot import LootItem, LootPool
 from levels.components.bomb import Bomb, BombState
+from utils import pixil
 
 
 class Monster(Snake):
@@ -17,7 +18,6 @@ class Monster(Snake):
         # Câu hình màu sắc và hình ảnh cho đầu rắn
         self.pos = pos if pos else random.choice([(constant.MAP_LEFT, constant.MAP_TOP), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_BOTTOM -
                                                  constant.TILE_SIZE), (constant.MAP_LEFT, constant.MAP_BOTTOM - constant.TILE_SIZE), (constant.MAP_RIGHT - constant.TILE_SIZE, constant.MAP_TOP)])
-        # self.color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.color = self.color if hasattr(self, "color") else pygame.Color(0, 255, 0)
         self.headImg = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE))
         self.headImg.fill(self.color)
@@ -185,11 +185,9 @@ class Monster(Snake):
 
 class BombMonster(Monster):
     def __init__(self, level, init_len, pos=None):
-        self.color = pygame.Color(255, 0, 0)
+        self.color = pygame.Color(79,79,79)
         super().__init__(level, init_len, pos)
-        self.headImg.fill(self.color)
-        pygame.draw.rect(self.headImg, (255, 255, 255), (3, 3, 2, 4))
-        pygame.draw.rect(self.headImg, (255, 255, 255), (11, 3, 2, 4))
+        self.headImg = pixil.Pixil.load(constant.Texture.bomb_snake_head, 1).frames[0]
 
     def handle_ai_movement(self):
         if not self.player is None and self.player.is_dead == False:

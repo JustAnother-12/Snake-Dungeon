@@ -103,7 +103,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                         int(self.target_pos.y != self.pos.y),
                     ), pygame.SRCALPHA
                 )
-                self.image.fill(to_dark_color(self.color, 10 * (3 - self.health)))
+                self.image.fill(to_dark_color(self.color, 30 * (3 - self.health)))
             self.rect.topleft = (
                 int(self.pos.x),
                 int(self.pos.y),
@@ -120,7 +120,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                     int(self.target_pos.y != self.pos.y),
                 ), pygame.SRCALPHA
             )
-            self.image.fill(to_dark_color(self.color, 10 * (3 - self.health)))
+            self.image.fill(to_dark_color(self.color, 30 * (3 - self.health)))
             if self.target_pos.x > self.pos.x or self.target_pos.y > self.pos.y:
                 self.rect = self.image.get_rect(
                     bottomright=(
@@ -144,6 +144,7 @@ class SnakeBlock(pygame.sprite.Sprite):
             if self.time >= self.burning_time:  # NOTE: thời gian để thoát khỏi trạng thái đốt
                 self.is_burning = False
                 self.time = 0
+                self.health = 3
                 
         if self.is_severed:
             self.time_severed -= Share.clock.get_time() / 1000

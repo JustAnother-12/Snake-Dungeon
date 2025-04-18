@@ -9,9 +9,12 @@ DEATH_DELAY = 0.7
 LEFT_RIGHT_BORDER_TILES = 9
 TOP_BOTTOM_BORDER_TILES = 5
 WALL_TILES = 4
-COIN_VALUE = 10
 MIN_LEN = 3
 FLOOR_TILE_SIZE = 32
+
+COIN_VALUE = 10
+
+ITEM_SALE = 100
 
 MAP_WIDTH = (
     SCREEN_WIDTH_TILES -
@@ -36,6 +39,7 @@ PIXEL_FONT = "game-assets/font/default-pixilart-text.ttf"
 class Texture:
     button = "game-assets/graphics/pixil/BTN_SPRITE_SHEET.pixil"
     snake_head= "game-assets/graphics/pixil/SNAKE_HEAD.pixil"
+    bomb_snake_head = "game-assets/graphics/pixil/BOMB_SNAKE_HEAD.pixil"
     pasue_menu_bg = "game-assets/graphics/pixil/PAUSED_MENU_BG.pixil"
     apple = "game-assets/graphics/pixil/apple.pixil"
     bomb = 'game-assets/graphics/pixil/item-sprite/BOMB_ITEM.pixil'
