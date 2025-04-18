@@ -144,18 +144,6 @@ class WaveManager:
             self.level.snake_group.add(bomb)
             return bomb
             
-        elif entity_type == "trap":
-            x = random.randint(
-                constant.MAP_LEFT + constant.TILE_SIZE*2,
-                constant.MAP_RIGHT - constant.TILE_SIZE*2
-            )
-            y = random.randint(
-                constant.MAP_TOP + constant.TILE_SIZE*2,
-                constant.MAP_BOTTOM - constant.TILE_SIZE*2
-            )
-            trap = Trap(self.level, (x, y))
-            self.level.trap_group.add(trap)
-            return trap
             
         return None
     

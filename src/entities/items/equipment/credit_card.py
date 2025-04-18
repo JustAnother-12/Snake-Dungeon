@@ -22,14 +22,12 @@ class CreditCardStack(ItemStack):
     def apply_effect(self, snake):
         self.add_runtime_overriding(snake, 'update', 'before', self.discount)
 
-    def discount(self, snake,*args, **kwargs):
-        for itemEntity in snake.level.item_group.sprites():
-            itemEntity.item_type.sale = 70
+    def discount(self,snake,*args, **kwargs):
+        pass
         return args, kwargs
     
     def remove_effect(self, snake):
-        for itemEntity in snake.level.item_group.sprites():
-            itemEntity.item_type.sale = 100
+        pass
         self.remove_runtime_overriding(snake, 'update', 'before', self.discount)
         
     def get_item_entity_class(self):
