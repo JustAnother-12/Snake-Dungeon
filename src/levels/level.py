@@ -92,9 +92,9 @@ class Level(State):
                 "monster": 1
             }),
             loot_pool=LootPoolConfig(
-                chest=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5)),
-                pot=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5)),
-                enemy=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5))
+                chest=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5)),
+                pot=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5)),
+                enemy=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5))
             )
         )
 
@@ -137,8 +137,7 @@ class Level(State):
             entities_config = {
                 "monster": 0,
                 "bomb": 0,
-                "trap": 0,
-                "obstacle": 0,
+                "blocker": 0,
             }
 
             enemy_count = random.randint(0, wave_config.max_wave_entities)

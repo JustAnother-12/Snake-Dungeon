@@ -1,8 +1,9 @@
 import random
 import config.constant as constant
 from entities.items.instant.coin import CoinEntity
+from entities.items.instant.key import KeyEntity
 from entities.items.item_registry import ItemRegistry
-from loot import LootPool
+from loot import LootItem, LootPool
 from ui.elements.text import TextElement
 import utils.pixil as pixil
 from time import time
@@ -87,12 +88,15 @@ class Chest(pygame.sprite.Sprite):
     def OpenChest(self):
         self.isClosed = False
         item, rarity = LootPool(
-            (0, 0, 0, 35, 25, 25, 15), (0, 6, 4)).get_item()
+            (0, 0, 0, 20, 28, 20, 20, 12), (0, 6, 4)).get_item()
         coin_count = random.randint(10, 15)
         for _ in range(coin_count):
             self._level.item_group.add(CoinEntity(self._level, self.rect))
-        self._level.item_group.add(
-            ItemRegistry.create_item(item, rarity, self._level, self.rect))
+        if item == LootItem.KEY:
+            self._level.item_group.add(KeyEntity(self.level, self.rect))
+        else:
+            self._level.item_group.add(
+                ItemRegistry.create_item(item, rarity, self._level, self.rect))
         self.collision_time = time()
 
     def on_collision(self):

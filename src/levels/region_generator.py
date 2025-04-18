@@ -119,15 +119,3 @@ class RegionGenerator:
             if self.is_area_free(x,y,2):
                 self.chests_initpos.append(((x + constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE, (y + constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE))
                 self.mark_area(x,y,2)
-                
-
-
-            
-
-
-
-
-
-
-
-    

@@ -2,6 +2,7 @@ import random
 import config.constant as constant
 from entities.items.instant.coin import CoinEntity
 from entities.items.instant.food import FoodEntity
+from entities.items.instant.key import KeyEntity
 from entities.items.item_registry import ItemRegistry
 from entities.items.item_type import ItemCategory, Rarity
 from utils.help import Share
@@ -41,11 +42,13 @@ class Pot(pygame.sprite.Sprite):
     
     def open(self):
         self.isClosed = False
-        item, rarity = LootPool((300, 350, 245, 105, 0, 0, 0)).get_item()
+        item, rarity = LootPool((60, 63, 42, 14, 21, 0, 0, 0)).get_item()
         if item == LootItem.COIN:
             self.level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
         elif item == LootItem.FOOD:
             self.level.item_group.add(FoodEntity(self.level, self.rect, 1))
+        elif item == LootItem.KEY:
+            self.level.item_group.add(KeyEntity(self.level, self.rect, 1))
         elif item == LootItem.EMPTY:
             print("Empty pot")
         else:

@@ -1,3 +1,4 @@
+from re import L
 from typing import Tuple
 from enum import Enum
 import random
@@ -10,23 +11,25 @@ class LootItem(Enum):
     EMPTY = 1
     COIN = 2
     FOOD = 3
-    INSTANT = 4
-    CONSUMABLE = 5
-    EQUIPMENT = 6
-    SKILL = 7
+    KEY = 4
+    INSTANT = 5
+    CONSUMABLE = 6
+    EQUIPMENT = 7
+    SKILL = 8
 
 
 class LootPool:
-    def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (45, 35, 20)):
+    def __init__(self, item_rate: Tuple[int, int, int, int, int, int, int, int] = (0, 0, 0, 0, 0, 0, 0, 0), rarity_rate: Tuple[int, int, int] = (45, 35, 20)):
         """Khởi tạo LootPool với tỉ lệ xuất hiện của các vật phẩm
         - item_rate: tuple chứa tỉ lệ xuất hiện của các vật phẩm trong loot pool
             + item_rate[0]: EMPTY
             + item_rate[1]: COIN
             + item_rate[2]: FOOD
-            + item_rate[3]: ITEM_INSTANT
-            + item_rate[4]: CONSUMABLE
-            + item_rate[5]: EQUIPMENT
-            + item_rate[6]: SKILL
+            + item_rate[3]: KEY
+            + item_rate[4]: ITEM_INSTANT
+            + item_rate[5]: CONSUMABLE
+            + item_rate[6]: EQUIPMENT
+            + item_rate[7]: SKILL
         - rarity_rate: tuple chứa tỉ lệ của các độ hiếm
             + rarity_rate[0]: COMMON
             + rarity_rate[1]: UNCOMMON
@@ -36,6 +39,7 @@ class LootPool:
             LootItem.EMPTY: item_rate[0],
             LootItem.COIN: item_rate[1],
             LootItem.FOOD: item_rate[2],
+            LootItem.KEY: item_rate[3],
             LootItem.INSTANT: item_rate[3],
             LootItem.CONSUMABLE: item_rate[4],
             LootItem.EQUIPMENT: item_rate[5],

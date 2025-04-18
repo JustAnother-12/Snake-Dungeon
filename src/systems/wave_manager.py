@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2
 
 from config import constant
-from entities.Monster import BombMonster, Monster
+from entities.Monster import BlockerMonster, BombMonster, Monster
 from levels.components.bomb import Bomb, BombState
 from levels.components.trap import Trap
 from utils.help import Share
@@ -137,25 +137,26 @@ class WaveManager:
             monster.set_player_reference(self.level.snake)
             self.level.snake_group.add(monster)
             return monster
-            
+        elif entity_type == "blocker":
+            x = random.randint(
+                (constant.MAP_LEFT + constant.TILE_SIZE*2)//constant.TILE_SIZE,
+                (constant.MAP_RIGHT - constant.TILE_SIZE*2)//constant.TILE_SIZE
+            )
+            y = random.randint(
+                (constant.MAP_TOP + constant.TILE_SIZE*2)//constant.TILE_SIZE,
+                (constant.MAP_BOTTOM - constant.TILE_SIZE*2)//constant.TILE_SIZE
+            )
+            print(x,y)
+            blocker = BlockerMonster(self.level, random.randint(5, 8), (x*constant.TILE_SIZE,y*constant.TILE_SIZE))
+            blocker.set_player_reference(self.level.snake)
+            self.level.snake_group.add(blocker)
+            return blocker
+        
         elif entity_type == "bomb":
             bomb = BombMonster(self.level, 4)
             bomb.set_player_reference(self.level.snake)
             self.level.snake_group.add(bomb)
             return bomb
-            
-        elif entity_type == "trap":
-            x = random.randint(
-                constant.MAP_LEFT + constant.TILE_SIZE*2,
-                constant.MAP_RIGHT - constant.TILE_SIZE*2
-            )
-            y = random.randint(
-                constant.MAP_TOP + constant.TILE_SIZE*2,
-                constant.MAP_BOTTOM - constant.TILE_SIZE*2
-            )
-            trap = Trap(self.level, (x, y))
-            self.level.trap_group.add(trap)
-            return trap
             
         return None
     
@@ -182,24 +183,3 @@ class WaveManager:
         """Check if all waves are completed"""
         return (self.current_wave_index >= len(self.waves) and 
                 all(wave.state == WaveState.COMPLETED for wave in self.waves))
-    
-    def generate_waves(self, difficulty=1.0):
-        """Generate waves based on difficulty level"""
-        self.waves = []
-        
-        # Simple template-based generation
-        if difficulty <= 1.0:  # Easy
-            self.add_wave(Wave({"monster": 1}, delay=2.0))
-            
-        elif difficulty <= 2.0:  # Medium
-            self.add_wave(Wave({"monster": 3}, delay=1.5))
-            self.add_wave(Wave({"monster": 2, "bomb": 2}, delay=3.0))
-            self.add_wave(Wave({"monster": 4, "trap": 1}, delay=3.0))
-            
-        else:  # Hard
-            self.add_wave(Wave({"monster": 4}, delay=1.0))
-            self.add_wave(Wave({"monster": 3, "bomb": 3}, delay=2.5))
-            self.add_wave(Wave({"monster": 3, "trap": 2}, delay=2.0))
-            self.add_wave(Wave({"monster": 5, "bomb": 2, "trap": 1}, delay=2.0))
-        
-        return self

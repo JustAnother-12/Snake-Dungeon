@@ -27,9 +27,9 @@ shope_template = LevelConfig(
         }
     ),
     loot_pool=LootPoolConfig(
-        chest=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
-        pot=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
-        enemy=LootPool((0, 0, 0, 0, 0, 0, 0), (0, 0, 0))
+        chest=LootPool((0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
+        pot=LootPool((0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0)),
+        enemy=LootPool((0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0))
     ),
     room_type=RoomType.SHOP
 )
@@ -55,9 +55,9 @@ template = {
             }
         ),
         loot_pool=LootPoolConfig(
-            chest=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5)),
-            pot=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5)),
-            enemy=LootPool((10, 45, 30, 15, 0, 0, 0), (70, 25, 5))
+            chest=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5)),
+            pot=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5)),
+            enemy=LootPool((60, 63, 42,14, 12, 0, 0, 0), (70, 25, 5))
         )
     ),
 
@@ -80,9 +80,9 @@ template = {
             }
         ),
         loot_pool=LootPoolConfig(
-            chest=LootPool((5, 30, 25, 15, 15, 10, 0), (50, 35, 15)),
-            pot=LootPool((5, 30, 25, 15, 15, 10, 0), (50, 35, 15)),
-            enemy=LootPool((5, 30, 25, 15, 15, 10, 0), (50, 35, 15))
+            chest=LootPool((5, 30, 20, 10, 15, 10, 10, 0), (50, 35, 15)),
+            pot=LootPool((5, 30, 20, 10, 15, 10, 10, 0), (50, 35, 15)),
+            enemy=LootPool((5, 30, 20, 10, 15, 10, 10, 0), (50, 35, 15))
         )
     ),
 
@@ -105,9 +105,9 @@ template = {
             }
         ),
         loot_pool=LootPoolConfig(
-            chest=LootPool((0, 15, 10, 15, 25, 25, 10), (30, 40, 30)),
-            pot=LootPool((0, 15, 10, 15, 25, 25, 10), (30, 40, 30)),
-            enemy=LootPool((0, 15, 10, 15, 25, 25, 10), (30, 40, 30))
+            chest=LootPool((0, 15, 10, 10, 10, 20, 25, 10), (30, 40, 30)),
+            pot=LootPool((0, 15, 10, 10, 10, 20, 25, 10), (30, 40, 30)),
+            enemy=LootPool((0, 15, 10, 10, 10, 20, 25, 10), (30, 40, 30))
         )
     ),
 
@@ -128,9 +128,9 @@ template = {
             }
         ),
         loot_pool=LootPoolConfig(
-            chest=LootPool((0, 0, 10, 20, 30, 30, 10), (10, 40, 50)),
-            pot=LootPool((0, 0, 10, 20, 30, 30, 10), (10, 40, 50)),
-            enemy=LootPool((0, 0, 10, 20, 30, 30, 10), (10, 40, 50))
+            chest=LootPool((0, 0, 10, 5, 15, 30, 30, 10), (10, 40, 50)),
+            pot=LootPool((0, 0, 10, 5, 15, 30, 30, 10), (10, 40, 50)),
+            enemy=LootPool((0, 0, 10, 5, 15, 30, 30, 10), (10, 40, 50))
         ),
         room_type=RoomType.BOSS
     )

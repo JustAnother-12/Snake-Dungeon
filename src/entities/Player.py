@@ -8,7 +8,7 @@ from levels.components.bomb import Bomb, BombState
 from levels.components.fire_tile import Fire_Tile
 from levels.components.trap import TrapState
 from ui.screens.game_over import GameOver_menu
-from utils.help import Share
+from utils.help import Share, to_dark_color
 import config.constant as constant
 from levels.components.obstacle import Obstacle
 from levels.components.wall import Wall
@@ -103,7 +103,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                         int(self.target_pos.y != self.pos.y),
                     ), pygame.SRCALPHA
                 )
-                self.image.fill(self.color)
+                self.image.fill(to_dark_color(self.color, 10 * (3 - self.health)))
             self.rect.topleft = (
                 int(self.pos.x),
                 int(self.pos.y),
@@ -120,7 +120,7 @@ class SnakeBlock(pygame.sprite.Sprite):
                     int(self.target_pos.y != self.pos.y),
                 ), pygame.SRCALPHA
             )
-            self.image.fill(self.color)
+            self.image.fill(to_dark_color(self.color, 10 * (3 - self.health)))
             if self.target_pos.x > self.pos.x or self.target_pos.y > self.pos.y:
                 self.rect = self.image.get_rect(
                     bottomright=(

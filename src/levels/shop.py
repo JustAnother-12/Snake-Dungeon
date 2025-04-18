@@ -14,9 +14,9 @@ class Shop_level:
         self.npc = NPC(self.level, (constant.SCREEN_WIDTH_TILES//2 *
                        constant.TILE_SIZE, constant.SCREEN_HEIGHT_TILES//2*constant.TILE_SIZE))
 
-        self.InstantPool = LootPool((0, 0, 0, 100, 0, 0, 0))
-        self.ConsumablePool = LootPool((0, 0, 0, 0, 100, 0, 0))
-        self.EquipmentAndSkillPool = LootPool((0, 0, 0, 0, 0, 60, 40))
+        self.InstantPool = LootPool((0, 0, 0, 0, 100, 0, 0, 0))
+        self.ConsumablePool = LootPool((0, 0, 0, 0, 0,  100, 0, 0))
+        self.EquipmentAndSkillPool = LootPool((0, 0, 0, 0, 0, 0, 60, 40))
 
         self.instantItems: List[pygame.sprite.Group] = []
         self.consumableItems: List[pygame.sprite.Group] = []
