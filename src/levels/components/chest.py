@@ -1,21 +1,22 @@
 import random
-from config.constant import TILE_SIZE
 import config.constant as constant
 from entities.items.instant.coin import CoinEntity
-from entities.items.instant.food import FoodEntity
 from entities.items.item_registry import ItemRegistry
-from loot import LootItem, LootPool
+from loot import LootPool
 from ui.elements.text import TextElement
 import utils.pixil as pixil
 from time import time
 import pygame
 
+
 class Chest(pygame.sprite.Sprite):
     from levels import level
-    def __init__(self, _level: "level.Level", pos, isLocked = None) -> None:
+
+    def __init__(self, _level: "level.Level", pos, isLocked=None) -> None:
         super().__init__()
         self._level = _level
-        self.isLocked = isLocked if isLocked != None else random.choice([True, False])
+        self.isLocked = isLocked if isLocked != None else random.choice([
+                                                                        True, False])
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
         ).frames[int(self.isLocked)]
@@ -24,7 +25,8 @@ class Chest(pygame.sprite.Sprite):
         self.isClosed = True
         self.collision_time = None
         self.alpha = 255
-        self.LockedText = TextElement("LOCKED!", "White", 8, int(self.pos[0])+8, int(self.pos[1]), "midleft")
+        self.LockedText = TextElement("LOCKED!", "White", 8, int(
+            self.pos[0])+8, int(self.pos[1]), "midleft")
         self.TextTime = None
 
     # def random_pos(self):
@@ -62,11 +64,12 @@ class Chest(pygame.sprite.Sprite):
                 "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
             ).frames[2]
         if not self.collision_time == None:
-            if(time() - self.collision_time > 2):
+            if (time() - self.collision_time > 2):
                 if not self.image == None:
-                    self.alpha = max(0,self.alpha-5)
+                    self.alpha = max(0, self.alpha-5)
                     self.image = self.image.copy()
-                    self.image.fill((255, 255, 255, self.alpha), special_flags=pygame.BLEND_RGBA_MULT)
+                    self.image.fill((255, 255, 255, self.alpha),
+                                    special_flags=pygame.BLEND_RGBA_MULT)
                     if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
                         self.kill()
                     # self.FadeOut(self.image)
@@ -78,17 +81,18 @@ class Chest(pygame.sprite.Sprite):
     #     if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
     #         self.kill()
 
-
     def __is_collision_with_snake(self):
         return self.rect and not self._level.snake.is_dead and self.rect.colliderect(self._level.snake.blocks[0].rect)
-    
+
     def OpenChest(self):
         self.isClosed = False
-        item, rarity = LootPool((0, 0, 0, 35, 25, 25, 15), (0, 6, 4)).get_item()
+        item, rarity = LootPool(
+            (0, 0, 0, 35, 25, 25, 15), (0, 6, 4)).get_item()
         coin_count = random.randint(10, 15)
         for _ in range(coin_count):
-            self._level.item_group.add(CoinEntity(self._level, self.rect)) 
-        ItemRegistry.create_item(item, rarity, self._level, self.rect)
+            self._level.item_group.add(CoinEntity(self._level, self.rect))
+        self._level.item_group.add(
+            ItemRegistry.create_item(item, rarity, self._level, self.rect))
         self.collision_time = time()
 
     def on_collision(self):

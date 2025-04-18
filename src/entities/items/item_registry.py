@@ -1,7 +1,7 @@
 import pygame
-from config.constant import TILE_SIZE
-from ui.elements.text import TextElement
+from entities.items.item_entity import ItemEntity
 from entities.items.item_type import ItemCategory, Rarity
+
 
 class ItemRegistry:
 
@@ -75,7 +75,7 @@ class ItemRegistry:
     }
 
     @staticmethod
-    def create_item(item_category, rarity: Rarity, level, *args, **kwargs):
+    def create_item(item_category, rarity: Rarity, level, *args, **kwargs) -> ItemEntity:
         '''
         Tạo item từ item_category và rarity
         - item_category: loại item (ItemCategory | LootItem)
@@ -87,38 +87,38 @@ class ItemRegistry:
             category_name = item_category.name
             if hasattr(ItemCategory, category_name):
                 item_category = getattr(ItemCategory, category_name)
-            else: 
-                return None
-            
-        list_item = list(ItemRegistry.item_registry[item_category][rarity].items())
+            else:
+                raise ValueError(
+                    f"Invalid item category: {category_name}")
+
+        list_item = list(
+            ItemRegistry.item_registry[item_category][rarity].items())
         if len(list_item) == 0:
-            return None
+            raise ValueError(
+                f"No items found for category {item_category} and rarity {rarity}")
         file_name, class_name = random.choice(list_item)
         if file_name == None or class_name == None:
-            return None
-        try: 
-            import importlib
-            module = importlib.import_module(f"entities.items.{item_category.value}.{file_name}")
-            if hasattr(module, class_name):
-                cls = getattr(module, class_name)
-                try:
-                    kwargs_copy = kwargs.copy()
-                    pos = kwargs_copy.pop('pos', None) 
-                    item = cls(level, *args, **kwargs_copy)
-                    if pos is not None:
-                        item.pos = pygame.Vector2(pos)
-                        item.rect = item.image.get_rect(topleft=item.pos)
-                        price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))), 'yellow', 10, pos[0] + TILE_SIZE, pos[1] + 3*TILE_SIZE, 'center')
-                        level.add(price_text)
+            raise ValueError(
+                f"Invalid item name or class name: {file_name}, {class_name}")
 
-                        if not item.check_pos(item.image):
-                            item.random_pos(None, r=2)
-                    level.item_group.add(item)
-                except Exception as e:
-                    print(f"Error creating item: {e}")
-                    return None
-            else:
-                return None
-        except ImportError as e:
-            print(f"Error importing item: {e}")
-            return None
+        import importlib
+        module = importlib.import_module(
+            f"entities.items.{item_category.value}.{file_name}")
+        if hasattr(module, class_name):
+            cls = getattr(module, class_name)
+            kwargs_copy = kwargs.copy()
+            pos = kwargs_copy.pop('pos', None)
+            item = cls(level, *args, **kwargs_copy)
+            # set position nếu có truyền vào pos
+            if pos is not None:
+                item.pos = pygame.Vector2(pos)
+                item.rect = item.image.get_rect(topleft=item.pos)
+                if not item.check_pos(item.image):
+                    item.random_pos(None, r=2)
+            # set quantity nếu là consumables
+            if item_category is ItemCategory.CONSUMABLE:
+                item.quantity = random.randint(1, item.item_type.max_stack)
+            return item
+        else:
+            raise AttributeError(
+                f"Class {class_name} not found in module {file_name}")

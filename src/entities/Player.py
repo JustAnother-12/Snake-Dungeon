@@ -16,10 +16,12 @@ from stats import StatType, Stats
 from utils.pixil import Pixil
 from ui.screens.Stats_Menu import base_stats_value
 
+
 class SnakeBlock(pygame.sprite.Sprite):
     def __init__(self, layer, pos: tuple[int, int], color: pygame.Color) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((constant.TILE_SIZE, constant.TILE_SIZE), pygame.SRCALPHA)
+        self.image = pygame.Surface(
+            (constant.TILE_SIZE, constant.TILE_SIZE), pygame.SRCALPHA)
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.color = color
         self.image.fill(self.color)
@@ -45,13 +47,13 @@ class SnakeBlock(pygame.sprite.Sprite):
     @property
     def is_head(self):
         return self.__is_head
-    
+
     def take_fire_damage(self, damage):
-        if self.time >= self.take_damage_delay: # NOTE: nhận sát thương khi hết delay
+        if self.time >= self.take_damage_delay:  # NOTE: nhận sát thương khi hết delay
             self.time = 0
             self.is_burning = True
             self.health -= damage
-            
+
     @is_head.setter
     def is_head(self, value):
         self.__is_head = value
@@ -94,8 +96,11 @@ class SnakeBlock(pygame.sprite.Sprite):
             if not self.is_head:
                 self.image = pygame.surface.Surface(
                     (
-                        constant.TILE_SIZE + int(self.target_pos.x != self.pos.x), #NOTE: pos bị lệch khoảng nhỏ nên cần thêm 1
-                        constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
+                        # NOTE: pos bị lệch khoảng nhỏ nên cần thêm 1
+                        constant.TILE_SIZE +
+                        int(self.target_pos.x != self.pos.x),
+                        constant.TILE_SIZE +
+                        int(self.target_pos.y != self.pos.y),
                     ), pygame.SRCALPHA
                 )
                 self.image.fill(self.color)
@@ -109,8 +114,10 @@ class SnakeBlock(pygame.sprite.Sprite):
             d_y = abs(self.target_pos.y - self.pos.y)
             self.image = pygame.surface.Surface(
                 (
-                    d_x + constant.TILE_SIZE + int(self.target_pos.x != self.pos.x),
-                    d_y + constant.TILE_SIZE + int(self.target_pos.y != self.pos.y),
+                    d_x + constant.TILE_SIZE +
+                    int(self.target_pos.x != self.pos.x),
+                    d_y + constant.TILE_SIZE +
+                    int(self.target_pos.y != self.pos.y),
                 ), pygame.SRCALPHA
             )
             self.image.fill(self.color)
@@ -129,34 +136,37 @@ class SnakeBlock(pygame.sprite.Sprite):
                     )
                 )
         return True
-    
+
     def update(self):
+        
         self.time += Share.clock.get_time() / 1000
         if self.is_burning:
-            if self.time >= self.burning_time: # NOTE: thời gian để thoát khỏi trạng thái đốt
+            if self.time >= self.burning_time:  # NOTE: thời gian để thoát khỏi trạng thái đốt
                 self.is_burning = False
                 self.time = 0
                 
         if self.is_severed:
             self.time_severed -= Share.clock.get_time() / 1000
             if self.time_severed >= 0:
-                if self.time_severed <=0.2:
-                    self.image.fill((255,255,255))  # type: ignore
+                if self.time_severed <= 0.2:
+                    self.image.fill((255, 255, 255))  # type: ignore
                 return
             snake = self.groups()[0]
             if self.transform_type == "COIN":
+                from entities.items.instant.coin import CoinEntity
                 for _ in range(random.randint(6, 8)):
-                    snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2)) # type: ignore
+                    snake.level.item_group.add(CoinEntity(snake.level, self.rect, 2))  # type: ignore
             elif self.transform_type == "BOMB":
                 snake.level.bomb_group.add(Bomb(snake.level, self.rect.topleft, BombState.ACTIVE)) # type: ignore
             elif self.transform_type == "FIRE":
-                snake.level.fire_group.add(Fire_Tile(snake.level, self.rect.center,2,2,5)) # type: ignore
+                snake.level.fire_group.add(Fire_Tile(snake.level, self.rect.center, 2, 2, 5)) # type: ignore
             self.kill()
-    
+
     def sever(self, type, delay):
         self.is_severed = True
         self.time_severed = delay
         self.transform_type = type
+
 
 class Snake(pygame.sprite.AbstractGroup):
     def __init__(self, level, init_len):
@@ -167,13 +177,14 @@ class Snake(pygame.sprite.AbstractGroup):
 
         # Visual appearance
         self.color = getattr(self, "color", pygame.Color(255, 139, 38))
-        self.headImg = getattr(self, "headImg", Pixil.load(constant.Texture.snake_head, 1).frames[0])
-        
+        self.headImg = getattr(self, "headImg", Pixil.load(
+            constant.Texture.snake_head, 1).frames[0])
+
         # Item and skill management
         from systems.inventory_manager import InventoryManager
         self.inventory = InventoryManager(self)
         from levels.level import Level
-        self.level : Level= level
+        self.level: Level = level
 
         # Snake state
         self.is_dead = False
@@ -204,8 +215,8 @@ class Snake(pygame.sprite.AbstractGroup):
         # Initialize the snake blocks
         self._init_snake_blocks(init_len)
 
-
     # NOTE: Intercept method calls to apply runtime overrides
+
     def __getattribute__(self, name: str) -> Any:
         try:
             # Use object.__getattribute__ to avoid infinite recursion
@@ -250,7 +261,7 @@ class Snake(pygame.sprite.AbstractGroup):
         for i in range(init_len):
             x = (constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE
             y = constant.MAP_BOTTOM - constant.TILE_SIZE
-            block = SnakeBlock(int(i==0) ,(x, y), self.color)
+            block = SnakeBlock(int(i == 0), (x, y), self.color)
             self.blocks.append(block)
 
         self.blocks[0].is_head = True
@@ -277,12 +288,12 @@ class Snake(pygame.sprite.AbstractGroup):
             pygame.K_s: Vector2(0, 1),
             pygame.K_w: Vector2(0, -1),
         }
-        
+
         for key, direction in key_map.items():
             if (
                 keys[key]
                 and self._last_direction != -direction
-            ):  
+            ):
                 self.direction = direction
                 is_pressed = True
 
@@ -290,7 +301,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self.is_speed_boost = True
         else:
             self.is_speed_boost = False
-        
+
         return is_pressed
 
     def handle_movement(self):
@@ -298,13 +309,14 @@ class Snake(pygame.sprite.AbstractGroup):
             if snake_block.moving:
                 return
 
-        if self.is_dead: return
+        if self.is_dead:
+            return
         head_pos = self._block_positions[0]
         new_head_pos = head_pos + self.direction * constant.TILE_SIZE
 
         self._block_positions.insert(0, new_head_pos)
 
-        if self._is_collide(self._block_positions[0]) :
+        if self._is_collide(self._block_positions[0]):
             self._block_positions.pop(0)
             if not self._will_go_out_of_bounds:
                 # print("Snake died after", self.base_stats.resistance, "out of bounds!")
@@ -323,7 +335,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self._collide_with_bomb()
 
     def handle_go_out_of_bounds(self, dt):
-        if self._will_go_out_of_bounds:
+        if self._will_go_out_of_bounds and self.auto_state:
             if self._out_of_bounds_time != None:
                 if self._out_of_bounds_time / 1000 > self.base_stats.resistance:
                     self.is_dead = True
@@ -337,7 +349,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self.time_die += Share.clock.get_time() / 1000
             for block in self.blocks:
                 block: SnakeBlock
-                block.image.fill((255, 255, 255)) # type: ignore
+                block.image.fill((255, 255, 255))  # type: ignore
             if self.time_die > 0.05:
                 self.die()
                 self.time_die = 0
@@ -364,7 +376,8 @@ class Snake(pygame.sprite.AbstractGroup):
         # print(self._block_positions, end=" " * 50 + "\r", flush=True)
         for i, block in enumerate(self.blocks):
             block.set_target(
-                self.base_stats.speed, self._block_positions[i]  # NOTE: test stats (speed)
+                # NOTE: test stats (speed)
+                self.base_stats.speed, self._block_positions[i]
             )
             if i == 0:
                 block.rotate(self.direction, self.headImg)
@@ -375,7 +388,7 @@ class Snake(pygame.sprite.AbstractGroup):
                 != self.blocks[i - 1].target_pos
                 - self.blocks[i - 1]._last_target,
             )
-        
+
         for block in self.sprites():
             block.update()
 
@@ -391,14 +404,14 @@ class Snake(pygame.sprite.AbstractGroup):
             self._block_positions.append(newBlock.pos.copy())
             for i in self.blocks[0].groups():
                 i.add(newBlock)  # type: ignore
-                
+
     def check_blocks_health(self):
         # print(len(self.sprites()), list(sprite.health for sprite in self.sprites()))
         for index, block in enumerate(self.sprites()):
             if block.health <= 0:
                 self.split(index)
 
-    def split(self, index,transform_type='', delay = 2):
+    def split(self, index, transform_type='', delay=2):
         for i, block in enumerate(self.blocks[index:]):
             # block.is_severed = True
             block.sever(transform_type, delay + 0.1 * i)
@@ -416,7 +429,8 @@ class Snake(pygame.sprite.AbstractGroup):
                 self.stamina -= constant.STAMINA_DECREASE
         else:
             if self.stamina < self.base_stats.energy_cap:
-                self.stamina = min(self.base_stats.energy_cap, self.stamina + self.base_stats.energy_regen)
+                self.stamina = min(self.base_stats.energy_cap,
+                                   self.stamina + self.base_stats.energy_regen)
 
     def _is_collide(self, position):
         if self._is_collide_with_wall(position) or self._is_collide_with_obstacle(position) or self._is_collide_with_self(position) or self._is_collide_with_orther_snake(position):
@@ -426,14 +440,17 @@ class Snake(pygame.sprite.AbstractGroup):
     def _is_collide_with_obstacle(self, position):
         for obstacle in self.level.obstacle_group:
             obstacle: Obstacle
-            if obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):  # type: ignore
+            
+            if obstacle.rect.colliderect((position[0], position[1], constant.TILE_SIZE, constant.TILE_SIZE)):# type: ignore
                 return True
         return False
 
     def _is_collide_with_self(self, position):
-        if self.is_curling: return False
+        if self.is_curling:
+            return False
         for block in self.sprites():
-            if block == self.blocks[0]: continue
+            if block == self.blocks[0]:
+                continue
             if block.rect.colliderect(
                 (
                     position[0],
@@ -442,7 +459,7 @@ class Snake(pygame.sprite.AbstractGroup):
                     constant.TILE_SIZE,
                 )
             ):
-                if block.is_edible: 
+                if block.is_edible:
                     # code ở đây tệ vl
                     block.kill()
                     self.grow_up(1)
@@ -480,7 +497,8 @@ class Snake(pygame.sprite.AbstractGroup):
         pos = None
         for i in range(len(self.blocks)):
             block = self.blocks[i]
-            bom = pygame.sprite.spritecollideany(block, self.level.bomb_group) # type: ignore
+            bom = pygame.sprite.spritecollideany(
+                block, self.level.bomb_group)  # type: ignore
             if not bom is None:
                 bom: Bomb
                 if bom.state == BombState.EXPLOSION:
@@ -488,12 +506,14 @@ class Snake(pygame.sprite.AbstractGroup):
                     pos = i if pos == None else pos
         if pos != None:
             self.split(pos)
-    
+
     def _is_collide_with_orther_snake(self, position):
-        for snake in self.level.snake_group._sub_group__: # type: ignore
+        for snake in self.level.snake_group._sub_group__:  # type: ignore
             snake: Snake
-            if snake == self: continue
-            if snake.is_dead: continue
+            if snake == self:
+                continue
+            if snake.is_dead:
+                continue
             for block in snake.sprites():
                 if block.rect.colliderect(
                     (
@@ -515,13 +535,18 @@ class Snake(pygame.sprite.AbstractGroup):
             self.direction = Vector2(0, 0)
 
     def update_stats(self):
-        self.base_stats.speed = constant.BASE_SPEED * (1 + Stats.getValue(StatType.SPEED)/100)
-        self.base_stats.resistance = constant.DEATH_DELAY * (1 + Stats.getValue(StatType.RESISTANCE)/100)
-        self.base_stats.energy_cap = 10 * constant.TILE_SIZE * (1 + Stats.getValue(StatType.ENERGY_CAPACITY)/100)
-        self.base_stats.energy_regen = constant.STAMINA_RECOVERY * (1 + Stats.getValue(StatType.ENERGY_REGEN)/100)
-        self.base_stats.food_potency =  int(1 + Stats.getValue(StatType.FOOD_POTENCY)//25)
+        self.base_stats.speed = constant.BASE_SPEED * \
+            (1 + Stats.getValue(StatType.SPEED)/100)
+        self.base_stats.resistance = constant.DEATH_DELAY * \
+            (1 + Stats.getValue(StatType.RESISTANCE)/100)
+        self.base_stats.energy_cap = 10 * constant.TILE_SIZE * \
+            (1 + Stats.getValue(StatType.ENERGY_CAPACITY)/100)
+        self.base_stats.energy_regen = constant.STAMINA_RECOVERY * \
+            (1 + Stats.getValue(StatType.ENERGY_REGEN)/100)
+        self.base_stats.food_potency = int(
+            1 + Stats.getValue(StatType.FOOD_POTENCY)//25)
         Stats.setValue(StatType.LENGTH, len(self.blocks))
-    
+
     def die(self):
         if len(self.blocks) == 0:
             self.level.game.state_stack[-1].visible = False

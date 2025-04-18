@@ -54,7 +54,7 @@ class ItemInfoPopup(State):
         self.item_name = TextElement(item_entity.item_type.name.upper(), 'white', 20, self.bg_rect.midleft[0]+12*TILE_SIZE, self.bg_rect.midleft[1]-9*TILE_SIZE, 'topleft', 400)
 
         # item's description display
-        self.description_text = TextElement(item_entity.item_type.description.upper(), 'white', 14, self.bg_rect.midleft[0]+2*TILE_SIZE, self.bg_rect.midleft[1]+TILE_SIZE,'topleft',width=42*TILE_SIZE)
+        self.description_text = TextElement(item_entity.item_type.description.upper(), 'white', 12, self.bg_rect.midleft[0]+2*TILE_SIZE, self.bg_rect.midleft[1]+TILE_SIZE,'topleft',width=42*TILE_SIZE)
         
         self.add(self.bg_sprite, 
                  self.description_text, 
@@ -152,7 +152,6 @@ class ItemInfoPopup(State):
             self.level.interaction_manager.unregister_interact(self.item_entity)
         elif self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
             self.item_entity.kill()
-            print('ok')
             self.level.interaction_manager.unregister_interact(self.item_entity)
         self.level.game.state_stack.pop()
 
@@ -179,6 +178,8 @@ class ItemInfoPopup(State):
                     if not self.check_for_slots(): # type:ignore
                         Share.audio.play_sound("sell-reroll")
                         self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+                        if self.item_entity.alive():
+                            self.item_entity.groups()[0].empty()
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())
@@ -199,6 +200,8 @@ class ItemInfoPopup(State):
                     if not self.check_for_slots():
                         Share.audio.play_sound("sell-reroll")
                         self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+                        if self.item_entity.alive():
+                            self.item_entity.groups()[0].empty()
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())

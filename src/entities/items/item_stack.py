@@ -19,7 +19,6 @@ class ItemStack:
     def use(self, snake: "P.Snake"):
         """Sử dụng item"""
         self.last_use_time = Share.clock.get_time()
-        self.active = True
         # Equipment tự đông kích hoạt hiệu ứng
         if self.item_type.category == ItemCategory.EQUIPMENT:
             return False

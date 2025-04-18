@@ -124,22 +124,22 @@ class WaveManager:
     def _create_entity(self, entity_type):
         """Create an entity based on type"""
         if entity_type == "monster":
-            monster = Monster(self.level, random.randint(5, 8))
+            x = random.randint(
+                (constant.MAP_LEFT + constant.TILE_SIZE*2)//constant.TILE_SIZE,
+                (constant.MAP_RIGHT - constant.TILE_SIZE*2)//constant.TILE_SIZE
+            )
+            y = random.randint(
+                (constant.MAP_TOP + constant.TILE_SIZE*2)//constant.TILE_SIZE,
+                (constant.MAP_BOTTOM - constant.TILE_SIZE*2)//constant.TILE_SIZE
+            )
+            print(x,y)
+            monster = Monster(self.level, random.randint(5, 8), (x*constant.TILE_SIZE,y*constant.TILE_SIZE))
             monster.set_player_reference(self.level.snake)
             self.level.snake_group.add(monster)
             return monster
             
         elif entity_type == "bomb":
-            # Random position for bomb
-            x = random.randint(
-                constant.MAP_LEFT + constant.TILE_SIZE*2,
-                constant.MAP_RIGHT - constant.TILE_SIZE*2
-            )
-            y = random.randint(
-                constant.MAP_TOP + constant.TILE_SIZE*2,
-                constant.MAP_BOTTOM - constant.TILE_SIZE*2
-            )
-            bomb = BombMonster(self.level, 4, Vector2(x, y))
+            bomb = BombMonster(self.level, 4)
             bomb.set_player_reference(self.level.snake)
             self.level.snake_group.add(bomb)
             return bomb

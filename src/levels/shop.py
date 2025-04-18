@@ -1,125 +1,143 @@
-from numpy import concat
+
+from typing import List
 import pygame
 from entities.items.item_registry import ItemRegistry
-from entities.items.item_type import ItemCategory
 from ui.elements.text import TextElement
-from utils.pixil import Pixil
 from entities.NPC_entity import NPC
 from config import constant
 from loot import LootPool
 
+
 class Shop_level:
     def __init__(self, level) -> None:
         self.level = level
-        self.npc = NPC(self.level, (constant.SCREEN_WIDTH_TILES//2*constant.TILE_SIZE, constant.SCREEN_HEIGHT_TILES//2*constant.TILE_SIZE))
+        self.npc = NPC(self.level, (constant.SCREEN_WIDTH_TILES//2 *
+                       constant.TILE_SIZE, constant.SCREEN_HEIGHT_TILES//2*constant.TILE_SIZE))
 
-        self.InstantPool = LootPool((0,0,0,100,0,0,0))
-        self.ConsumablePool = LootPool((0,0,0,0,100,0,0))
-        self.EquipmentAndSkillPool = LootPool((0,0,0,0,0,60,40))
+        self.InstantPool = LootPool((0, 0, 0, 100, 0, 0, 0))
+        self.ConsumablePool = LootPool((0, 0, 0, 0, 100, 0, 0))
+        self.EquipmentAndSkillPool = LootPool((0, 0, 0, 0, 0, 60, 40))
 
-        self.instantItems = []
-        self.consumableItems = []
-        self.equipAndSkillItems = []
-        # self.init_Stock()
-        # self.display_Stock()
+        self.instantItems: List[pygame.sprite.Group] = []
+        self.consumableItems: List[pygame.sprite.Group] = []
+        self.equipAndSkillItems: List[pygame.sprite.Group] = []
+
+        self.item_positions = [
+            # Instant items
+            [(constant.MAP_LEFT + (4+(i*3))*constant.TILE_SIZE,
+              (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(2)],
+            # Consumable items
+            [(constant.MAP_RIGHT - (9-(i*3))*constant.TILE_SIZE,
+              (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(2)],
+            # Equipment/skill items
+            [((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(i*3))*constant.TILE_SIZE,
+              (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(3)]
+        ]
 
         self.reStockPrice = 20
-        # self.reStockBtn = pygame.sprite.Sprite()
-        # self.reStockBtn.image = Pixil.load("gane-assets/graphics/pixil/item-sprite/REVERSE.pixil").frames[0]
-        # self.reStockBtn.rect = self.reStockBtn.image.get_rect(topleft = ((constant.SCREEN_WIDTH_TILES//2)*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2+4)*constant.TILE_SIZE))
 
     def init_Stock(self):
+        '''
+        Tạo 3 loại item trong shop
+        - 2 item instant
+        - 2 item consumable
+        - 3 item equipment/skill
+        '''
         # Tạo 2 item instant
-        while True:
-            if len(self.instantItems) == 2:
-                break
+
+        instantItems = []
+        consumableItems = []
+        equipAndSkillItems = []
+
+        while len(instantItems) < 2:
             instantItem = self.InstantPool.get_item()
-            if instantItem not in self.instantItems:
-                self.instantItems.append(instantItem)
+            if instantItem in instantItems:
+                continue
+
+            instantItems.append(instantItem)
+            item_shop = pygame.sprite.Group()
+            item = ItemRegistry.create_item(
+                instantItem[0], instantItem[1], self.level, pos=self.item_positions[0][len(self.instantItems)])
+            item.shop_item = True
+            item_shop.add(item)
+            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+                                     'yellow', 10, self.item_positions[0][len(self.instantItems)][0] + constant.TILE_SIZE, self.item_positions[0][len(self.instantItems)][1] + 3*constant.TILE_SIZE, 'center')
+            item_shop.add(price_text)
+            self.instantItems.append(item_shop)
 
         # tạo 2 item consumable
-        while True:
-            if len(self.consumableItems) == 2:
-                break
+        while len(consumableItems) < 2:
             consumableItem = self.ConsumablePool.get_item()
-            if consumableItem not in self.consumableItems:
-                self.consumableItems.append(consumableItem)
+            if consumableItem in consumableItems:
+                continue
+
+            consumableItems.append(consumableItem)
+            item_shop = pygame.sprite.Group()
+            item = ItemRegistry.create_item(
+                consumableItem[0], consumableItem[1], self.level, pos=self.item_positions[1][len(self.consumableItems)])
+            item.shop_item = True
+            item_shop.add(item)
+            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+                                     'yellow', 10, self.item_positions[1][len(self.consumableItems)][0] + constant.TILE_SIZE, self.item_positions[1][len(self.consumableItems)][1] + 3*constant.TILE_SIZE, 'center')
+            item_shop.add(price_text)
+            self.consumableItems.append(item_shop)
 
         # Tạo 3 item equipment/skill
-        while True:
-            if len(self.equipAndSkillItems) == 3:
-                break
+        while len(equipAndSkillItems) < 3:
             EquipAndSkillItem = self.EquipmentAndSkillPool.get_item()
-            if EquipAndSkillItem not in self.equipAndSkillItems:
-                self.equipAndSkillItems.append(EquipAndSkillItem)
+            if EquipAndSkillItem in equipAndSkillItems:
+                continue
+            equipAndSkillItems.append(EquipAndSkillItem)
+            item_shop = pygame.sprite.Group()
+            item = ItemRegistry.create_item(
+                EquipAndSkillItem[0], EquipAndSkillItem[1], self.level, pos=self.item_positions[2][len(self.equipAndSkillItems)])
+            item.shop_item = True
+            item_shop.add(item)
+            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+                                     'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
+            item_shop.add(price_text)
+            self.equipAndSkillItems.append(item_shop)
 
-        print(self.instantItems)
-        print(self.consumableItems)
-        print(self.equipAndSkillItems)
+        print(instantItems)
+        print(consumableItems)
+        print(equipAndSkillItems)
 
     def reStock(self):
-        print("shop_restock")
-        # chỉ restock Equipment và Skill
-        self.reStockPrice += 10
-        self.equipAndSkillItems = []
-        while True:
-            if len(self.equipAndSkillItems) == 3:
-                break
+        '''
+        remove equip and skill item -> reset new item euipment/skill -> display all item again
+        '''
+        self.level.remove(*self.equipAndSkillItems)
+        self.equipAndSkillItems.clear()
+
+        equipAndSkillItems = []
+        while len(self.equipAndSkillItems) < 3:
             EquipAndSkillItem = self.EquipmentAndSkillPool.get_item()
-            if EquipAndSkillItem not in self.equipAndSkillItems:
-                self.equipAndSkillItems.append(EquipAndSkillItem)
+            if EquipAndSkillItem in equipAndSkillItems:
+                continue
+            equipAndSkillItems.append(EquipAndSkillItem)
+            item_shop = pygame.sprite.Group()
+            item = ItemRegistry.create_item(
+                EquipAndSkillItem[0], EquipAndSkillItem[1], self.level, pos=self.item_positions[2][len(self.equipAndSkillItems)])
+            item.shop_item = True
+            item_shop.add(item)
+            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+                                     'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
+            item_shop.add(price_text)
+            self.equipAndSkillItems.append(item_shop)
 
-        # xóa item cũ
-        for item in self.level.item_group:
-            category = item.item_type.category
-            if(category == ItemCategory.EQUIPMENT or category == ItemCategory.SKILL):
-                item.kill()
-                for text in self.level:
-                    if isinstance(text, TextElement) and text.text == str(item.item_type.price):
-                        text.kill()
+        self.level.add(*self.equipAndSkillItems)
 
-        # cho item equipment/skill vào trong level
-        for index, equipandskill in enumerate(self.equipAndSkillItems):
-            ItemRegistry.create_item(
-                                    equipandskill[0],
-                                    equipandskill[1], 
-                                    self.level, 
-                                    pos=((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(index*3))*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE)
-                                    )   
-
-        for item in self.level.item_group:
-            item.shop_item = True 
+    def remove_Stock(self):
+        self.level.remove(self.npc)
+        self.level.remove(*self.instantItems)
+        self.level.remove(*self.consumableItems)
+        self.level.remove(*self.equipAndSkillItems)
+        self.instantItems.clear()
+        self.consumableItems.clear()
+        self.equipAndSkillItems.clear()
 
     def display_Stock(self):
         self.level.add(self.npc)
-
-        # cho item instant vào trong level
-        for index, instant in enumerate(self.instantItems):
-            ItemRegistry.create_item(
-                                    instant[0],
-                                    instant[1], 
-                                    self.level, 
-                                    pos=(constant.MAP_LEFT + (4+(index*3))*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE)
-                                    )
-            
-        # cho item consumable vào trong level 
-        for index, consumable in enumerate(self.consumableItems):
-            ItemRegistry.create_item(
-                                    consumable[0],
-                                    consumable[1], 
-                                    self.level, 
-                                    pos=(constant.MAP_RIGHT - (9-(index*3))*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE)
-                                    )    
-            
-        # cho item equipment/skill vào trong level
-        for index, equipandskill in enumerate(self.equipAndSkillItems):
-            ItemRegistry.create_item(
-                                    equipandskill[0],
-                                    equipandskill[1], 
-                                    self.level, 
-                                    pos=((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(index*3))*constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE)
-                                    )    
-            
-        for item in self.level.item_group:
-            item.shop_item = True
-
+        self.level.add(*self.instantItems)
+        self.level.add(*self.consumableItems)
+        self.level.add(*self.equipAndSkillItems)
