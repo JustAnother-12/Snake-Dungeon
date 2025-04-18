@@ -70,7 +70,7 @@ class Level(State):
         self.snake.inventory.add_item(RitualDaggerStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
-        # self.snake.inventory.add_item(CreditCardStack())
+        self.snake.inventory.add_item(CreditCardStack())
         # end todo
 
         self.hud = HUD(self)
@@ -203,6 +203,7 @@ class Level(State):
         if self.level_status == LevelStatus.CREATED:
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Instruction(self.game, self))
+            Share.audio.play_music("level", -1, 2000)
             # self.game.state_stack.append(Count_down(
             #     self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
@@ -211,6 +212,7 @@ class Level(State):
             self.check_room_cleared()
 
         if self.level_status == LevelStatus.ROOM_CLEARED:
+            # Share.audio.stop_music()
             if self._config.room_type != RoomType.SHOP:
                 self.game.state_stack.append(RoomCleared(self.game))
 

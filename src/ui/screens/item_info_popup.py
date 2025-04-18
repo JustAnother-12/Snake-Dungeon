@@ -64,13 +64,14 @@ class ItemInfoPopup(State):
                  self.category_text, 
                  )
         
+        self.take_quantity = 1
         # popup's buttons display
         if not self.item_entity.shop_item:
             self.confirm_btn = ButtonElement(self.bg_rect.bottomleft[0]+10*TILE_SIZE, self.bg_rect.bottomleft[1]-3*TILE_SIZE, "CONFIRM", "white", 14, width=160, height=50)
             self.confirm_key_text = TextElement("E",'yellow', 20, self.bg_rect.bottomleft[0]+3*TILE_SIZE, self.bg_rect.bottomleft[1]-3*TILE_SIZE)
             self.sell_btn = ButtonElement(self.bg_rect.bottomright[0]-15*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE, "SELL FOR ", "white", 14, width=160, height=50)
             self.sell_key_text = TextElement("R",'yellow', 20, self.bg_rect.bottomright[0]-22*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
-            self.sell_price = int(item_entity.item_type.price*(1-40/100))*self.item_entity.quantity
+            self.sell_price = int(item_entity.item_type.price*(1-40/100))*self.take_quantity
             self.sell_price_text = TextElement(str(self.sell_price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-9*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
             
             self.add(
@@ -83,7 +84,8 @@ class ItemInfoPopup(State):
         else:
             self.buy_btn = ButtonElement(self.bg_rect.centerx, self.bg_rect.centery + 13*TILE_SIZE, "BUY FOR", "white", 14, width=160, height=50)
             self.buy_key_text = TextElement("E",'yellow', 20, self.bg_rect.centerx-7*TILE_SIZE, self.bg_rect.centery + 13*TILE_SIZE)
-            self.price_text = TextElement(str((int)(item_entity.item_type.price*(self.item_entity.item_type.sale/100)))+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-18*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
+            self.buy_price = (int)(self.take_quantity*item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+            self.price_text = TextElement(str(self.buy_price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-18*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
             self.add(
                     self.buy_btn,
                     self.buy_key_text,
@@ -95,6 +97,11 @@ class ItemInfoPopup(State):
         if self.item_quantity>1:
             self.stack_info_text = TextElement("THIS IS A STACK OF ("+str(self.item_quantity)+") ITEMS", 'grey', 10,self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]-7*TILE_SIZE, 'center')
             self.add(self.stack_info_text)
+            if self.item_entity.item_type.category == ItemCategory.CONSUMABLE:
+                self.increbtn = ButtonElement(self.bg_rect.midright[0]-7*TILE_SIZE, self.bg_rect.midright[1]-2*TILE_SIZE, "+", "white", 14, width=30, height=25)
+                self.quantity_text = TextElement(str(self.take_quantity),'white', 14, self.bg_rect.midright[0]-5*TILE_SIZE, self.bg_rect.midright[1]-2*TILE_SIZE, 'center')
+                self.decrebtn = ButtonElement(self.bg_rect.midright[0]-3*TILE_SIZE, self.bg_rect.midright[1]-2*TILE_SIZE, "-", "white", 14, width=30, height=25)
+                self.add(self.increbtn, self.quantity_text, self.decrebtn)
 
         self.inventory_manager = self.level.snake.inventory
 
@@ -113,7 +120,7 @@ class ItemInfoPopup(State):
             self.add(message)
 
     def check_for_slots(self):
-        if self.item_entity.shop_item and self.level.snake.gold < (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100)):
+        if self.item_entity.shop_item and self.level.snake.gold < self.buy_price*self.take_quantity:
             return 4
         
         if self.item_entity.item_type.category != ItemCategory.CONSUMABLE:
@@ -150,39 +157,56 @@ class ItemInfoPopup(State):
             self.item_entity.apply_instant_effect()
             self.item_entity.kill()
             self.level.interaction_manager.unregister_interact(self.item_entity)
-        elif self.level.snake.inventory.add_item(self.item_entity.to_item_stack()):
-            self.item_entity.kill()
+        else:
+            self.item_entity.quantity=self.take_quantity
+            self.level.snake.inventory.add_item(self.item_entity.to_item_stack())
+            self.item_entity.quantity = self.item_quantity - self.take_quantity
+            if self.item_entity.quantity == 0:
+                self.item_entity.kill()
             self.level.interaction_manager.unregister_interact(self.item_entity)
         self.level.game.state_stack.pop()
 
     def sellItem(self):
-        self.level.snake.gold+=self.sell_price
-        self.item_entity.kill()
+        self.level.snake.gold+=(self.sell_price*self.take_quantity)
+        self.item_entity.quantity-=self.take_quantity
+        if self.item_entity.quantity == 0:
+            self.item_entity.kill()
         self.level.interaction_manager.unregister_interact(self.item_entity)
         self.level.game.state_stack.pop()
     
     def get_event(self, event: Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            Share.audio.play_sound("click")
             if not self.item_entity.shop_item:
                 if self.confirm_btn.isHovered():
+                    Share.audio.play_sound("click")
                     if not self.check_for_slots(): # type:ignore
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())
                 if self.sell_btn.isHovered():
+                    Share.audio.play_sound("click")
                     Share.audio.play_sound("sell-reroll")
                     self.sellItem()
             else:
                 if self.buy_btn.isHovered():
+                    Share.audio.play_sound("click")
                     if not self.check_for_slots(): # type:ignore
                         Share.audio.play_sound("sell-reroll")
-                        self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+                        self.level.snake.gold -= (self.buy_price*self.take_quantity)
                         if self.item_entity.alive():
                             self.item_entity.groups()[0].empty()
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())
+            if self.item_entity.item_type.category == ItemCategory.CONSUMABLE and self.item_entity.quantity > 1:
+                if self.increbtn.isHovered() and self.take_quantity < self.item_entity.quantity:
+                    Share.audio.play_sound("click")
+                    self.take_quantity+=1
+                if self.decrebtn.isHovered() and self.take_quantity > 1:
+                    Share.audio.play_sound("click")
+                    self.take_quantity-=1
+                self.handle_quantity_change()
+
         elif event.type == pygame.KEYDOWN:
             key = event.key
             pygame.event.clear(eventtype=pygame.KEYDOWN)
@@ -199,12 +223,24 @@ class ItemInfoPopup(State):
                  if key == pygame.K_e:
                     if not self.check_for_slots():
                         Share.audio.play_sound("sell-reroll")
-                        self.level.snake.gold -= (int)(self.item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+                        self.level.snake.gold -= (self.buy_price*self.take_quantity)
                         if self.item_entity.alive():
                             self.item_entity.groups()[0].empty()
                         self.getItem()
                     else: 
                         self.print_message(self.check_for_slots())
+            if self.item_entity.item_type.category == ItemCategory.CONSUMABLE and self.item_entity.quantity > 1:
+                if key == pygame.K_KP_PLUS and self.take_quantity < self.item_entity.quantity:
+                    self.take_quantity+=1
+                if key == pygame.K_KP_MINUS and self.take_quantity > 1:
+                    self.take_quantity-=1
+                self.handle_quantity_change()
             if key == pygame.K_ESCAPE:
                 self.level.game.state_stack.pop()
         return super().get_event(event)
+    
+    def handle_quantity_change(self):
+        self.quantity_text.set_text(str(self.take_quantity))
+        if not self.item_entity.shop_item:
+            self.sell_price_text.set_text(str(self.sell_price*self.take_quantity)+" GOLD")
+        else: self.price_text.set_text(str(self.buy_price*self.take_quantity)+" GOLD")

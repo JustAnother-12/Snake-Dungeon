@@ -96,13 +96,13 @@ class AudioManager:
                 count += 1
         return count
     
-    def play_music(self, name, loops=-1):
+    def play_music(self, name, loops=-1,fade_ms=0):
         """Play a music track, looping by default"""
         if name in self.music:
             try:
                 pygame.mixer.music.load(self.music[name])
                 pygame.mixer.music.set_volume(self.music_volume)
-                pygame.mixer.music.play(loops)
+                pygame.mixer.music.play(loops, fade_ms=fade_ms)
                 self.current_music = name
             except pygame.error as e:
                 print(f"Error playing music {name}: {e}")

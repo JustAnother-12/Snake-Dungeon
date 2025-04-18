@@ -39,7 +39,7 @@ class MainMenu(Menu):
                     button.on_click()
 
     def play_button_event(self):
-        Share.audio.stop_music(5000)
+        Share.audio.stop_music()
         new_state = Level(self.game)
         new_state.enter_state()
 

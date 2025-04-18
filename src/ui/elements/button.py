@@ -22,8 +22,9 @@ class ButtonElement(pygame.sprite.Sprite):
         self.y_pos = y_pos
         
         self.text_input = text_input
-        text_font = pygame.font.Font("game-assets/font/default-pixilart-text.ttf", text_size)
-        self.text = text_font.render(self.text_input, True, text_color)
+        self.text_font = pygame.font.Font("game-assets/font/default-pixilart-text.ttf", text_size)
+        self.text_color = text_color
+        self.text = self.text_font.render(self.text_input, True, self.text_color)
 
         
         self.rect: pygame.rect.Rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
@@ -32,6 +33,7 @@ class ButtonElement(pygame.sprite.Sprite):
         self.callback = callback
         
     def update(self) -> None:
+        self.text = self.text_font.render(self.text_input, True, self.text_color)
         if self.isHovered():
             self.image = self.images.frames[1]
         else:
