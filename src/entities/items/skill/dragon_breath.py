@@ -1,8 +1,11 @@
+import pygame
 from config import constant
 from entities.items.item_entity import ItemEntity
 from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
+from entities.throw_projectile import Throw_projectile
 from levels.components.fire_breath import FireBreath
+from levels.components.fire_tile import Fire_Tile
 from stats import StatType, Stats
 from utils.help import Share
 
@@ -65,18 +68,28 @@ class DragonBreathStack(ItemStack):
         self.remove_runtime_overriding(snake, 'update', 'after', self.activate)
     
     def activate(self, snake):
-        if self.time >= 0.2:
+        if self.time >= 0.5:
             self.time = 0
-            snake.stamina -= 5
-        
+            snake.stamina -= 10
+            head = snake.blocks[0].rect
+            mouse_pos = pygame.mouse.get_pos()
+            throw_project = Throw_projectile(snake.level,
+                                             head.centerx,
+                                             head.centery,
+                                             mouse_pos[0],
+                                             mouse_pos[1],
+                                             'red',
+                                             10 * constant.TILE_SIZE,
+                                             5,
+                                             4,
+                                             on_expire_class=Fire_Tile,
+                                             on_expire_kwargs={'width_tile': 2, 'height_tile': 2, 'burn_time': 3}
+                                             )
+            snake.level.add(throw_project)
         if snake.stamina <= 0:
             snake.stamina = 0
             self.remove_effect(snake)
             return
-        
-        if self.fire_breath is not None and (len(snake.blocks) > 0):
-            self.fire_breath.update_pos(snake.blocks[0].rect.center, snake.direction)
-            
     
     def get_item_entity_class(self):
         return DragonBreathEntity

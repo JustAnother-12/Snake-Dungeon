@@ -136,7 +136,7 @@ class SnakeBlock(pygame.sprite.Sprite):
             if self.time >= self.burning_time: # NOTE: thời gian để thoát khỏi trạng thái đốt
                 self.is_burning = False
                 self.time = 0
-
+                
         if self.is_severed:
             self.time_severed -= Share.clock.get_time() / 1000
             if self.time_severed >= 0:

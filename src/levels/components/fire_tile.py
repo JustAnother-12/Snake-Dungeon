@@ -1,7 +1,5 @@
-from ast import Tuple
 from enum import Enum
 import random
-from re import S
 import pygame
 from config import constant
 from utils import pixil
@@ -36,6 +34,10 @@ class Fire_Tile(pygame.sprite.Sprite):
         
         for x in range(self.width_tile):
             for y in range(self.height_tile):
+                pos_x = x * constant.TILE_SIZE + self.rect.left # type: ignore
+                pos_y = y * constant.TILE_SIZE + self.rect.top # type: ignore
+                if pos_x < constant.MAP_LEFT or pos_x >= constant.MAP_RIGHT or pos_y < constant.MAP_TOP or pos_y >= constant.MAP_BOTTOM:
+                    continue
                 self.image.blit(self.frames[self.frame_index], (x*constant.TILE_SIZE, y*constant.TILE_SIZE))
         
     def update(self):
