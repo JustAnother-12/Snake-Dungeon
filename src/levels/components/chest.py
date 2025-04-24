@@ -73,14 +73,7 @@ class Chest(pygame.sprite.Sprite):
                                     special_flags=pygame.BLEND_RGBA_MULT)
                     if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
                         self.kill()
-                    # self.FadeOut(self.image)
-
-    # def FadeOut(self, sprite:pygame.Surface):
-    #     self.alpha = max(0,self.alpha-5)
-    #     sprite = sprite.copy()
-    #     sprite.fill((255, 255, 255, self.alpha), special_flags=pygame.BLEND_RGBA_MULT)
-    #     if self.alpha <= 0:  # Kill the sprite when the alpha is <= 0.
-    #         self.kill()
+                    
 
     def __is_collision_with_snake(self):
         return self.rect and not self._level.snake.is_dead and self.rect.colliderect(self._level.snake.blocks[0].rect)
@@ -88,7 +81,7 @@ class Chest(pygame.sprite.Sprite):
     def OpenChest(self):
         self.isClosed = False
         item, rarity = LootPool(
-            (0, 0, 0, 20, 28, 20, 20, 12), (0, 6, 4)).get_item()
+            (0, 0, 0, 20, 28, 24, 20, 8), (0, 6, 4)).get_item()
         coin_count = random.randint(10, 15)
         for _ in range(coin_count):
             self._level.item_group.add(CoinEntity(self._level, self.rect))

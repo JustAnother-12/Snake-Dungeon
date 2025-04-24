@@ -46,8 +46,8 @@ template = {
         ),
         wave_manager=WaveManagerConfig(
             wave_interval=2,     # 2 giây giữa các đợt
-            max_wave_count=5,    # Tối đa 2 đợt
-            max_wave_entities=29,  # Tối đa 4 quái mỗi đợt
+            max_wave_count=2,    # Tối đa 2 đợt
+            max_wave_entities=8,  # Tối đa 4 quái mỗi đợt
             enemy_types={
                 'weak_monster': 0.7,
                 'bomb': 0.3,
@@ -72,7 +72,7 @@ template = {
         wave_manager=WaveManagerConfig(
             wave_interval=1,
             max_wave_count=3,
-            max_wave_entities=10,
+            max_wave_entities=6,
             enemy_types={
                 'weak_monster': 0.4,
                 'bomb': 0.3,

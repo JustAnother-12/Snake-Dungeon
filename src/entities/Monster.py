@@ -46,6 +46,22 @@ class Monster(Snake):
         # return super().handle_input()
 
     def update(self):
+        if self.is_dead and len(self.blocks) == 1:
+            block = self.blocks.pop(0)
+            for _ in range(random.randint(3,5)):
+                self.level.item_group.add(CoinEntity(self.level, block.rect, 1)) # luôn luôn drop tiền
+
+            loot_pool = LootPool((0, 0, 40, 10, 17, 15, 13, 5))
+            item, rarity = loot_pool.get_item()       
+            if item == LootItem.FOOD:
+                for _ in range(random.randint(1,2)):
+                    self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
+            elif item == LootItem.KEY:
+                self.level.item_group.add(KeyEntity(self.level, block.rect, 1))
+            else:
+                from entities.items.item_registry import ItemRegistry
+                self.level.item_group.add(ItemRegistry.create_item(
+                    item, rarity, self.level, block.rect))
         return super().update()
 
     def handle_ai_movement(self):
@@ -163,23 +179,23 @@ class Monster(Snake):
         if len(self.blocks) == 0:
             self.level.snake_group.remove(self)
             return
-        loot_pool = LootPool((5, 10, 5, 2, 3, 0, 0, 0))
+        
         block = self.blocks.pop(0)
         self._block_positions.pop(0)
-        item, rarity = loot_pool.get_item()
-        if item == LootItem.COIN:
-            self.level.item_group.add(CoinEntity(
-                self.level, block.rect, 1, random.randint(10, 15)))
-        elif item == LootItem.FOOD:
-            self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
-        elif item == LootItem.KEY:
-            self.level.item_group.add(KeyEntity(self.level, self.rect, 1))
-        elif item == LootItem.EMPTY:
-            pass
-        else:
-            from entities.items.item_registry import ItemRegistry
-            self.level.item_group.add(ItemRegistry.create_item(
-                item, rarity, self.level, block.rect))
+        # loot_pool = LootPool((5, 10, 5, 2, 3, 0, 0, 0))
+        # item, rarity = loot_pool.get_item()
+        # if item == LootItem.COIN:
+        #     self.level.item_group.add(CoinEntity(self.level, block.rect, 1))
+        # elif item == LootItem.FOOD:
+        #     self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
+        # elif item == LootItem.KEY:
+        #     self.level.item_group.add(KeyEntity(self.level, block.rect, 1))
+        # elif item == LootItem.EMPTY:
+        #     pass
+        # else:
+        #     from entities.items.item_registry import ItemRegistry
+        #     self.level.item_group.add(ItemRegistry.create_item(
+        #         item, rarity, self.level, block.rect))
         block.kill()
 
 

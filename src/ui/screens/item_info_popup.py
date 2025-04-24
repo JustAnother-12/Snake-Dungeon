@@ -71,7 +71,7 @@ class ItemInfoPopup(State):
             self.confirm_key_text = TextElement("E",'yellow', 20, self.bg_rect.bottomleft[0]+3*TILE_SIZE, self.bg_rect.bottomleft[1]-3*TILE_SIZE)
             self.sell_btn = ButtonElement(self.bg_rect.bottomright[0]-15*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE, "SELL FOR ", "white", 14, width=160, height=50)
             self.sell_key_text = TextElement("R",'yellow', 20, self.bg_rect.bottomright[0]-22*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
-            self.sell_price = int(item_entity.item_type.price*(1-40/100))*self.take_quantity
+            self.sell_price = int(item_entity.item_type.price*0.6)*self.take_quantity # giá bán bằng 60% so với giá gốc
             self.sell_price_text = TextElement(str(self.sell_price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-9*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
             
             self.add(
@@ -84,7 +84,7 @@ class ItemInfoPopup(State):
         else:
             self.buy_btn = ButtonElement(self.bg_rect.centerx, self.bg_rect.centery + 13*TILE_SIZE, "BUY FOR", "white", 14, width=160, height=50)
             self.buy_key_text = TextElement("E",'yellow', 20, self.bg_rect.centerx-7*TILE_SIZE, self.bg_rect.centery + 13*TILE_SIZE)
-            self.buy_price = (int)(self.take_quantity*item_entity.item_type.price*(self.item_entity.item_type.sale/100))
+            self.buy_price = self.take_quantity*item_entity.item_type.price
             self.price_text = TextElement(str(self.buy_price)+" GOLD", 'yellow', 14, self.bg_rect.bottomright[0]-18*TILE_SIZE, self.bg_rect.bottomright[1]-3*TILE_SIZE)
             self.add(
                     self.buy_btn,
@@ -92,11 +92,10 @@ class ItemInfoPopup(State):
                     self.price_text
                     )
 
-        
-        
         if self.item_quantity>1:
             self.stack_info_text = TextElement("THIS IS A STACK OF ("+str(self.item_quantity)+") ITEMS", 'grey', 10,self.bg_rect.midbottom[0], self.bg_rect.midbottom[1]-7*TILE_SIZE, 'center')
             self.add(self.stack_info_text)
+
             if self.item_entity.item_type.category == ItemCategory.CONSUMABLE:
                 self.increbtn = ButtonElement(self.bg_rect.midright[0]-7*TILE_SIZE, self.bg_rect.midright[1]-2*TILE_SIZE, "+", "white", 14, width=30, height=25)
                 self.quantity_text = TextElement(str(self.take_quantity),'white', 14, self.bg_rect.midright[0]-5*TILE_SIZE, self.bg_rect.midright[1]-2*TILE_SIZE, 'center')
@@ -134,10 +133,7 @@ class ItemInfoPopup(State):
                 return 0
         else:
             if self.inventory_manager._check_item_exits(self.item_entity.to_item_stack()) >= 0:
-                if self.item_quantity + self.current_stack > self.item_entity.item_type.max_stack:
-                    print(self.item_quantity + self.current_stack)
-                    print(self.item_quantity)
-                    print(self.current_stack)
+                if self.take_quantity + self.current_stack > self.item_entity.item_type.max_stack:
                     return 2
                 else:
                     return 0
@@ -147,8 +143,6 @@ class ItemInfoPopup(State):
                 return 0
 
     def update(self, *args: Any, **kwargs: Any) -> None:
-        # if self.confirm_btn.on_hover():
-        #     self.level.snake.add_item(self.item_stack)
             
         return super().update(*args, **kwargs)
     

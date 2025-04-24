@@ -152,7 +152,7 @@ class Level(State):
 
         self.region_generator = RegionGenerator()
         self.snake.is_curling = True
-        for i, v in enumerate(self.snake._block_positions):
+        for i, v in enumerate(self.snake.blocks):
             self.snake._block_positions[i] = pygame.Vector2(
                 (constant.SCREEN_WIDTH_TILES // 2) * constant.TILE_SIZE, constant.MAP_BOTTOM - constant.TILE_SIZE)
             self.snake.blocks[i].pos = self.snake._block_positions[i]
@@ -212,10 +212,10 @@ class Level(State):
             self.check_room_cleared()
 
         if self.level_status == LevelStatus.ROOM_CLEARED:
-            # Share.audio.stop_music()
             if self._config.room_type != RoomType.SHOP:
                 self.game.state_stack.append(RoomCleared(self.game))
 
+            print("CLEARED")
             # tạo cửa ở tường
 
             # tạo random từ 2 -> 3 cửa
@@ -248,7 +248,7 @@ class Level(State):
                 for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
                     self.chest_group.add(
                         Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
-            # self.snake.auto_state = False
+        
 
         # self.check_for_secret_input()
 
@@ -264,13 +264,13 @@ class Level(State):
             self.level_status = LevelStatus.ROOM_CLEARED
             self.snake.auto_state = False
 
-    def to_shop(self):
-        self.snake.auto_state = False
+    # def to_shop(self):
+    #     self.snake.auto_state = False
 
-        self.region_generator = RegionGenerator(0, 0, 0, 0)
+    #     self.region_generator = RegionGenerator(0, 0, 0, 0)
 
-        self.shop.init_Stock()
-        self.shop.display_Stock()
+    #     self.shop.init_Stock()
+    #     self.shop.display_Stock()
 
     def next_level(self, config: LevelConfig):
         self._config = config

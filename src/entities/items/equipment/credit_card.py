@@ -11,24 +11,31 @@ CREDIT_CARD = ItemType(
     texture=ItemTexture(
         constant.Texture.credit_card
     ),
-    description="Provides 30% discount in the shop",
+    description="Gives 10% of player's total gold at the end of a level",
 )
 
 class CreditCardStack(ItemStack):
     def __init__(self):
         super().__init__(CREDIT_CARD, 1)
-        self.fire_list = []
+        self.is_payed = 0
 
     def apply_effect(self, snake):
-        self.add_runtime_overriding(snake, 'update', 'before', self.discount)
+        self.add_runtime_overriding(snake, 'update', 'before', self.payment)
 
-    def discount(self,snake,*args, **kwargs):
-        pass
+    def payment(self,snake,*args, **kwargs):
+        from levels.level import LevelStatus
+
+        current_total_gold = snake.gold
+        if snake.level.level_status == LevelStatus.PLAYING:
+            self.is_payed = 0
+        
+        if snake.level.level_status == LevelStatus.ROOM_COMPLETED and self.is_payed == 0:
+            self.is_payed = 1
+            snake.gold+= (int)(current_total_gold*0.2)
         return args, kwargs
     
     def remove_effect(self, snake):
-        pass
-        self.remove_runtime_overriding(snake, 'update', 'before', self.discount)
+        self.remove_runtime_overriding(snake, 'update', 'before', self.payment)
         
     def get_item_entity_class(self):
         return CreditCardEntity

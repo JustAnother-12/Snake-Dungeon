@@ -557,7 +557,6 @@ class Snake(pygame.sprite.AbstractGroup):
         self._block_positions.pop(0)
         block: SnakeBlock
         block.kill()
-
 # class GreenSnake(Snake):
 #     from levels import level # type: ignore
 #     def __init__(self, level: "level.Level", init_len):

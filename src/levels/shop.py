@@ -59,7 +59,7 @@ class Shop_level:
                 instantItem[0], instantItem[1], self.level, pos=self.item_positions[0][len(self.instantItems)])
             item.shop_item = True
             item_shop.add(item)
-            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+            price_text = TextElement(str(item.item_type.price),
                                      'yellow', 10, self.item_positions[0][len(self.instantItems)][0] + constant.TILE_SIZE, self.item_positions[0][len(self.instantItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.instantItems.append(item_shop)
@@ -76,7 +76,7 @@ class Shop_level:
                 consumableItem[0], consumableItem[1], self.level, pos=self.item_positions[1][len(self.consumableItems)])
             item.shop_item = True
             item_shop.add(item)
-            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+            price_text = TextElement(str(item.item_type.price),
                                      'yellow', 10, self.item_positions[1][len(self.consumableItems)][0] + constant.TILE_SIZE, self.item_positions[1][len(self.consumableItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.consumableItems.append(item_shop)
@@ -92,7 +92,7 @@ class Shop_level:
                 EquipAndSkillItem[0], EquipAndSkillItem[1], self.level, pos=self.item_positions[2][len(self.equipAndSkillItems)])
             item.shop_item = True
             item_shop.add(item)
-            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+            price_text = TextElement(str(item.item_type.price),
                                      'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.equipAndSkillItems.append(item_shop)
@@ -119,7 +119,7 @@ class Shop_level:
                 EquipAndSkillItem[0], EquipAndSkillItem[1], self.level, pos=self.item_positions[2][len(self.equipAndSkillItems)])
             item.shop_item = True
             item_shop.add(item)
-            price_text = TextElement(str((int)(item.item_type.price*(item.item_type.sale/100))),
+            price_text = TextElement(str(item.item_type.price),
                                      'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.equipAndSkillItems.append(item_shop)

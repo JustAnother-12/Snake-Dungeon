@@ -44,7 +44,8 @@ class Pot(pygame.sprite.Sprite):
         self.isClosed = False
         item, rarity = LootPool((60, 63, 42, 14, 21, 0, 0, 0)).get_item()
         if item == LootItem.COIN:
-            self.level.item_group.add(CoinEntity(self.level, self.rect, 1, random.randint(1, 5)))
+            for _ in range(random.randint(1, 3)):
+                self.level.item_group.add(CoinEntity(self.level, self.rect, 1))
         elif item == LootItem.FOOD:
             self.level.item_group.add(FoodEntity(self.level, self.rect, 1))
         elif item == LootItem.KEY:

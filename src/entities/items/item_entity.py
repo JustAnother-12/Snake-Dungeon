@@ -12,9 +12,10 @@ from utils import pixil
 
 class ItemEntity(InteractionObject):
     from entities.items.item_type import ItemType
-    import levels.level
-    def __init__(self, level: "levels.level.Level", item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
+    # from levels.level import Level
+    def __init__(self, level, item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
         super().__init__(level, "pickup "+item_type.name, constant.TILE_SIZE * 2)
+        self.level = level
         self.item_type = item_type
         self.quantity = quantity
         self._image = pixil.Pixil.load(item_type.texture.pixil_path, item_type.texture.scale).frames[item_type.texture.entity_frame]
@@ -174,4 +175,4 @@ class ItemEntity(InteractionObject):
         self.on_pickup()
 
     def _is_collision_with_snake(self):
-        return self.rect and len(self.level.snake) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
+        return self.rect and len(self.level.snake.blocks) > 0 and self.rect.colliderect(self.level.snake.blocks[0].rect)
