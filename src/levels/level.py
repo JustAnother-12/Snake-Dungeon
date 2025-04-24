@@ -11,6 +11,7 @@ from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
+from entities.items.skill.celestine_amulet import CelestineAmuletStack
 from entities.items.skill.gun_devil_contract import GunEntity
 from entities.items.skill.ritual_dagger import RitualDaggerStack
 from entities.items.skill.thanos import ThanosEntity
@@ -68,7 +69,7 @@ class Level(State):
         self.snake = Snake(self, 5)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(RitualDaggerStack())
+        self.snake.inventory.add_item(CelestineAmuletStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
         self.snake.inventory.add_item(CreditCardStack())
