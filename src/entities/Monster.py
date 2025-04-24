@@ -173,7 +173,7 @@ class Monster(Snake):
         elif item == LootItem.FOOD:
             self.level.item_group.add(FoodEntity(self.level, block.rect, 1))
         elif item == LootItem.KEY:
-            self.level.item_group.add(KeyEntity(self.level, self.rect, 1))
+            self.level.item_group.add(KeyEntity(self.level, block.rect, 1))
         elif item == LootItem.EMPTY:
             pass
         else:

@@ -31,9 +31,7 @@ class SpeedPotionStack(ItemStack):
         
     def apply_effect(self, snake):
         self.active_time = self.active_duration
-
         self.last_speed = snake.base_stats.speed
-
         self.add_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_potion)
     
     def speed_potion(self, snake: Snake, *args, **kwargs):

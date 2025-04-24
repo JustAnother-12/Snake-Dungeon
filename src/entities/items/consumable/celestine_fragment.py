@@ -23,11 +23,14 @@ class CelestineFragmentStack(ItemStack):
         self.active_duration = 5
         self.active_time = 0
         self.energy_regen = 0
+        self.last_speed = 0
         
     def apply_effect(self, snake):
         self.active_time = self.active_duration
+        self.last_speed = snake.base_stats.speed
         self.add_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
         self.add_runtime_overriding(snake, 'handle_collision', 'return', self.disable_collision)
+        self.add_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boost)
         
     def disable_collision(self, snake, *args, **kwargs):
         return False
@@ -54,6 +57,10 @@ class CelestineFragmentStack(ItemStack):
                     return False
         return False
     
+    def speed_boost(self, snake, *args, **kwargs):
+        snake.base_stats.speed = int(self.last_speed * 1.5)
+        return args, kwargs
+    
     def update(self, inventory_manager):
         self.active_time -= (Share.clock.get_time() / 1000)
         return super().update(inventory_manager)
@@ -61,6 +68,7 @@ class CelestineFragmentStack(ItemStack):
     def remove_effect(self, snake):
         self.remove_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
         self.remove_runtime_overriding(snake, 'handle_collision', 'return', self.disable_collision)
+        self.remove_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boost)
     
     def get_item_entity_class(self):
         return CelestineFragmentEntity
