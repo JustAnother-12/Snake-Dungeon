@@ -179,7 +179,6 @@ class Level(State):
         self.item_group.add(FireGemAmuletEntity(self))
         self.item_group.add(GunEntity(self))
         self.item_group.add(FlameTrailEntity(self))
-        self.item_group.add(ThanosEntity(self))
         self.item_group.add(MidasBloodEntity(self))
         self.item_group.add(BloodBombDevilEntity(self))
 

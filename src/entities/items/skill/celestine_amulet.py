@@ -26,6 +26,8 @@ class CelestineAmuletStack(ItemStack):
         self.last_speed = 0
         
     def apply_effect(self, snake):
+        Share.audio.set_sound_volume("power-down", 0.5)
+        Share.audio.play_sound("power-up")
         self.active_time = self.active_duration
         self.last_speed = snake.base_stats.speed
         self.add_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
@@ -57,7 +59,7 @@ class CelestineAmuletStack(ItemStack):
                     return False
         return False
     def speed_boost(self, snake, *args, **kwargs):
-        snake.base_stats.speed = int(self.last_speed * 1.5)
+        snake.base_stats.speed = int(self.last_speed * 3)
         return args, kwargs
     
     def update(self, inventory_manager):
@@ -65,6 +67,8 @@ class CelestineAmuletStack(ItemStack):
         return super().update(inventory_manager)
     
     def remove_effect(self, snake):
+        Share.audio.set_sound_volume("power-down", 0.4)
+        Share.audio.play_sound("power-down")
         self.remove_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
         self.remove_runtime_overriding(snake, 'handle_collision', 'return', self.disable_collision)
         self.remove_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boost)
