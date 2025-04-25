@@ -108,7 +108,7 @@ class ItemEntity(InteractionObject):
                 )
             self.pos = pygame.Vector2(x, y)
         if not self.check_pos(self.image):
-            self.random_pos(area)
+            return self.random_pos(area, r)
 
     def check_pos(self, image):
         """Kiểm tra vị trí item có hợp lệ không"""

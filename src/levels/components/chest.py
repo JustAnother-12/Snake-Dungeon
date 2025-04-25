@@ -16,8 +16,7 @@ class Chest(pygame.sprite.Sprite):
     def __init__(self, _level: "level.Level", pos, isLocked=None) -> None:
         super().__init__()
         self._level = _level
-        self.isLocked = isLocked if isLocked != None else random.choice([
-                                                                        True, False])
+        self.isLocked = isLocked if isLocked != None else random.choice([True, False])
         self.image = pixil.Pixil.load(
             "game-assets/graphics/pixil/CHEST_SHEET.pixil", 1, constant.TILE_SIZE
         ).frames[int(self.isLocked)]
@@ -80,16 +79,32 @@ class Chest(pygame.sprite.Sprite):
 
     def OpenChest(self):
         self.isClosed = False
-        item, rarity = LootPool(
-            (0, 0, 0, 20, 28, 24, 20, 8), (0, 6, 4)).get_item()
-        coin_count = random.randint(10, 15)
-        for _ in range(coin_count):
-            self._level.item_group.add(CoinEntity(self._level, self.rect))
-        if item == LootItem.KEY:
-            self._level.item_group.add(KeyEntity(self._level, self.rect))
+        if not self.isLocked:
+            coin_count = random.randint(6, 10)
+            for _ in range(coin_count):
+                self._level.item_group.add(CoinEntity(self._level, self.rect))
+                
+            # rương ko khóa tỉ lệ 20% key, 80% item. Item (35%,30%,25%,10%), tỉ lệ độ hiếm (50%, 30%, 20%)
+            item, rarity = LootPool(
+                (0, 0, 0, 20, 28, 24, 20, 8), (50, 30, 20)).get_item()
+            if item == LootItem.KEY:
+                self._level.item_group.add(KeyEntity(self._level, self.rect))
+            else:
+                self._level.item_group.add(
+                    ItemRegistry.create_item(item, rarity, self._level, self.rect))
         else:
-            self._level.item_group.add(
-                ItemRegistry.create_item(item, rarity, self._level, self.rect))
+            # rương khóa tỉ lệ 20% key, 80% item. Item (0%,40%,35%,25%), tỉ lệ độ hiếm (0%, 60%, 40%)
+            coin_count = random.randint(10, 15)
+            for _ in range(coin_count):
+                self._level.item_group.add(CoinEntity(self._level, self.rect))
+
+            item, rarity = LootPool(
+                (0, 0, 0, 20, 0, 32, 28, 20), (0, 6, 4)).get_item()
+            if item == LootItem.KEY:
+                self._level.item_group.add(KeyEntity(self._level, self.rect))
+            else:
+                self._level.item_group.add(
+                    ItemRegistry.create_item(item, rarity, self._level, self.rect))
         self.collision_time = time()
 
     def on_collision(self):

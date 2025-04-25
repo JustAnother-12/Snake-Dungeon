@@ -23,7 +23,7 @@ from levels.components.pot import Pot
 from levels.components.trap import Trap
 from levels.components.wall import Walls
 from loot import LootPool
-from stats import Stats
+from stats import StatType, Stats
 from systems.interaction_manager import InteractionManager
 from systems.level_manager import DoorType, LevelConfig, LootPoolConfig, RegionGeneratorConfig, RoomType, WaveManagerConfig
 from systems.wave_manager import Wave, WaveManager
@@ -169,10 +169,17 @@ class Level(State):
         for x, y in self.region_generator.traps_initpos:
             self.trap_group.add(Trap(self, (x, y)))
 
+        # Make chests
+        self.chest_group.empty()
+        for x, y in self.region_generator.chests_initpos:
+            self.chest_group.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE))) 
+
         # Make pot
         self.pot_group.empty()
         for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
+        
+        
 
         self.item_group.empty()
         self.item_group.add(HephaestusBloodEntity(self))
@@ -204,8 +211,6 @@ class Level(State):
             self.game.state_stack[-1].visible = False
             self.game.state_stack.append(Instruction(self.game, self))
             Share.audio.play_music("level", -1, 2000)
-            # self.game.state_stack.append(Count_down(
-            #     self.game, self, "PRESS MOVEMENT KEYS TO START"))
 
         if self.level_status == LevelStatus.PLAYING:
             self.wave_manager.update(Share.clock.get_time() / 1000)
@@ -215,7 +220,6 @@ class Level(State):
             if self._config.room_type != RoomType.SHOP:
                 self.game.state_stack.append(RoomCleared(self.game))
 
-            print("CLEARED")
             # tạo cửa ở tường
 
             # tạo random từ 2 -> 3 cửa
@@ -243,14 +247,12 @@ class Level(State):
 
             self.level_status = LevelStatus.ROOM_COMPLETED
             if self._config.room_type != RoomType.SHOP:
-                print(self.region_generator.chests_initpos)
+                self.region_generator.get_reward_chest_region()
+                # print(self.region_generator.chests_initpos)
                 # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
-                for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else []:
-                    self.chest_group.add(
-                        Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
+                for x, y in self.region_generator.reward_chests_initpos:
+                    self.chest_group.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
         
-
-        # self.check_for_secret_input()
 
         self.handle_input()
         t = self.snake._will_go_out_of_bounds
@@ -264,13 +266,6 @@ class Level(State):
             self.level_status = LevelStatus.ROOM_CLEARED
             self.snake.auto_state = False
 
-    # def to_shop(self):
-    #     self.snake.auto_state = False
-
-    #     self.region_generator = RegionGenerator(0, 0, 0, 0)
-
-    #     self.shop.init_Stock()
-    #     self.shop.display_Stock()
 
     def next_level(self, config: LevelConfig):
         self._config = config
@@ -296,31 +291,14 @@ class Level(State):
             self.shop = Shop_level(self)
             self.shop.init_Stock()
             self.shop.display_Stock()
-            self.level_status = LevelStatus.PLAYING
+            self.level_status = LevelStatus.ROOM_CLEARED
             return
 
         self.current_level += 1
         self.create_config_room(config)
         self.generator()
 
-    def check_for_secret_input(self):
-        SECRET_IMPUTS = [
-            pygame.K_t, pygame.K_h, pygame.K_a, pygame.K_n, pygame.K_o, pygame.K_s
-        ]
-        input_keys = []
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                input_keys.append(event.key)
-
-        if len(input_keys) > len(SECRET_IMPUTS):
-            input_keys.pop(0)
-        if input_keys == SECRET_IMPUTS:
-            print("test")
-            input_keys.clear()
-
     def draw(self, surface: pygame.Surface) -> list[pygame.FRect | pygame.Rect]:
-        # self.draw_grid(surface)
-
         t = super().draw(surface)
         self.interaction_manager.draw(surface)
         return t

@@ -42,7 +42,7 @@ class Pot(pygame.sprite.Sprite):
     
     def open(self):
         self.isClosed = False
-        item, rarity = LootPool((70, 18, 0, 4, 8, 0, 0, 0)).get_item()
+        item, rarity = LootPool((70, 18, 0, 2, 10, 0, 0, 0)).get_item()
         if item == LootItem.COIN:
             for _ in range(random.randint(1, 3)):
                 self.level.item_group.add(CoinEntity(self.level, self.rect, 1))

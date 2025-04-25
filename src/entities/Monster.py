@@ -32,7 +32,7 @@ class Monster(Snake):
         self.avoidance_radius = 5 * constant.TILE_SIZE
         self.direction = Vector2(0, 0)
         self.is_curling = True
-        self.base_stats.speed = 12
+        self.base_stats.speed = 14
 
     def set_player_reference(self, player: Snake):
         self.player = player
@@ -214,6 +214,7 @@ class BlockerMonster(Monster):
     def __init__(self, level, init_len, pos=None):
         self.color = pygame.Color(0, 150, 150)
         super().__init__(level, init_len, pos)
+        self.base_stats.speed = 18
         self.headImg.fill(self.color)
         pygame.draw.rect(self.headImg, (255, 255, 0), (3, 3, 2, 4))
         pygame.draw.rect(self.headImg, (255, 255, 0), (11, 3, 2, 4))
