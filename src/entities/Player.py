@@ -509,7 +509,7 @@ class Snake(pygame.sprite.AbstractGroup):
             self.split(pos)
 
     def _is_collide_with_orther_snake(self, position):
-        for snake in self.level.snake_group._sub_group__:  # type: ignore
+        for snake in self.level.snake_group._sub_group__: # type: ignore
             snake: Snake
             if snake == self:
                 continue
