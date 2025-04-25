@@ -284,7 +284,8 @@ class Level(State):
         self.item_group.empty()
 
         # xoa shop
-        self.shop.remove_Stock()
+        if hasattr(self, "shop"):
+            self.shop.remove_Stock()
 
         # xóa cửa
         for i in self.sprites():
@@ -292,6 +293,7 @@ class Level(State):
                 i.kill()
 
         if config.room_type == RoomType.SHOP:
+            self.shop = Shop_level(self)
             self.shop.init_Stock()
             self.shop.display_Stock()
             self.level_status = LevelStatus.PLAYING

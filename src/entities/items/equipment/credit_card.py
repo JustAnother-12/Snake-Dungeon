@@ -11,7 +11,7 @@ CREDIT_CARD = ItemType(
     texture=ItemTexture(
         constant.Texture.credit_card
     ),
-    description="Gives 10% of player's total gold at the end of a level",
+    description="Gives 20% of player's total gold at the end of a level",
 )
 
 class CreditCardStack(ItemStack):

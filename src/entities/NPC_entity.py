@@ -6,7 +6,7 @@ from utils.pixil import Pixil
 class NPC(InteractionObject):
     def __init__(self, level, pos):
         self.reStockPrice = 20
-        super().__init__(level, f'restock ({self.reStockPrice} Gold)', 45)
+        super().__init__(level, f'restock Equipments and Skills ({self.reStockPrice} Gold)', 45)
         self.pos = pos
         self.frame_index = 0
         self.frame_duration = 1
@@ -37,7 +37,11 @@ class NPC(InteractionObject):
         return self.rect and not self.level.snake.is_dead and self.rect.colliderect(self.level.snake.blocks[0].rect)
 
     def on_interact(self):
-        Share.audio.play_sound("sell-reroll")
-        self.level.shop.reStock()
-        self.reStockPrice+=20
-        self.text = f'restock ({self.reStockPrice} Gold)'
+        if self.level.snake.gold >= self.reStockPrice:
+            Share.audio.play_sound("sell-reroll")
+            self.level.shop.reStock()
+            self.level.snake.gold-=self.reStockPrice
+            self.reStockPrice+=20
+            self.text = f'restock ({self.reStockPrice} Gold)'
+        else:
+            Share.audio.play_sound("error")

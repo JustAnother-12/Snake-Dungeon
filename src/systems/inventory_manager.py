@@ -160,8 +160,7 @@ class InventoryManager:
         if index < 0:
             return False
 
-        
-        if quantity == -1 or (self.slots[index].quantity - quantity) == 0: # type: ignore
+        if quantity == -1 or (self.slots[index].quantity - quantity) == 0:# type: ignore
             self.slots[index] = None
             return True
 
@@ -180,10 +179,9 @@ class InventoryManager:
         if self.slots[index].item_type.category == ItemCategory.EQUIPMENT:  # type: ignore
             self.slots[index].remove_effect(self.snake)  # type: ignore
 
-        
-        item_entity_class = self.slots[index].get_item_entity_class() # type: ignore
+        # type: ignore
+        item_entity_class = self.slots[index].get_item_entity_class()# type: ignore
         self.snake.level.item_group.add(item_entity_class(
-            
-            self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity)) # type: ignore
+            self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity))# type: ignore
         self.slots[index] = None
         return True

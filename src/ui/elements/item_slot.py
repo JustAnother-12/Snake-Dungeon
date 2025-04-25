@@ -41,7 +41,6 @@ class ItemSlot(pygame.sprite.Sprite):
         if self.item_stack is None:
             self.image.blit(self._empty_slot) # type: ignore
         else:
-            # print(self.item_stack.active)
             if not self.item_stack.active:
                 match self.item_stack.item_type.category:
                     case ItemCategory.CONSUMABLE:

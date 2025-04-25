@@ -40,10 +40,10 @@ class LootPool:
             LootItem.COIN: item_rate[1],
             LootItem.FOOD: item_rate[2],
             LootItem.KEY: item_rate[3],
-            LootItem.INSTANT: item_rate[3],
-            LootItem.CONSUMABLE: item_rate[4],
-            LootItem.EQUIPMENT: item_rate[5],
-            LootItem.SKILL: item_rate[6]
+            LootItem.INSTANT: item_rate[4],
+            LootItem.CONSUMABLE: item_rate[5],
+            LootItem.EQUIPMENT: item_rate[6],
+            LootItem.SKILL: item_rate[7]
         }
         self.rarity_table = {
             Rarity.COMMON: max(0, rarity_rate[0] - Stats.getValue(StatType.LUCK)/2),
@@ -82,7 +82,7 @@ class LootPool:
         '''
         Lấy vật phẩm từ loot pool
         - Trả về tuple (LootItem, Rarity)
-        - LootItem: vật phẩm được chọn [EMPTY, COIN, FOOD, INSTANT, CONSUMABLE, EQUIPMENT, SKILL]
+        - LootItem: vật phẩm được chọn [EMPTY, COIN, FOOD, KEY, INSTANT, CONSUMABLE, EQUIPMENT, SKILL]
         - Rarity: độ hiếm của vật phẩm
         '''
         keys = list(self.loot_table.keys())

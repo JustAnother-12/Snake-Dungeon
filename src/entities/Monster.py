@@ -90,9 +90,9 @@ class Monster(Snake):
 
             # Kiểm tra va chạm trực tiếp
             if not self._is_collide(new_head_pos):
-                weight = max(self._calculate_weight(move, new_head_pos), 1)
+                weight = max(self._calculate_weight(move, new_head_pos), 1.0)
                 valid_moves.append(move)
-                move_weights.append(self._calculate_weight(move, new_head_pos))
+                move_weights.append(weight)
 
         if len(valid_moves) > 0:
             self.direction = random.choices(
@@ -241,7 +241,7 @@ class BlockerMonster(Monster):
         
         # Reduce weight if moving away from player
         if distance_to_player > constant.TILE_SIZE * 10:
-            weight /= 2
+            weight = max(1, weight/2)
         
         # Factor in danger avoidance from parent class (traps, etc.)
         trap_danger = self._calculate_trap_danger(position)

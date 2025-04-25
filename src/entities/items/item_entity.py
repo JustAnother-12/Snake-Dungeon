@@ -12,7 +12,6 @@ from utils import pixil
 
 class ItemEntity(InteractionObject):
     from entities.items.item_type import ItemType
-    # from levels.level import Level
     def __init__(self, level, item_type: ItemType, area: pygame.Rect | None = None, r=2, quantity=1):
         super().__init__(level, "pickup "+item_type.name, constant.TILE_SIZE * 2)
         self.level = level

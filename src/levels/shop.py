@@ -13,7 +13,7 @@ class Shop_level:
     def __init__(self, level) -> None:
         self.level = level
         self.npc = NPC(self.level, (constant.SCREEN_WIDTH_TILES//2 *
-                       constant.TILE_SIZE, constant.SCREEN_HEIGHT_TILES//2*constant.TILE_SIZE))
+                       constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES//2 - 4)*constant.TILE_SIZE))
 
         self.InstantPool = LootPool((0, 0, 0, 0, 100, 0, 0, 0))
         self.ConsumablePool = LootPool((0, 0, 0, 0, 0,  100, 0, 0))
@@ -26,10 +26,10 @@ class Shop_level:
         self.item_positions = [
             # Instant items
             [(constant.MAP_LEFT + (4+(i*3))*constant.TILE_SIZE,
-              (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(2)],
+              (constant.SCREEN_HEIGHT_TILES//2-2)*constant.TILE_SIZE) for i in range(2)],
             # Consumable items
             [(constant.MAP_RIGHT - (9-(i*3))*constant.TILE_SIZE,
-              (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(2)],
+              (constant.SCREEN_HEIGHT_TILES//2-2)*constant.TILE_SIZE) for i in range(2)],
             # Equipment/skill items
             [((constant.SCREEN_WIDTH_TILES//2 - 7)*constant.TILE_SIZE + (3+(i*3))*constant.TILE_SIZE,
               (constant.SCREEN_HEIGHT_TILES//2 + 4)*constant.TILE_SIZE) for i in range(3)]
@@ -64,6 +64,18 @@ class Shop_level:
             item_shop.add(price_text)
             self.instantItems.append(item_shop)
 
+        Instant_category_text_group = pygame.sprite.Group()
+        Instant_category_text = TextElement("INSTANTS", 
+                                            'white', 
+                                            12, 
+                                            self.item_positions[0][1][0],
+                                            self.item_positions[0][0][1]+4*constant.TILE_SIZE,
+                                            'center'
+                                            )
+        Instant_category_text_group.add(Instant_category_text)
+        self.instantItems.append(Instant_category_text_group)
+
+
         # tạo 2 item consumable
         while len(consumableItems) < 2:
             consumableItem = self.ConsumablePool.get_item()
@@ -81,6 +93,18 @@ class Shop_level:
             item_shop.add(price_text)
             self.consumableItems.append(item_shop)
 
+        Consumable_category_text_group = pygame.sprite.Group()
+        Consumable_category_text = TextElement("CONSUMABLES", 
+                                            'white', 
+                                            12, 
+                                            self.item_positions[1][1][0],
+                                            self.item_positions[1][0][1]+4*constant.TILE_SIZE,
+                                            'center'
+                                            )
+        Consumable_category_text_group.add(Consumable_category_text)
+        self.consumableItems.append(Consumable_category_text_group)
+
+
         # Tạo 3 item equipment/skill
         while len(equipAndSkillItems) < 3:
             EquipAndSkillItem = self.EquipmentAndSkillPool.get_item()
@@ -96,6 +120,17 @@ class Shop_level:
                                      'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.equipAndSkillItems.append(item_shop)
+
+        EquipAndSkill_category_text_group = pygame.sprite.Group()
+        EquipAndSkill_category_text = TextElement("EQUIPMENTS AND SKILLS", 
+                                            'white', 
+                                            12, 
+                                            self.item_positions[2][1][0]+constant.TILE_SIZE,
+                                            self.item_positions[2][0][1]+4*constant.TILE_SIZE,
+                                            'center'
+                                            )
+        EquipAndSkill_category_text_group.add(EquipAndSkill_category_text)
+        self.equipAndSkillItems.append(EquipAndSkill_category_text_group)
 
         print(instantItems)
         print(consumableItems)
@@ -123,6 +158,17 @@ class Shop_level:
                                      'yellow', 10, self.item_positions[2][len(self.equipAndSkillItems)][0] + constant.TILE_SIZE, self.item_positions[2][len(self.equipAndSkillItems)][1] + 3*constant.TILE_SIZE, 'center')
             item_shop.add(price_text)
             self.equipAndSkillItems.append(item_shop)
+        
+        EquipAndSkill_category_text_group = pygame.sprite.Group()
+        EquipAndSkill_category_text = TextElement("EQUIPMENTS AND SKILLS", 
+                                            'white', 
+                                            12, 
+                                            self.item_positions[2][1][0]+constant.TILE_SIZE,
+                                            self.item_positions[2][0][1]+4*constant.TILE_SIZE,
+                                            'center'
+                                            )
+        EquipAndSkill_category_text_group.add(EquipAndSkill_category_text)
+        self.equipAndSkillItems.append(EquipAndSkill_category_text_group)
 
         self.level.add(*self.equipAndSkillItems)
 

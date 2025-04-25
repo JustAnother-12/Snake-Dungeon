@@ -42,18 +42,16 @@ class Pot(pygame.sprite.Sprite):
     
     def open(self):
         self.isClosed = False
-        item, rarity = LootPool((60, 63, 42, 14, 21, 0, 0, 0)).get_item()
+        item, rarity = LootPool((70, 18, 0, 4, 8, 0, 0, 0)).get_item()
         if item == LootItem.COIN:
             for _ in range(random.randint(1, 3)):
                 self.level.item_group.add(CoinEntity(self.level, self.rect, 1))
-        elif item == LootItem.FOOD:
-            self.level.item_group.add(FoodEntity(self.level, self.rect, 1))
         elif item == LootItem.KEY:
             self.level.item_group.add(KeyEntity(self.level, self.rect, 1))
-        elif item == LootItem.EMPTY:
-            print("Empty pot")
+        elif item == LootItem.INSTANT:
+            self.level.item_group.add(ItemRegistry.create_item(item, rarity, self.level, self.rect))
         else:
-            ItemRegistry.create_item(item, rarity, self.level, self.rect)
+            pass
         if self.collision_time == None:
             self.collision_time = time()
 

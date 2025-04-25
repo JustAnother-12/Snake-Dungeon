@@ -86,7 +86,7 @@ class Chest(pygame.sprite.Sprite):
         for _ in range(coin_count):
             self._level.item_group.add(CoinEntity(self._level, self.rect))
         if item == LootItem.KEY:
-            self._level.item_group.add(KeyEntity(self.level, self.rect))
+            self._level.item_group.add(KeyEntity(self._level, self.rect))
         else:
             self._level.item_group.add(
                 ItemRegistry.create_item(item, rarity, self._level, self.rect))
