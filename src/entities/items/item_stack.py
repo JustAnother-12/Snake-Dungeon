@@ -31,6 +31,8 @@ class ItemStack:
         
         # kiểm tra xem còn thanh năng lượng không
         if snake.stamina < self.item_type.energy_usage:
+            Share.audio.set_sound_volume("fail_use", 0.6)
+            Share.audio.play_sound("fail_use")
             return False
         
         # Trừ năng lượng của người trơi
@@ -43,7 +45,6 @@ class ItemStack:
         # Giảm số lượng nếu là consumable
         if self.item_type.category == ItemCategory.CONSUMABLE:
             self.quantity -= 1
-            
         return True
     
     def apply_effect(self, snake: "P.Snake"):

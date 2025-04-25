@@ -12,8 +12,8 @@ CELESTINE_AMULET_TYPE = ItemType(
     ItemTexture(
         constant.Texture.celestine_amulet
     ),
-    description="Upon activation, gives the player Powered state. Makes the player invincible and kill everything on contact. Last for 10s and consumes 120 Energy, 20s cooldown",
-    cooldown=20.0,
+    description="Upon activation, gives the player Powered state. Makes the player invincible and kill everything on contact. Last for 10s and consumes 120 Energy, 30s cooldown",
+    cooldown=30.0,
     energy_usage=120
 )
 

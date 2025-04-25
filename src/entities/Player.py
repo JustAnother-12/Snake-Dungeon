@@ -447,7 +447,7 @@ class Snake(pygame.sprite.AbstractGroup):
         return False
 
     def _is_collide_with_self(self, position):
-        if self.is_curling:
+        if self.is_curling or not self.auto_state:
             return False
         for block in self.sprites():
             if block == self.blocks[0]:
@@ -540,7 +540,7 @@ class Snake(pygame.sprite.AbstractGroup):
             (1 + Stats.getValue(StatType.SPEED)/100)
         self.base_stats.resistance = constant.DEATH_DELAY * \
             (1 + Stats.getValue(StatType.RESISTANCE)/100)
-        self.base_stats.energy_cap = 10 * constant.TILE_SIZE * \
+        self.base_stats.energy_cap = 100 * \
             (1 + Stats.getValue(StatType.ENERGY_CAPACITY)/100)
         self.base_stats.energy_regen = constant.STAMINA_RECOVERY * \
             (1 + Stats.getValue(StatType.ENERGY_REGEN)/100)

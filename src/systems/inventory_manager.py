@@ -74,8 +74,7 @@ class InventoryManager:
                         press_duration = time.time() - self.time_press[index]
                         if press_duration < self.press_time:
                             if not self.slots[index] is None:
-                                self.slots[index].use(
-                                    self.snake)  # type: ignore
+                                self.slots[index].use(self.snake)  # type: ignore
                         self.time_press[index] = 0
                     if not self.slots[index] is None:
                         self.slots[index].active = False  # type: ignore
@@ -161,8 +160,7 @@ class InventoryManager:
         if index < 0:
             return False
 
-        # type: ignore
-        if quantity == -1 or (self.slots[index].quantity - quantity) == 0:
+        if quantity == -1 or (self.slots[index].quantity - quantity) == 0:# type: ignore
             self.slots[index] = None
             return True
 
@@ -182,9 +180,8 @@ class InventoryManager:
             self.slots[index].remove_effect(self.snake)  # type: ignore
 
         # type: ignore
-        item_entity_class = self.slots[index].get_item_entity_class()
+        item_entity_class = self.slots[index].get_item_entity_class()# type: ignore
         self.snake.level.item_group.add(item_entity_class(
-            # type: ignore
-            self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity))
+            self.snake.level, self.snake.blocks[1].rect, 2, self.slots[index].quantity))# type: ignore
         self.slots[index] = None
         return True
