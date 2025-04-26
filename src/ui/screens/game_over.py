@@ -11,17 +11,14 @@ class GameOver_menu(Menu):
         super().__init__(game)
 
         self.Gamer_over_text = TextElement("GAME OVER", "white", 45, (SCREEN_WIDTH_TILES//2)*TILE_SIZE, (SCREEN_HEIGHT_TILES//2 - 8)*TILE_SIZE, "center")
-        self.black_rect = pygame.Rect(0,0,SCREEN_WIDTH_TILES*TILE_SIZE, SCREEN_HEIGHT_TILES*TILE_SIZE)
-        self.Background_texture = pygame.Surface((self.black_rect.w,self.black_rect.h))
-        # self.Background_rect = ImageElement((SCREEN_WIDTH_TILES/2)*TILE_SIZE, (SCREEN_HEIGHT_TILES/2)*TILE_SIZE, self.Background_texture)
 
         self.restart_button = ButtonElement((SCREEN_WIDTH_TILES/2)*TILE_SIZE, (SCREEN_HEIGHT_TILES/2)*TILE_SIZE ,"NEW RUN", "white", callback=self.restart_button_event)
         self.main_menu_button = ButtonElement((SCREEN_WIDTH_TILES/2)*TILE_SIZE, (SCREEN_HEIGHT_TILES/2 + 8)*TILE_SIZE ,"MAIN MENU", "white", callback=self.main_menu_button_event)
         self.addBtn([self.restart_button, self.main_menu_button])
 
-        # self.add(self.Background_rect,self.Gamer_over_text, self.restart_button, self.main_menu_button)
+ 
         self.add(self.Gamer_over_text, self.restart_button, self.main_menu_button)
-        # Share.audio.play_sound("screaming")
+
 
     def update(self):
         return super().update()

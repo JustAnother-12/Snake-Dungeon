@@ -20,9 +20,9 @@ GUN_CONSTRACT = ItemType(
     texture=ItemTexture(
         constant.Texture.hand_gun
     ),
-    cooldown=10.0,
-    description="Upon activation, the Player loses 1 body part to fires a bullet at the cursor position. The bullet kills anything on contact. Consumes 80 Energy, 10s cooldown",
-    energy_usage=80
+    cooldown=4.0,
+    description="Upon activation, the Player loses 1 body part to fires a bullet at the cursor position. The bullet kills anything on contact. Consumes 60 Energy, 4s cooldown",
+    energy_usage=60
 )
 
 class GunStack(ItemStack):

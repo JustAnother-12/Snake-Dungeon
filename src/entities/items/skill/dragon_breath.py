@@ -17,7 +17,7 @@ DRAGON_BREATH_TYPE = ItemType(
     ItemTexture(
         constant.Texture.dragon_breath
     ),
-    description="Upon activation, breaths out a line of fire in front which consume 5 Energy every 0.2s, the effect is cancel if activation button is press again or the player is out of Energy. 15s cooldown",
+    description="Upon activation, breaths out a barrange of fire balls in front and consumes 10 Energy each, the effect is cancel if activation button is press again or the player is out of Energy. 15s cooldown",
     cooldown=15.0,
     energy_usage=0
 )
@@ -73,17 +73,20 @@ class DragonBreathStack(ItemStack):
             snake.stamina -= 10
             head = snake.blocks[0].rect
             mouse_pos = pygame.mouse.get_pos()
+            Share.audio.set_sound_volume("fire-blast", 0.5)
+            Share.audio.play_sound("fire-blast")
             throw_project = Throw_projectile(snake.level,
                                              head.centerx,
                                              head.centery,
                                              mouse_pos[0],
                                              mouse_pos[1],
-                                             'red',
-                                             10 * constant.TILE_SIZE,
+                                             'orange',
+                                             16 * constant.TILE_SIZE,
                                              5,
                                              4,
+                                             trail_color=(255,64,0),
                                              on_expire_class=Fire_Tile,
-                                             on_expire_kwargs={'width_tile': 2, 'height_tile': 2, 'burn_time': 3}
+                                             on_expire_kwargs={'width_tile': 2, 'height_tile': 2, 'burn_time': 5}
                                              )
             snake.level.add(throw_project)
         if snake.stamina <= 0:

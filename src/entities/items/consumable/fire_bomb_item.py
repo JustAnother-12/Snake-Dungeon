@@ -6,6 +6,7 @@ from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 from levels.components.bomb import Bomb, BombState
 from entities.throw_projectile import Throw_projectile
 from levels.components.fire_bomb import FireBomb
+from utils.help import Share
 
 
 FIRE_BOMB_TYPE = ItemType(
@@ -40,7 +41,8 @@ class FireBombStack(ItemStack):
                                     on_expire_class=FireBomb
                                     )
         snake.level.add(projectile)
-        # projectile.draw_trail()
+        Share.audio.set_sound_volume("throw", 0.45)
+        Share.audio.play_sound("throw")
 
         
     def get_item_entity_class(self):

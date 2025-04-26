@@ -6,6 +6,7 @@ from entities.items.item_stack import ItemStack
 from entities.items.item_type import ItemCategory, ItemTexture, ItemType, Rarity
 from entities.throw_projectile import Throw_projectile
 from levels.components.fire_tile import Fire_Tile
+from utils.help import Share
 
 
 MOLOTOV_TYPE = ItemType(
@@ -41,6 +42,8 @@ class MolotovStack(ItemStack):
                                     on_expire_kwargs={'width_tile': 3, 'height_tile': 3, 'burn_time': 7}
                                     )
         snake.level.add(projectile)
+        Share.audio.set_sound_volume("throw", 0.45)
+        Share.audio.play_sound("throw")
 
     def get_item_entity_class(self):
         return MolotovEntity
