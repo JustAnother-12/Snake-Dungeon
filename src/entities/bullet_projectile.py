@@ -15,7 +15,7 @@ class Bullet_projectile(Projectile):
 
     def handle_enemy_collision(self):
         for group in self.level.snake_group._sub_group__:
-            if group is self.level.snake:
+            if group is self.level.snake or group.is_dead:
                 continue
             for sprite in group.sprites():
                 if self.hitbox_rect.colliderect(sprite.rect):
@@ -26,6 +26,8 @@ class Bullet_projectile(Projectile):
     
     def handle_pot_collision(self):
         for sprite in self.level.pot_group.sprites():
+            if not sprite.isClosed:
+                continue
             if self.hitbox_rect.colliderect(sprite.rect):
                 self.pierce_count+=1
                 sprite.on_collision()

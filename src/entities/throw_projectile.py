@@ -8,11 +8,10 @@ from levels.components.fire_tile import Fire_Tile
 from utils.help import Share
 
 class Throw_projectile(Projectile):
-    def __init__(self, level, x_pos, y_pos, target_x, target_y, color, max_range, speed,size, on_expire_class, on_expire_kwargs=None) -> None:
+    def __init__(self, level, x_pos, y_pos, target_x, target_y, color, max_range, speed,size, on_expire_class, on_expire_kwargs=None, trail_color = (255,255,255)) -> None:
         super().__init__(level, x_pos, y_pos, target_x, target_y, color, max_range, speed, size)
-
-        Share.audio.set_sound_volume("throw", 0.45)
-        Share.audio.play_sound("throw")
+        self.trail_color = trail_color
+        
         # Customizable on-expire behavior
         self.on_expire_class = on_expire_class
         self.on_expire_kwargs = on_expire_kwargs or {}
@@ -50,7 +49,7 @@ class Throw_projectile(Projectile):
             rel_y = pos[1] - self.rect.centery + 50
             pygame.draw.circle(
                 self.image,
-                (255, 255, 255, alpha),
+                (self.trail_color[0], self.trail_color[1], self.trail_color[2], alpha),
                 (int(rel_x), int(rel_y)),
                 1 + (i * 0.2),
             )
@@ -79,9 +78,9 @@ class Throw_projectile(Projectile):
             if hasattr(self.level, "fire_group") and isinstance(
                 expire_obj, Fire_Tile
             ):  
-                Share.audio.set_sound_volume("glass-break", 0.5)
-                Share.audio.play_sound("glass-break")
-                Share.audio.set_sound_volume("short-fire-burst", 0.5)
+                # Share.audio.set_sound_volume("glass-break", 0.5)
+                # Share.audio.play_sound("glass-break")
+                Share.audio.set_sound_volume("short-fire-burst", 0.4)
                 Share.audio.play_sound("short-fire-burst")
                 self.level.fire_group.add(expire_obj)
 

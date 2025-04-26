@@ -1,5 +1,6 @@
 from enum import Enum
 import random
+from re import S
 import pygame
 
 import config.constant as constant
@@ -11,7 +12,9 @@ from entities.items.equipment.hephaestus_blood import HephaestusBloodEntity
 from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
+from entities.items.instant.food import FoodEntity
 from entities.items.skill.celestine_amulet import CelestineAmuletStack
+from entities.items.skill.dragon_breath import DragonBreathEntity, DragonBreathStack
 from entities.items.skill.gun_devil_contract import GunEntity
 from entities.items.skill.ritual_dagger import RitualDaggerStack
 from entities.items.skill.thanos import ThanosEntity
@@ -33,6 +36,7 @@ from ui.screens.Instruction import Instruction
 from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
+from ui.screens.you_win import YouWin_menu
 from utils.help import Share
 from levels.shop import Shop_level
 
@@ -66,10 +70,10 @@ class Level(State):
         self.item_group = pygame.sprite.Group()
         self.snake_group = NestedGroup()
         self.fire_group = pygame.sprite.Group()
-        self.snake = Snake(self, 5)
+        self.snake = Snake(self, 10)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(CelestineAmuletStack())
+        self.snake.inventory.add_item(DragonBreathStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
         self.snake.inventory.add_item(CreditCardStack())
@@ -112,10 +116,6 @@ class Level(State):
             self.bomb_group,
             self.fire_bomb_group
         )
-
-        # # remove this
-        # self.add(Door(self, (constant.MAP_LEFT - 100, constant.MAP_TOP + 100)))
-        # self.level_status = LevelStatus.CREATED
 
     def create_config_room(self, room_config: LevelConfig):
         region_generator = room_config.region_generator
@@ -188,6 +188,8 @@ class Level(State):
         self.item_group.add(FlameTrailEntity(self))
         self.item_group.add(MidasBloodEntity(self))
         self.item_group.add(BloodBombDevilEntity(self))
+        for _ in range(10):
+            self.item_group.add(FoodEntity(self))
 
     def reset(self):
         Stats.reset()
@@ -217,9 +219,12 @@ class Level(State):
             self.check_room_cleared()
 
         if self.level_status == LevelStatus.ROOM_CLEARED:
+            if self.current_level >= self.max_level: # kết thúc game nếu vượt qua hết màn chơi
+                self.game.state_stack.append(YouWin_menu(self.game))
+                Share.audio.stop_music()
+                return
             if self._config.room_type != RoomType.SHOP:
                 self.game.state_stack.append(RoomCleared(self.game))
-
             # tạo cửa ở tường
 
             # tạo random từ 2 -> 3 cửa
@@ -228,11 +233,10 @@ class Level(State):
             # random vị trí cửa canh đề nhau phía trên
 
             # chosen random door index shope
-
             shope_index = random.randint(0, doors - 1)
             if self._config.room_type == RoomType.SHOP:
                 shope_index = -1
-            # spacing = constant.MAP_WIDTH // (doors + 1)
+
             spacing = 128
             print(spacing)
             print(shope_index, doors)
@@ -248,8 +252,6 @@ class Level(State):
             self.level_status = LevelStatus.ROOM_COMPLETED
             if self._config.room_type != RoomType.SHOP:
                 self.region_generator.get_reward_chest_region()
-                # print(self.region_generator.chests_initpos)
-                # for x, y in self.region_generator.chests_initpos if self.region_generator.chests_initpos else [((constant.SCREEN_WIDTH_TILES * constant.TILE_SIZE) // 2, (constant.SCREEN_HEIGHT_TILES * constant.TILE_SIZE) // 2)]:
                 for x, y in self.region_generator.reward_chests_initpos:
                     self.chest_group.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
         

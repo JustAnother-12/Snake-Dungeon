@@ -304,7 +304,9 @@ class Snake(pygame.sprite.AbstractGroup):
             self.is_speed_boost = False
 
         return is_pressed
+    
 
+    
     def handle_movement(self):
         for snake_block in self.blocks:
             if snake_block.moving:
