@@ -163,9 +163,11 @@ class WaveManager:
     def _is_wave_clear(self, wave):
         """Check if all monsters in the wave are defeated"""
         # Count alive monsters from this wave
-        active_monsters = [e for e in wave.spawned_entities 
-                         if isinstance(e, Monster) and e.is_dead == False]
-        return len(active_monsters) == 0
+        for entity in wave.spawned_entities:
+            if isinstance(entity, Monster) and entity.is_dead and len(entity.blocks) == 0:
+                continue
+            return False
+        return True
     
     def _handle_all_waves_completed(self):
         """Handle completion of all waves"""

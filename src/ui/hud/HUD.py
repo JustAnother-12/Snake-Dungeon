@@ -2,6 +2,7 @@ import pygame
 from ui.elements.image import ImageElement
 from ui.elements.item_slot import ItemSlot
 from ui.elements.text import TextElement
+from utils.help import Share
 from utils.pixil import Pixil
 import config.constant as constant
 
@@ -50,13 +51,15 @@ class HUD(pygame.sprite.Group):
 
             ItemSlot(i-(85-50-5), 80, scale=2),
         ]
-
+        
+        self.time_value = 0
+        self.time_bar = TextElement(f'Time: {self.time_value//60:02}:{self.time_value%60:02}', 'yellow', 15, (constant.SCREEN_WIDTH_TILES - 10) * constant.TILE_SIZE, (constant.SCREEN_HEIGHT_TILES - 2) * constant.TILE_SIZE)
         self.level_.snake.inventory.slots
         
         self.Key_text = TextElement(str(snake.keys), "white", 15, 4*constant.TILE_SIZE, int(18.8*constant.TILE_SIZE), "midleft")
         self.stamina_bar = pygame.sprite.Sprite()
 
-        self.add(self.Player_Icon_rect, self.Gold_Icon_rect, self.Length_Icon_rect, self.Gold_text, self.length_text, self.Key_Icon_rect, self.Key_text)
+        self.add(self.Player_Icon_rect, self.Gold_Icon_rect, self.Length_Icon_rect, self.Gold_text, self.length_text, self.Key_Icon_rect, self.Key_text, self.time_bar)
         self.draw_stamina(snake.stamina, snake.base_stats.energy_cap)
         self.add(self.stamina_bar)
         self.add(*self.item_slot)
@@ -105,6 +108,13 @@ class HUD(pygame.sprite.Group):
             self.stamina_bar.image, (133, 133, 133), (0, 0, max_stamina + 4, 32), 4, 0, 0, 10, 0, 10
         )
         self.stamina_bar.rect = self.stamina_bar.image.get_rect(topleft=(6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE))
+    
+    def update_time(self):
+        from levels.level import LevelStatus
+        if self.level_.level_status == LevelStatus.PLAYING:
+            self.time_value += Share.clock.get_time() / 1000
+            second = int(self.time_value)
+            self.time_bar.set_text(f'Time: {second//60:02d}:{second%60:02d}')
 
     def update(self):
         self.draw_stamina(self.level_.snake.stamina, self.level_.snake.base_stats.energy_cap)
@@ -112,7 +122,7 @@ class HUD(pygame.sprite.Group):
         self.set_gold(coin)
         self.set_length(length)
         self.set_key(keys)
-
+        self.update_time()
         for index, value in enumerate(self.level_.snake.inventory.slots):
             self.item_slot[index].item_stack = value # type: ignore
 

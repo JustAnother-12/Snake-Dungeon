@@ -49,7 +49,7 @@ class Monster(Snake):
         if self.is_dead and len(self.blocks) == 1:
             block = self.blocks.pop(0)
             for _ in range(random.randint(3,5)):
-                self.level.item_group.add(CoinEntity(self.level, block.rect, 1)) # luôn luôn drop tiền
+                self.level.item_group.add(CoinEntity(self.level, area=block.rect, r=1)) # luôn luôn drop tiền
 
             loot_pool = LootPool((0, 0, 40, 10, 17, 15, 13, 5))
             item, rarity = loot_pool.get_item()       
@@ -219,6 +219,46 @@ class BlockerMonster(Monster):
         pygame.draw.rect(self.headImg, (255, 255, 0), (3, 3, 2, 4))
         pygame.draw.rect(self.headImg, (255, 255, 0), (11, 3, 2, 4))
         self.look_ahead = 3
+        
+    def handle_ai_movement(self):
+        for snake_block in self.blocks:
+            if snake_block.moving:
+                return
+        if self.is_dead or self.player is None or self.player.is_dead:
+            return
+
+        head_pos = self._block_positions[0]
+        player_head_pos = self.player._block_positions[0]
+        
+        # Calculate distance to player
+        distance_to_player = (head_pos - player_head_pos).length() / constant.TILE_SIZE
+        
+        # If far from player (7+ tiles), directly move towards player's head
+        if distance_to_player > 7:
+            # Direct targeting when far away
+            delta = player_head_pos - head_pos
+            
+            # Determine primary direction to move (horizontal vs vertical)
+            if abs(delta.x) > abs(delta.y):
+                new_direction = Vector2(1 if delta.x > 0 else -1, 0)
+            else:
+                new_direction = Vector2(0, 1 if delta.y > 0 else -1)
+            
+            # Don't go backwards
+            if new_direction == -self.direction and self.direction.length() > 0:
+                # Try perpendicular direction instead
+                if abs(delta.x) > abs(delta.y):
+                    new_direction = Vector2(0, 1 if delta.y > 0 else -1)
+                else:
+                    new_direction = Vector2(1 if delta.x > 0 else -1, 0)
+            
+            # Check if the move is valid
+            new_head_pos = head_pos + new_direction * constant.TILE_SIZE
+            if not self._is_collide(new_head_pos):
+                self.direction = new_direction
+                self.is_curling = False
+                return
+        return super().handle_ai_movement()
     
     def _calculate_weight(self, move, position):
         """Calculate weight for each potential move to block player's movement paths"""
@@ -267,38 +307,38 @@ class BlockerMonster(Monster):
         
         # Current direction
         if player_direction.length() > 0:
-            player_possible_moves.append(player_direction)
+            player_possible_moves.append((player_direction, 1.5))  # Weight current direction higher
             
             # Left turn (perpendicular direction)
             left_turn = Vector2(-player_direction.y, player_direction.x)
-            player_possible_moves.append(left_turn)
+            player_possible_moves.append((left_turn, 1.0))
             
             # Right turn (perpendicular direction)
             right_turn = Vector2(player_direction.y, -player_direction.x)
-            player_possible_moves.append(right_turn)
+            player_possible_moves.append((right_turn, 1.0))
         else:
-            # If player isn't moving, consider all 4 directions
-            player_possible_moves = [Vector2(1, 0), Vector2(-1, 0), 
-                                Vector2(0, 1), Vector2(0, -1)]
+            # If player isn't moving, consider all 4 directions equally
+            directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
+            player_possible_moves = [(d, 1.0) for d in directions]
         
         # Calculate how well this move blocks player paths
         blocking_score = 0
-        for player_move in player_possible_moves:
+        for player_move, importance in player_possible_moves:
             # Create a vector for where player would go
             player_next_pos = player_pos + player_move * constant.TILE_SIZE
             
             # Check if our position would block this path
             if (position.x == player_next_pos.x and position.y == player_next_pos.y):
                 # Direct blocking position!
-                blocking_score += 1000
+                blocking_score += 1200 * importance
             
-            # Check if we'd be in line with player's path (within 2 tiles)
-            for i in range(1, 3):
+            # Check if we'd be in line with player's path (checking 3 tiles ahead instead of 2)
+            for i in range(1, 4):
                 check_pos = player_pos + player_move * constant.TILE_SIZE * i
                 check_distance = (Vector2(position) - check_pos).length()
                 if check_distance < constant.TILE_SIZE:
                     # We'd be directly in player's path!
-                    blocking_score += 800 / (i + 0.1)  # Closer is better
+                    blocking_score += (900 / (i + 0.1)) * importance  # Closer is better
         
         return blocking_score
 
@@ -312,8 +352,8 @@ class BlockerMonster(Monster):
         player_direction = self.player.direction
         distance_to_player = (Vector2(position) - player_pos).length()
         
-        # Only consider wall trapping when close enough
-        if distance_to_player > constant.TILE_SIZE * 5:
+        # Only consider wall trapping when close enough - extended range
+        if distance_to_player > constant.TILE_SIZE * 6:
             return 0
             
         # Predict player's possible movement paths
@@ -331,7 +371,7 @@ class BlockerMonster(Monster):
         else:
             # If player isn't moving, consider all 4 directions
             player_possible_moves = [Vector2(1, 0), Vector2(-1, 0), 
-                                Vector2(0, 1), Vector2(0, -1)]
+                               Vector2(0, 1), Vector2(0, -1)]
         
         # Calculate trapping score
         wall_trapping_score = 0
@@ -347,21 +387,23 @@ class BlockerMonster(Monster):
                 player_future_pos.y < constant.MAP_TOP or
                 player_future_pos.y >= constant.MAP_BOTTOM):
                 blocked_directions += 1
-                wall_trapping_score += 200
+                wall_trapping_score += 250  # Increased from 200
                 
             # Check for obstacles that would trap player
             elif self._is_collide_with_obstacle(player_future_pos):
                 blocked_directions += 1
-                wall_trapping_score += 300
+                wall_trapping_score += 350  # Increased from 300
                 
             # Check if our new position would block this direction
             elif position.x == player_future_pos.x and position.y == player_future_pos.y:
                 blocked_directions += 1
-                wall_trapping_score += 400
+                wall_trapping_score += 500  # Increased from 400
         
-        # Huge bonus if we're blocking the last escape route (3 directions already blocked)
+        # Huge bonus if we're blocking escape routes
         if blocked_directions >= 3:
-            wall_trapping_score += 1500
+            wall_trapping_score += 2000  # Increased from 1500
+        elif blocked_directions == 2:
+            wall_trapping_score += 600  # Added bonus for blocking 2 directions
         
         return wall_trapping_score
 
@@ -380,8 +422,8 @@ class BlockerMonster(Monster):
             
         interception_score = 0
         
-        # Calculate ideal interception point (ahead of player)
-        for i in range(1, self.look_ahead + 1):
+        # Look further ahead (up to 4 tiles) with diminishing returns
+        for i in range(1, self.look_ahead + 2):
             interception_point = player_pos + player_direction * constant.TILE_SIZE * i
             
             # Check if our move gets us closer to intercepting player
@@ -390,11 +432,11 @@ class BlockerMonster(Monster):
             
             # Higher score if we're moving closer to interception point
             if new_to_intercept < current_to_intercept:
-                # More points for closer interception points
-                interception_score += 300 * (1 - (new_to_intercept / (constant.TILE_SIZE * 10))) / i
+                # More points for closer interception points, with steeper falloff
+                interception_score += 350 * (1 - (new_to_intercept / (constant.TILE_SIZE * 10))) / (i ** 0.7)
                 
             # Huge bonus if we're exactly at the interception point
             if abs(position.x - interception_point.x) < 0.1 and abs(position.y - interception_point.y) < 0.1:
-                interception_score += 700 / i  # More points for earlier interception
-        
+                interception_score += 800 / i  # More points for earlier interception
+    
         return interception_score

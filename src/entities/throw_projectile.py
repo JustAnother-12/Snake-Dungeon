@@ -75,7 +75,7 @@ class Throw_projectile(Projectile):
                 if isinstance(expire_obj, Bomb):
                     self.level.bomb_group.add(expire_obj)
                 elif isinstance(expire_obj, FireBomb):
-                    self.level.bomb_group.add(expire_obj)
+                    self.level.fire_bomb_group.add(expire_obj)
             if hasattr(self.level, "fire_group") and isinstance(
                 expire_obj, Fire_Tile
             ):  
