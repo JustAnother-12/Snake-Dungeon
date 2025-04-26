@@ -108,6 +108,9 @@ class HUD(pygame.sprite.Group):
             self.stamina_bar.image, (133, 133, 133), (0, 0, max_stamina + 4, 32), 4, 0, 0, 10, 0, 10
         )
         self.stamina_bar.rect = self.stamina_bar.image.get_rect(topleft=(6.5*constant.TILE_SIZE, 2.5*constant.TILE_SIZE))
+       
+    def get_time_value(self):
+        return self.time_value
     
     def update_time(self):
         from levels.level import LevelStatus
