@@ -73,7 +73,7 @@ class Level(State):
         self.snake = Snake(self, 10)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(DragonBreathStack())
+        self.snake.inventory.add_item(RitualDaggerStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
         self.snake.inventory.add_item(CreditCardStack())
