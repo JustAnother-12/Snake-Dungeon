@@ -1,6 +1,5 @@
 from enum import Enum
 import random
-from re import S
 import pygame
 
 import config.constant as constant
@@ -13,11 +12,8 @@ from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.instant.food import FoodEntity
-from entities.items.skill.celestine_amulet import CelestineAmuletStack
-from entities.items.skill.dragon_breath import DragonBreathEntity, DragonBreathStack
+from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.items.skill.gun_devil_contract import GunEntity
-from entities.items.skill.ritual_dagger import RitualDaggerStack
-from entities.items.skill.thanos import ThanosEntity
 from levels.components.chest import Chest
 from levels.components.door import Door
 from levels.components.floor_tile import Floor
@@ -26,7 +22,7 @@ from levels.components.pot import Pot
 from levels.components.trap import Trap
 from levels.components.wall import Walls
 from loot import LootPool
-from stats import StatType, Stats
+from stats import Stats
 from systems.interaction_manager import InteractionManager
 from systems.level_manager import DoorType, LevelConfig, LootPoolConfig, RegionGeneratorConfig, RoomType, WaveManagerConfig
 from systems.wave_manager import Wave, WaveManager
@@ -48,9 +44,6 @@ class LevelStatus(Enum):
     ROOM_CLEARED = 3
     PAUSED = 4
     ROOM_COMPLETED = 5
-
-# làm cho nó gọn để kế thừa
-
 
 class Level(State):
     def __init__(self, game) -> None:
@@ -77,8 +70,8 @@ class Level(State):
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
         self.snake.inventory.add_item(CreditCardStack())
-        # end todo
-
+        # TODO: nhớ xóa
+        
         self.hud = HUD(self)
         self.interaction_manager = InteractionManager(self)
 
@@ -178,8 +171,6 @@ class Level(State):
         self.pot_group.empty()
         for x, y in self.region_generator.pots_initpos:
             self.pot_group.add(Pot(self, (x, y)))
-        
-        
 
         self.item_group.empty()
         self.item_group.add(HephaestusBloodEntity(self))
@@ -219,42 +210,7 @@ class Level(State):
             self.check_room_cleared()
 
         if self.level_status == LevelStatus.ROOM_CLEARED:
-            if self.current_level >= self.max_level: # kết thúc game nếu vượt qua hết màn chơi
-                self.game.state_stack.append(YouWin_menu(self.game))
-                Share.audio.stop_music()
-                return
-            if self._config.room_type != RoomType.SHOP:
-                self.game.state_stack.append(RoomCleared(self.game))
-            # tạo cửa ở tường
-
-            # tạo random từ 2 -> 3 cửa
-            doors = random.randint(2, 3)
-            # tạo random vị trí cửa
-            # random vị trí cửa canh đề nhau phía trên
-
-            # chosen random door index shope
-            shope_index = random.randint(0, doors - 1)
-            if self._config.room_type == RoomType.SHOP:
-                shope_index = -1
-
-            spacing = 128
-            print(spacing)
-            print(shope_index, doors)
-
-            for index, x in enumerate(range(constant.MAP_LEFT + spacing, constant.MAP_RIGHT, spacing)):
-                if index >= doors:
-                    break
-                door = Door(self, (x, constant.MAP_TOP - 64),
-                            DoorType.SHOP if index == shope_index else None)
-                print(door)
-                self.add(door)
-
-            self.level_status = LevelStatus.ROOM_COMPLETED
-            if self._config.room_type != RoomType.SHOP:
-                self.region_generator.get_reward_chest_region()
-                for x, y in self.region_generator.reward_chests_initpos:
-                    self.chest_group.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
-        
+            self._room_cleared()
 
         self.handle_input()
         t = self.snake._will_go_out_of_bounds
@@ -267,9 +223,43 @@ class Level(State):
         if self.wave_manager.is_complete():
             self.level_status = LevelStatus.ROOM_CLEARED
             self.snake.auto_state = False
+        
+    def _room_cleared(self):
+        if self._config.room_type != RoomType.SHOP:
+            self.game.state_stack.append(RoomCleared(self.game))
 
+        # tạo random từ 2 -> 3 cửa
+        doors = random.randint(2, 3)
+        # nếu là shop | hoặc level cuối thì chỉ có 1 cửa
+        if self._config.room_type == RoomType.SHOP or self.current_level >= self.max_level - 1:
+            doors = 1
+        shope_index = random.randint(0, doors - 1)
+        if self._config.room_type == RoomType.SHOP or self.current_level >= self.max_level - 1: 
+            shope_index = -1
+
+        spacing = 128
+
+        for index, x in enumerate(range(constant.MAP_LEFT + spacing, constant.MAP_RIGHT, spacing)):
+            if index >= doors:
+                break
+            door = Door(self, (x, constant.MAP_TOP - 64),
+                        DoorType.SHOP if index == shope_index else None)
+            print(door)
+            self.add(door)
+
+        self.level_status = LevelStatus.ROOM_COMPLETED
+
+        if self._config.room_type == RoomType.SHOP: return
+        self.region_generator.get_reward_chest_region()
+        for x, y in self.region_generator.reward_chests_initpos:
+            self.chest_group.add(Chest(self, (x - constant.TILE_SIZE, y - constant.TILE_SIZE), False))
 
     def next_level(self, config: LevelConfig):
+        if self.current_level >= self.max_level - 1:
+            self.game.state_stack.append(YouWin_menu(self.game))
+            Share.audio.stop_music()
+            return
+
         self._config = config
         # xóa những phần tử cũ đi
         self.chest_group.empty()
