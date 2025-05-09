@@ -168,7 +168,7 @@ class ItemEntity(InteractionObject):
     
     def on_pickup(self):
         """Called when player picks up the item"""
-        self.level.game.state_stack.append(ItemInfoPopup(self.level, self))
+        ItemInfoPopup(self.level, self).enter_state()
 
     def on_interact(self):
         self.on_pickup()

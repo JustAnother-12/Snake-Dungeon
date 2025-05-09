@@ -2,6 +2,8 @@ from typing import Any, Iterable
 import pygame
 from pygame.sprite import AbstractGroup
 
+
+
 class NestedGroup(pygame.sprite.Group):
     def __init__(self) -> None:
         super().__init__()
@@ -37,13 +39,14 @@ class NestedGroup(pygame.sprite.Group):
         return super().empty() 
 
 class State(NestedGroup):
-
     def __init__(self, game) -> None:
         super().__init__()
-        self.game = game
-        self.prev_state = None
+        from Main import Game
+        self.game: Game = game
+        self.prev_state: list[State] = []
         self.visible = True
         self.is_paused = False
+        self.module = False
 
     def get_event(self, event: pygame.event.Event):
         pass
@@ -52,9 +55,11 @@ class State(NestedGroup):
         pass
 
     def enter_state(self):
-        if len(self.game.state_stack) > 1:
-            self.prev_state = self.game.state_stack[-1]
+        if self.module:
+            self.game.state_stack[-1].visible = False
         self.game.state_stack.append(self)
 
     def exit_state(self):
         self.game.state_stack.pop()
+        if self.module:
+            self.game.state_stack[-1].visible = True

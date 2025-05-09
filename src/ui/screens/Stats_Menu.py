@@ -17,6 +17,7 @@ class base_stats_value:
 class Stats_menu(State):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.module = True 
         self.Stats_text = TextElement("STATS", "white", 45, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 18)*game.TILE_SIZE, "center")
         self.Background_texture = Pixil.load("game-assets/graphics/pixil/STATS_MENU_BG_BTN.pixil", 8).frames[0]
         self.Background_rect = ImageElement((game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2)*game.TILE_SIZE, self.Background_texture)

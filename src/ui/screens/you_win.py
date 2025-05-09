@@ -8,6 +8,7 @@ from config.constant import SCREEN_HEIGHT_TILES, SCREEN_WIDTH_TILES, TILE_SIZE
 class YouWin_menu(Menu):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.module = True
 
         self.You_win_text = TextElement("YOU WIN!", "white", 45, (SCREEN_WIDTH_TILES//2)*TILE_SIZE, (SCREEN_HEIGHT_TILES//2 - 10)*TILE_SIZE, "center")
         
@@ -37,11 +38,10 @@ class YouWin_menu(Menu):
                     button.on_click()
 
     def restart_button_event(self):
-        self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
-        self.game.state_stack[-1].visible = True
+        self.exit_state()
+        self.game.get_state().reset()
 
     def main_menu_button_event(self):
         while len(self.game.state_stack) > 1:
-            self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
+            self.game.get_state().exit_state()
+        self.game.get_state().reset()

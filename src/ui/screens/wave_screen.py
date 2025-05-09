@@ -29,11 +29,10 @@ class WaveScreen(State):
         self.duration -= Share.clock.get_time() / 1000
         self.count.set_text(f"Starting in {int(self.duration) + 1}")
         if self.duration <= 0:
-            self.game.state_stack.pop()
-            self.game.state_stack[-1].visible = True
+            self.exit_state()
 
 
     # chuyển hướng đến cho level
     def reset(self):
-        self.game.state_stack.pop()
+        self.exit_state()
         self.level_.reset()
