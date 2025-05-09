@@ -40,14 +40,14 @@ template = {
     DifficultyLevel.EASY: LevelConfig(
         region_generator=RegionGeneratorConfig(
             has_trap=0.2,       # Ít bẫy
-            has_obstacle=0.3,    # Ít chướng ngại vật
+            has_obstacle=0.5,    # Ít chướng ngại vật
             has_chest=0.7,       # Nhiều rương
             has_pot=0.8          # Nhiều bình
         ),
         wave_manager=WaveManagerConfig(
             wave_interval=2,     # 2 giây giữa các đợt
             max_wave_count=2,    # Tối đa 2 đợt
-            max_wave_entities=8,  # Tối đa 4 quái mỗi đợt
+            max_wave_entities=3,  # Tối đa 4 quái mỗi đợt
             enemy_types={
                 'weak_monster': 0.7,
                 'bomb': 0.3,
@@ -64,15 +64,15 @@ template = {
     # Độ khó THƯỜNG
     DifficultyLevel.NORMAL: LevelConfig(
         region_generator=RegionGeneratorConfig(
-            has_trap=0.4,
-            has_obstacle=0.5,
-            has_chest=0.5,
-            has_pot=0.6
+            has_trap=0.5,
+            has_obstacle=0.7,
+            has_chest=0.7,
+            has_pot=0.8
         ),
         wave_manager=WaveManagerConfig(
             wave_interval=1,
             max_wave_count=3,
-            max_wave_entities=6,
+            max_wave_entities=3,
             enemy_types={
                 'weak_monster': 0.4,
                 'bomb': 0.3,
@@ -90,14 +90,14 @@ template = {
     DifficultyLevel.HARD: LevelConfig(
         region_generator=RegionGeneratorConfig(
             has_trap=0.7,
-            has_obstacle=0.6,
-            has_chest=0.4,
-            has_pot=0.5
+            has_obstacle=0.8,
+            has_chest=0.8,
+            has_pot=1.0
         ),
         wave_manager=WaveManagerConfig(
             wave_interval=3,
             max_wave_count=4,
-            max_wave_entities=10,
+            max_wave_entities=4,
             enemy_types={
                 'weak_monster': 0.1,
                 'bomb': 0.3,

@@ -30,10 +30,18 @@ class CelestineAmuletStack(ItemStack):
         Share.audio.play_sound("power-up")
         self.active_time = self.active_duration
         self.last_speed = snake.base_stats.speed
+        self.add_runtime_overriding(snake, 'update', 'before', self.handle_death)
         self.add_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
         self.add_runtime_overriding(snake, 'handle_collision', 'return', self.disable_collision)
         self.add_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boost)
         
+
+    def handle_death(self, snake, *args, **kwargs):
+        for block in snake.blocks:
+            block.health = 3
+        snake.is_dead = False
+        return args, kwargs
+
     def disable_collision(self, snake, *args, **kwargs):
         return False
     
@@ -69,6 +77,7 @@ class CelestineAmuletStack(ItemStack):
     def remove_effect(self, snake):
         Share.audio.set_sound_volume("power-down", 0.4)
         Share.audio.play_sound("power-down")
+        self.remove_runtime_overriding(snake, 'update', 'before', self.handle_death)
         self.remove_runtime_overriding(snake, '_is_collide_with_orther_snake', 'return', self.kill_moster_when_collide)
         self.remove_runtime_overriding(snake, 'handle_collision', 'return', self.disable_collision)
         self.remove_runtime_overriding(snake, 'handle_speed_boost', 'before', self.speed_boost)

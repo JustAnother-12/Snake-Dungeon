@@ -12,6 +12,7 @@ from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.instant.food import FoodEntity
+from entities.items.skill.celestine_amulet import CelestineAmuletStack
 from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.items.skill.gun_devil_contract import GunEntity
 from entities.items.skill.ritual_dagger import RitualDaggerStack
@@ -23,7 +24,7 @@ from levels.components.pot import Pot
 from levels.components.trap import Trap
 from levels.components.wall import Walls
 from loot import LootPool
-from stats import Stats
+from stats import StatType, Stats
 from systems.interaction_manager import InteractionManager
 from systems.level_manager import DoorType, LevelConfig, LootPoolConfig, RegionGeneratorConfig, RoomType, WaveManagerConfig
 from systems.wave_manager import Wave, WaveManager
@@ -65,10 +66,11 @@ class Level(State):
         self.snake_group = NestedGroup()
         self.fire_group = pygame.sprite.Group()
         self.snake = Snake(self, 5)
+        Stats.setValue(StatType.ENERGY_CAPACITY, 100)
 
         # TODO: nhớ xóa
-        # self.snake.inventory.add_item(RitualDaggerStack())
-        # self.snake.inventory.add_item(FireBombStack(5))
+        self.snake.inventory.add_item(CelestineAmuletStack())
+        self.snake.inventory.add_item(FireBombStack(5))
         # self.snake.inventory.add_item(MolotovStack(5))
         # self.snake.inventory.add_item(CreditCardStack())
         # TODO: nhớ xóa
@@ -82,8 +84,8 @@ class Level(State):
 
         # level đầu tiên lúc nào cũng giống nhau
         self._config: LevelConfig = LevelConfig(
-            region_generator=RegionGeneratorConfig(0, 0, 0, 0),
-            wave_manager=WaveManagerConfig(5, 1, 1, {
+            region_generator=RegionGeneratorConfig(0.3, 0.4, 0.6, 0.8),
+            wave_manager=WaveManagerConfig(2, 1, 1, {
                 "monster": 1
             }),
             loot_pool=LootPoolConfig(
@@ -123,6 +125,7 @@ class Level(State):
         self.wave_manager = WaveManager(self)
         wave_config = room_config.wave_manager
         print(wave_config)
+        
 
         for i in range(wave_config.max_wave_count):
             entities_config = {
@@ -131,7 +134,8 @@ class Level(State):
                 "blocker": 0,
             }
 
-            enemy_count = random.randint(0, wave_config.max_wave_entities)
+            # enemy_count = random.randint(1, wave_config.max_wave_entities)
+            enemy_count = wave_config.max_wave_entities
             for _ in range(enemy_count):
                 entity_type = random.choice(list(entities_config.keys()))
                 entities_config[entity_type] += 1
@@ -270,6 +274,7 @@ class Level(State):
         self.bomb_group.empty()
         self.fire_bomb_group.empty()
         self.item_group.empty()
+        self.fire_group.empty()
 
         # xoa shop
         if hasattr(self, "shop"):
