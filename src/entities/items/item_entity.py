@@ -111,8 +111,6 @@ class ItemEntity(InteractionObject):
                 self.pos = pygame.Vector2(x, y)
             if self.check_pos(self.image):
                 break
-        
-        print("đéo tạo được vị trí item")
         self.kill()
 
     def check_pos(self, image):
