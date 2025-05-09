@@ -1,13 +1,9 @@
 import random
 from enum import Enum
-import pygame
-from pygame.math import Vector2
 
 from config import constant
 from entities.Monster import BlockerMonster, BombMonster, Monster
-from levels.components.bomb import Bomb, BombState
-from levels.components.trap import Trap
-from utils.help import Share
+from ui.screens.wave_screen import WaveScreen
 
 
 class WaveState(Enum):
@@ -36,7 +32,8 @@ class Wave:
 
 
 class WaveManager:
-    def __init__(self, level):
+    from levels import level as lv
+    def __init__(self, level: "lv.Level"):
         self.level = level
         self.waves = []
         self.current_wave_index = 0
@@ -87,20 +84,27 @@ class WaveManager:
         elif current_wave.state == WaveState.IN_PROGRESS:
             # Check if this wave is cleared (all monsters defeated)
             if self._is_wave_clear(current_wave):
-                current_wave.state = WaveState.COMPLETED
-                self._play_wave_cleared_sound()
-                
-                # Move to next wave
-                self.current_wave_index += 1
-                self.timer = 0
-                
-                # Check if all waves completed
-                if self.current_wave_index >= len(self.waves):
-                    self._handle_all_waves_completed()
-                    return
-                
-                # Start next wave
-                self.waves[self.current_wave_index].state = WaveState.WAITING
+                self.timer += dt
+                if self.timer >= 1.0:  # Wait for 1 second before clearing
+                    self.timer = 0
+                    current_wave.state = WaveState.COMPLETED
+                    self._play_wave_cleared_sound()
+                    
+                    # Move to next wave
+                    self.current_wave_index += 1
+                    self.timer = 0
+                    
+                    # Check if all waves completed
+                    if self.current_wave_index >= len(self.waves):
+                        self._handle_all_waves_completed()
+                        return
+                    
+                    # Start next wave
+                    self.waves[self.current_wave_index].state = WaveState.WAITING
+                    self.show_countdown()
+    
+    def show_countdown(self):
+        self.level.game.state_stack.append(WaveScreen(self.level.game, self.level))
     
     def _spawn_next_entity(self, wave):
         """Spawn the next entity from the wave config, return True if spawned"""

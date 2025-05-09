@@ -30,7 +30,9 @@ class Game:
         self.load_states()
     
     def update(self):
-        self.state_stack[-1].update()
+        for state in self.state_stack:
+            if state.visible:
+                state.update()
     
     def load_audio(self):
         self.audio.load_all_music('game-assets/audio/music')
