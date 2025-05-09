@@ -68,9 +68,10 @@ class Level(State):
         self.snake_group = NestedGroup()
         self.fire_group = pygame.sprite.Group()
         self.snake = Snake(self, 5)
-        Stats.setValue(StatType.ENERGY_CAPACITY, 100)
+        
 
         # TODO: nhớ xóa
+        Stats.setValue(StatType.ENERGY_CAPACITY, 100)
         self.snake.inventory.add_item(CelestineAmuletStack())
         self.snake.inventory.add_item(FireBombStack(5))
         # self.snake.inventory.add_item(MolotovStack(5))
@@ -180,14 +181,6 @@ class Level(State):
             self.pot_group.add(Pot(self, (x, y)))
 
         self.item_group.empty()
-        # self.item_group.add(HephaestusBloodEntity(self))
-        # self.item_group.add(FireGemAmuletEntity(self))
-        # self.item_group.add(GunEntity(self))
-        # self.item_group.add(FlameTrailEntity(self))
-        # self.item_group.add(MidasBloodEntity(self))
-        # self.item_group.add(BloodBombDevilEntity(self))
-        # for _ in range(10):
-        #     self.item_group.add(FoodEntity(self))
 
     def reset(self):
         Stats.reset()
@@ -200,7 +193,6 @@ class Level(State):
     def handle_input(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_ESCAPE]:
-            print('hello')
             Pause_menu(self.game).enter_state()
 
         self.interaction_manager.handle_input()

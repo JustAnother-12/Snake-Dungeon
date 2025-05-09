@@ -9,8 +9,8 @@ class TextElement(pygame.sprite.Sprite):
                  text: str, 
                  color: pygame.typing.ColorLike, 
                  font_size: int, 
-                 x_pos: int, 
-                 y_pos: int, 
+                 x_pos, 
+                 y_pos, 
                  choice: Literal["midleft", "center", "midright", "topleft"] = "midleft", 
                  width = -1
             ) -> None:
