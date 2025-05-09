@@ -1,15 +1,16 @@
 import pygame
 from levels.level import Level
 from ui.elements.button import ButtonElement
+from ui.elements.image import ImageElement
 from ui.screens.menu import Menu
 from utils.help import Share
 from utils.pixil import Pixil
 
-class Menu_logo(pygame.sprite.Sprite):
-    def __init__(self, x_pos, y_pos) -> None:
-        super().__init__()
-        self.image = Pixil.load("game-assets/graphics/pixil/MENU_LOGO.pixil", 3).frames[0]
-        self.rect = self.image.get_rect(center=(x_pos, y_pos))
+# class Menu_logo(pygame.sprite.Sprite):
+#     def __init__(self, x_pos, y_pos) -> None:
+#         super().__init__()
+#         self.image = Pixil.load("game-assets/graphics/pixil/MENU_LOGO.pixil", 3).frames[0]
+#         self.rect = self.image.get_rect(center=(x_pos, y_pos))
 
 class MainMenu(Menu):
     def __init__(self, game) -> None:
@@ -22,8 +23,8 @@ class MainMenu(Menu):
         self.play_button = ButtonElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES/2*game.TILE_SIZE, "PLAY", "white", 30,self.play_button_event)
         self.quit_button = ButtonElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_HEIGHT_TILES/1.5*game.TILE_SIZE, "QUIT", "white", 30,self.quit_button_event)
         self.addBtn([self.play_button, self.quit_button])
-
-        self.Main_menu = Menu_logo(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_WIDTH_TILES/4*game.TILE_SIZE)
+        self.logoimage = Pixil.load("game-assets/graphics/pixil/MENU_LOGO.pixil", 3).frames[0]
+        self.Main_menu = ImageElement(game.SCREEN_WIDTH_TILES/2*game.TILE_SIZE, game.SCREEN_WIDTH_TILES/4*game.TILE_SIZE, self.logoimage)
 
         self.add(self.play_button, self.quit_button, self.Main_menu)
 

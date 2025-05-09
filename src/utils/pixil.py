@@ -62,10 +62,4 @@ def get_coords_from_pixil(path, target_color):
                     coords.append((x,y))
     return coords
 
-    
-# if __name__ == '__main__':
-#     # pixil = Pixil.load('game-assets/graphics/pixil/apple.pixil', 2)
-#     # print(pixil.size)
-#     # print(pixil.original_size)
-#     coords = get_coords_from_pixil("C:/Users/user/Downloads/test.pixil", (255, 194, 14))
-#     print(coords)  
+     

@@ -59,7 +59,6 @@ class RegionGenerator:
         self.chests_initpos = []
         self.reward_chests_initpos = []
 
-        # self.get_reward_chest_region()
 
         if self.has_trap:
             self.get_trap_region()
@@ -70,11 +69,7 @@ class RegionGenerator:
         if self.has_chest:
             self.get_chest_region()
         
-
-    # def region_overlaped(self,x,y):
-    #     if (x,y) in self.grid:
-    #         return True
-    #     return False
+   
 
     # Hàm kiểm tra xem khu vực có trống không
     def is_area_free(self, x, y, size):
@@ -90,17 +85,7 @@ class RegionGenerator:
             for j in range(size):
                 self.grid[x + i][y + j] = 1
 
-    # def get_trap_region(self):
-    #     random.shuffle(trap_possible_regions)
-    #     for region in trap_possible_regions:
-    #         region_placed = False
-    #         for x,y in region:
-    #             if self.is_area_free(x,y,2):
-    #                 self.traps_initpos.append(((x + constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE, (y + constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE))
-    #                 self.mark_area(x,y,2)
-    #                 region_placed = True
-    #         if region_placed:
-    #             break
+    
 
     def get_trap_region(self):
         for x,y in random.choices(trap_possible_regions)[0]:
@@ -117,17 +102,7 @@ class RegionGenerator:
                 self.pots_initpos.append(((x + constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE, (y + constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE))
                 self.mark_area(x,y,1)
 
-    # def get_obstacle_region(self):
-    #     random.shuffle(obstacle_possible_regions)
-    #     for region in obstacle_possible_regions:
-    #         region_placed = False
-    #         for x,y in region:
-    #             if self.is_area_free(x,y,2):
-    #                 self.obstacles_initpos.append(((x + constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE, (y + constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES)*constant.TILE_SIZE))
-    #                 self.mark_area(x,y,2)
-    #                 region_placed = True
-    #         if region_placed:
-    #             break
+    
 
     def get_obstacle_region(self):
         for x,y in random.choices(obstacle_possible_regions)[0]:
