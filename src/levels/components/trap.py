@@ -5,8 +5,8 @@ from enum import Enum
 
 class TrapState(Enum):
     VISIBLE = 1  # Chỉ hiển thị, chưa kích hoạt (trạng thái mặc định)
-    WAITING = 2  # Đang kích hoạt (gai xuất hiện)
-    ACTIVATED = 3  # Đang trong quá trình lặp lại (trở về trạng thái ban đầu)
+    WAITING = 2  # Chờ kích hoạt
+    ACTIVATED = 3  # Đang kích hoạt (gai xuất hiện)
 
 class Trap(pygame.sprite.Sprite):
     from levels import level
@@ -28,8 +28,8 @@ class Trap(pygame.sprite.Sprite):
         # Cấu hình thời gian cho mỗi trạng thái
         self.duration = {
             TrapState.VISIBLE: 0,  # Trạng thái mặc định, không hết hạn
-            TrapState.WAITING: 1.5,  # Thời gian gai xuất hiện
-            TrapState.ACTIVATED: 0.5,  # Thời gian để lặp lại
+            TrapState.WAITING: 1.5,  # Thời gian chờ gai xuất hiện
+            TrapState.ACTIVATED: 0.5,  # Thời gian gai xuất hiện
         }
 
     def update(self):
@@ -66,10 +66,4 @@ class Trap(pygame.sprite.Sprite):
             if pygame.sprite.spritecollideany(self, snake.blocks): # type: ignore
                 return True
         return False
-        # return pygame.sprite.spritecollideany(self, self._level.snake.blocks) # type: ignore
-    
-    # def __is_collision_with_monster(self):
-    #     for snake in self._level.monster_group._sub_group__:
-    #         if pygame.sprite.spritecollideany(self, snake.blocks): # type: ignore
-    #             return True
-    #     return False
+        

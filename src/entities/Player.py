@@ -58,7 +58,6 @@ class SnakeBlock(pygame.sprite.Sprite):
     def is_head(self, value):
         self.__is_head = value
         if value:
-            # self.image = pygame.transform.rotate(Snake.headImg, -90)
             pass
 
     def rotate(self, direction, img):
@@ -363,7 +362,6 @@ class Snake(pygame.sprite.AbstractGroup):
 
         self.update_stats()
         dt = self.level.game.clock.get_time()
-        # self.handle_severed_blocks()
         is_press = self.handle_input()
 
         # một là đang trong trạng thái tự động, hai là có sự kiện nhấn phím
@@ -373,10 +371,9 @@ class Snake(pygame.sprite.AbstractGroup):
         self.handle_go_out_of_bounds(dt)
         self.handle_speed_boost()
         self.handle_collision()
-        self.handle_skills(dt)
         self.check_blocks_health()
         self.inventory.update()
-        # print(self._block_positions, end=" " * 50 + "\r", flush=True)
+       
         for i, block in enumerate(self.blocks):
             block.set_target(
                 # NOTE: test stats (speed)
@@ -409,16 +406,14 @@ class Snake(pygame.sprite.AbstractGroup):
                 i.add(newBlock)  # type: ignore
 
     def check_blocks_health(self):
-        # print(len(self.sprites()), list(sprite.health for sprite in self.sprites()))
+        
         for index, block in enumerate(self.sprites()):
             if block.health <= 0:
                 self.split(index)
 
     def split(self, index, transform_type='', delay=2):
         for i, block in enumerate(self.blocks[index:]):
-            # block.is_severed = True
             block.sever(transform_type, delay + 0.1 * i)
-            # block.image.fill((255, 255, 255)) # type: ignore
 
         self.blocks = self.blocks[:index]
         self._block_positions = self._block_positions[:index]
@@ -529,8 +524,6 @@ class Snake(pygame.sprite.AbstractGroup):
                     return True
         return False
 
-    def handle_skills(self, dt):
-        pass
 
     def curl_snake(self):
         if not self.is_curling:
@@ -559,6 +552,7 @@ class Snake(pygame.sprite.AbstractGroup):
         self._block_positions.pop(0)
         block: SnakeBlock
         block.kill()
+        
 # class GreenSnake(Snake):
 #     from levels import level # type: ignore
 #     def __init__(self, level: "level.Level", init_len):

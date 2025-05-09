@@ -64,13 +64,13 @@ class Level(State):
         self.item_group = pygame.sprite.Group()
         self.snake_group = NestedGroup()
         self.fire_group = pygame.sprite.Group()
-        self.snake = Snake(self, 10)
+        self.snake = Snake(self, 5)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(RitualDaggerStack())
-        self.snake.inventory.add_item(FireBombStack(5))
-        self.snake.inventory.add_item(MolotovStack(5))
-        self.snake.inventory.add_item(CreditCardStack())
+        # self.snake.inventory.add_item(RitualDaggerStack())
+        # self.snake.inventory.add_item(FireBombStack(5))
+        # self.snake.inventory.add_item(MolotovStack(5))
+        # self.snake.inventory.add_item(CreditCardStack())
         # TODO: nhớ xóa
         
         self.hud = HUD(self)
@@ -174,14 +174,14 @@ class Level(State):
             self.pot_group.add(Pot(self, (x, y)))
 
         self.item_group.empty()
-        self.item_group.add(HephaestusBloodEntity(self))
-        self.item_group.add(FireGemAmuletEntity(self))
-        self.item_group.add(GunEntity(self))
-        self.item_group.add(FlameTrailEntity(self))
-        self.item_group.add(MidasBloodEntity(self))
-        self.item_group.add(BloodBombDevilEntity(self))
-        for _ in range(10):
-            self.item_group.add(FoodEntity(self))
+        # self.item_group.add(HephaestusBloodEntity(self))
+        # self.item_group.add(FireGemAmuletEntity(self))
+        # self.item_group.add(GunEntity(self))
+        # self.item_group.add(FlameTrailEntity(self))
+        # self.item_group.add(MidasBloodEntity(self))
+        # self.item_group.add(BloodBombDevilEntity(self))
+        # for _ in range(10):
+        #     self.item_group.add(FoodEntity(self))
 
     def reset(self):
         Stats.reset()

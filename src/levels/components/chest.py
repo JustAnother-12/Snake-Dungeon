@@ -29,29 +29,6 @@ class Chest(pygame.sprite.Sprite):
             self.pos[0])+8, int(self.pos[1]), "midleft")
         self.TextTime = None
 
-    # def random_pos(self):
-    #     self.pos = pygame.Vector2(
-    #         random.randint(
-    #             constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES + 1,
-    #             (
-    #                 SCREEN_WIDTH_TILES
-    #                 - constant.LEFT_RIGHT_BORDER_TILES
-    #                 - 3
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #         random.randint(
-    #             constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES + 1,
-    #             (
-    #                 SCREEN_HEIGHT_TILES
-    #                 - constant.TOP_BOTTOM_BORDER_TILES
-    #                 - 3
-    #                 - constant.WALL_TILES
-    #             ),
-    #         )
-    #         * TILE_SIZE,
-    #     )
 
     def update(self) -> None:
         if self.TextTime != None:
