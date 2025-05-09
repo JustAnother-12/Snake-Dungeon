@@ -1,6 +1,8 @@
 import random
 from enum import Enum
 
+import pygame
+
 from config import constant
 from entities.Monster import BlockerMonster, BombMonster, Monster
 from ui.screens.wave_screen import WaveScreen
@@ -52,6 +54,7 @@ class WaveManager:
         self.timer = 0
         self.running = True
         # Register the first wave with delay
+        self.show_countdown()
         if self.waves:
             self.waves[0].state = WaveState.WAITING
     
@@ -124,10 +127,31 @@ class WaveManager:
             return True
             
         return False
-            
+    
+    def is_valid_spawn_position(self, pos):
+        """Check if the spawn position is valid"""
+        # min distance from player
+        min_distance = constant.TILE_SIZE * 5
+        pos_ = pygame.Vector2(pos[0] * constant.TILE_SIZE, pos[1] * constant.TILE_SIZE)
+        if pos_.distance_to(self.level.snake._block_positions[0]) < min_distance:
+            return False
+        
+        # Check if the position is colliding with any existing entities
+        for entity in self.level.snake_group:
+            if entity.rect.collidepoint(pos_):
+                return False
+        
+        # Check if the position is colliding with any obstacles
+        for obstacle in self.level.obstacle_group:
+            if obstacle.rect.collidepoint(pos_):
+                return False
+        
+        return True
+        
     def _create_entity(self, entity_type):
         """Create an entity based on type"""
-        if entity_type == "monster":
+
+        for _ in range(10):
             x = random.randint(
                 (constant.MAP_LEFT + constant.TILE_SIZE*2)//constant.TILE_SIZE,
                 (constant.MAP_RIGHT - constant.TILE_SIZE*2)//constant.TILE_SIZE
@@ -136,21 +160,18 @@ class WaveManager:
                 (constant.MAP_TOP + constant.TILE_SIZE*2)//constant.TILE_SIZE,
                 (constant.MAP_BOTTOM - constant.TILE_SIZE*2)//constant.TILE_SIZE
             )
+            if self.is_valid_spawn_position((x,y)):
+                break
+        else:
+            return None
+        
+        if entity_type == "monster":
             print(x,y)
             monster = Monster(self.level, random.randint(5, 8), (x*constant.TILE_SIZE,y*constant.TILE_SIZE))
             monster.set_player_reference(self.level.snake)
             self.level.snake_group.add(monster)
             return monster
         elif entity_type == "blocker":
-            x = random.randint(
-                (constant.MAP_LEFT + constant.TILE_SIZE*2)//constant.TILE_SIZE,
-                (constant.MAP_RIGHT - constant.TILE_SIZE*2)//constant.TILE_SIZE
-            )
-            y = random.randint(
-                (constant.MAP_TOP + constant.TILE_SIZE*2)//constant.TILE_SIZE,
-                (constant.MAP_BOTTOM - constant.TILE_SIZE*2)//constant.TILE_SIZE
-            )
-            print(x,y)
             blocker = BlockerMonster(self.level, random.randint(5, 8), (x*constant.TILE_SIZE,y*constant.TILE_SIZE))
             blocker.set_player_reference(self.level.snake)
             self.level.snake_group.add(blocker)
