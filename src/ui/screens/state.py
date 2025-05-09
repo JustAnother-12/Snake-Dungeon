@@ -43,7 +43,7 @@ class State(NestedGroup):
         super().__init__()
         from Main import Game
         self.game: Game = game
-        self.prev_state: list[State] = []
+        self.state_pass: list[State] = []
         self.visible = True
         self.is_paused = False
         self.module = False
@@ -56,10 +56,14 @@ class State(NestedGroup):
 
     def enter_state(self):
         if self.module:
-            self.game.state_stack[-1].visible = False
+            for state in self.game.state_stack:
+                if not state.visible: continue
+                self.state_pass.append(state)
+                state.visible = False
         self.game.state_stack.append(self)
 
     def exit_state(self):
         self.game.state_stack.pop()
-        if self.module:
-            self.game.state_stack[-1].visible = True
+        for state in self.state_pass:
+            state.visible = True
+        self.state_pass.clear()

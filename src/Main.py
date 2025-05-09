@@ -64,8 +64,8 @@ class Game:
             # print(self.state_stack, end=" " * 50 + "\r", flush=True)
 
             EventManager.update()
-            self.get_events()
             self.update()
+            self.get_events()
             self.render()
             self.clock.tick(60)
         pygame.quit()

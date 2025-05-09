@@ -1,5 +1,4 @@
 import pygame
-from ui.screens.count_down import Count_down
 from ui.screens.state import State
 from config.constant import SCREEN_HEIGHT_TILES, SCREEN_WIDTH_TILES, TILE_SIZE
 from ui.elements.text import TextElement
