@@ -14,6 +14,7 @@ from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.instant.food import FoodEntity
 from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.items.skill.gun_devil_contract import GunEntity
+from entities.items.skill.ritual_dagger import RitualDaggerStack
 from levels.components.chest import Chest
 from levels.components.door import Door
 from levels.components.floor_tile import Floor
@@ -66,7 +67,7 @@ class Level(State):
         self.snake = Snake(self, 10)
 
         # TODO: nhớ xóa
-        self.snake.inventory.add_item(DragonBreathStack())
+        self.snake.inventory.add_item(RitualDaggerStack())
         self.snake.inventory.add_item(FireBombStack(5))
         self.snake.inventory.add_item(MolotovStack(5))
         self.snake.inventory.add_item(CreditCardStack())
