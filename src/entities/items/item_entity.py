@@ -53,62 +53,67 @@ class ItemEntity(InteractionObject):
         )
 
     def random_pos(self, area: pygame.Rect | None, r = 2):
+        max_try = 10
 
-        # Random position theo grid
-        if not area:
-            self.pos = pygame.Vector2(
-                random.randint(
-                    constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
-                    (
-                        constant.SCREEN_WIDTH_TILES
-                        - constant.LEFT_RIGHT_BORDER_TILES
-                        - constant.WALL_TILES
-                        - math.ceil(self.image.get_width()/constant.TILE_SIZE ) if self.image else 0
-                    ),
+        for _ in range(max_try):
+            # Random position theo grid
+            if not area:
+                self.pos = pygame.Vector2(
+                    random.randint(
+                        constant.LEFT_RIGHT_BORDER_TILES + constant.WALL_TILES,
+                        (
+                            constant.SCREEN_WIDTH_TILES
+                            - constant.LEFT_RIGHT_BORDER_TILES
+                            - constant.WALL_TILES
+                            - math.ceil(self.image.get_width()/constant.TILE_SIZE ) if self.image else 0
+                        ),
+                    )
+                    * constant.TILE_SIZE,
+                    random.randint(
+                        constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
+                        (
+                            constant.SCREEN_HEIGHT_TILES
+                            - constant.TOP_BOTTOM_BORDER_TILES
+                            - constant.WALL_TILES
+                            - math.ceil(self.image.get_height()/constant.TILE_SIZE ) if self.image else 0
+                        ),
+                    )
+                    * constant.TILE_SIZE,
                 )
-                * constant.TILE_SIZE,
-                random.randint(
-                    constant.TOP_BOTTOM_BORDER_TILES + constant.WALL_TILES,
-                    (
-                        constant.SCREEN_HEIGHT_TILES
-                        - constant.TOP_BOTTOM_BORDER_TILES
-                        - constant.WALL_TILES
-                        - math.ceil(self.image.get_height()/constant.TILE_SIZE ) if self.image else 0
-                    ),
-                )
-                * constant.TILE_SIZE,
-            )
-        # Random position trong area đã cho
-        else:
-            R = int(r * constant.TILE_SIZE)
-            x = random.randint(
-                area.centerx - R - area.width // 2,
-                area.centerx + R + area.width // 2,
-            )
-            if (
-                x < area.centerx - area.width // 2
-                or x > area.centerx + area.width // 2
-            ):
-                y = random.randint(
-                    area.centery - R - area.height // 2,
-                    area.centery + R + area.height // 2,
-                )
+            # Random position trong area đã cho
             else:
-                y = random.choice(
-                    [
-                        random.randint(
-                            area.centery - R - area.height // 2,
-                            area.centery - area.height // 2,
-                        ),
-                        random.randint(
-                            area.centery + area.height // 2,
-                            area.centery + R + area.height // 2,
-                        ),
-                    ]
+                R = int(r * constant.TILE_SIZE)
+                x = random.randint(
+                    area.centerx - R - area.width // 2,
+                    area.centerx + R + area.width // 2,
                 )
-            self.pos = pygame.Vector2(x, y)
-        if not self.check_pos(self.image):
-            return self.random_pos(area, r)
+                if (
+                    x < area.centerx - area.width // 2
+                    or x > area.centerx + area.width // 2
+                ):
+                    y = random.randint(
+                        area.centery - R - area.height // 2,
+                        area.centery + R + area.height // 2,
+                    )
+                else:
+                    y = random.choice(
+                        [
+                            random.randint(
+                                area.centery - R - area.height // 2,
+                                area.centery - area.height // 2,
+                            ),
+                            random.randint(
+                                area.centery + area.height // 2,
+                                area.centery + R + area.height // 2,
+                            ),
+                        ]
+                    )
+                self.pos = pygame.Vector2(x, y)
+            if self.check_pos(self.image):
+                break
+        
+        print("đéo tạo được vị trí item")
+        self.kill()
 
     def check_pos(self, image):
         """Kiểm tra vị trí item có hợp lệ không"""
