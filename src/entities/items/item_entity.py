@@ -4,7 +4,7 @@ import pygame
 
 from config import constant
 from entities.items.item_stack import ItemStack
-from entities.items.item_type import ActivationType, ItemCategory
+from entities.items.item_type import ActivationType
 from systems.interaction_manager import InteractionObject
 from ui.screens.item_info_popup import ItemInfoPopup
 from utils import pixil

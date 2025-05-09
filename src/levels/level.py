@@ -51,7 +51,7 @@ class Level(State):
         super().__init__(game)
         from entities.Player import Snake
         self.snake_history: list[Snake] = []
-        self.max_level = 1
+        self.max_level = 5
         self.current_level = 0
 
         self.wall_group = Walls()
