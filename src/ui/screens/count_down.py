@@ -45,12 +45,12 @@ class Count_down(State):
         keys = pygame.key.get_just_pressed()
         for key in allow_key:
             if keys[key]:
+                self.exit_state()
                 from levels.level import LevelStatus
                 self.level_.level_status = LevelStatus.PLAYING
                 self.level_.snake.auto_state = True
                 self.level_.snake.is_curling = False
                 self.level_.wave_manager.start()
-                self.exit_state()
 
         if keys[pygame.K_ESCAPE]:
             Pause_menu(self.game).enter_state()
