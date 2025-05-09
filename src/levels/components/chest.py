@@ -93,5 +93,5 @@ class Chest(pygame.sprite.Sprite):
                     self._level.snake.keys -= 1
                     self.OpenChest()
                 else:
-                    self._level.add(self.LockedText)
+                    self._level.chest_group.add(self.LockedText)
                     self.TextTime = time()

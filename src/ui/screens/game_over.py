@@ -31,12 +31,12 @@ class GameOver_menu(Menu):
                     button.on_click()
 
     def restart_button_event(self):
-        print("Restarting game...")
         self.exit_state()
-        self.game.get_state().exit_state()
-        from levels.level import Level
-        new_state = Level(self.game)
-        new_state.enter_state()
+        self.game.get_state().reset()
+        # self.game.get_state().exit_state()
+        # from levels.level import Level
+        # new_state = Level(self.game)
+        # new_state.enter_state()
 
     def main_menu_button_event(self):
         while len(self.game.state_stack) > 1:

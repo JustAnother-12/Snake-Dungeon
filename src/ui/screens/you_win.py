@@ -21,7 +21,7 @@ class YouWin_menu(Menu):
         
         self.addBtn([self.restart_button, self.main_menu_button])
 
-        time = int(self.game.state_stack[-1].hud.get_time_value())
+        time = int(self.game.state_stack[-1].hud.get_time_value()) # type: ignore
         self.total_time_text = TextElement(f'Total time: {time//60:02d}:{time%60:02d}','yellow', 25, (SCREEN_WIDTH_TILES//2)*TILE_SIZE, (SCREEN_HEIGHT_TILES//2 - 6)*TILE_SIZE, "center")
 
         self.add(self.bg_sprite, self.You_win_text,self.total_time_text, self.restart_button, self.main_menu_button)
