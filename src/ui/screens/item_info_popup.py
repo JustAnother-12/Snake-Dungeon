@@ -18,7 +18,9 @@ from utils.pixil import Pixil
 class ItemInfoPopup(State):
     from levels import level as l
     def __init__(self, level: "l.Level", item_entity):
-        super().__init__(self)
+        super().__init__(level.game)
+        self.module = True
+
         self.level = level
         self.item_entity = item_entity
         self.item_in_slot_index = level.snake.inventory._check_item_exits(item_entity.to_item_stack())
@@ -158,7 +160,7 @@ class ItemInfoPopup(State):
             if self.item_entity.quantity == 0:
                 self.item_entity.kill()
             self.level.interaction_manager.unregister_interact(self.item_entity)
-        self.level.game.state_stack.pop()
+        self.exit_state()
 
     def sellItem(self):
         self.level.snake.gold+=(self.sell_price*self.take_quantity)
@@ -166,7 +168,7 @@ class ItemInfoPopup(State):
         if self.item_entity.quantity == 0:
             self.item_entity.kill()
         self.level.interaction_manager.unregister_interact(self.item_entity)
-        self.level.game.state_stack.pop()
+        self.exit_state()
     
     def get_event(self, event: Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -230,7 +232,7 @@ class ItemInfoPopup(State):
                     self.take_quantity-=1
                 self.handle_quantity_change()
             if key == pygame.K_ESCAPE:
-                self.level.game.state_stack.pop()
+                self.exit_state()
         return super().get_event(event)
     
     def handle_quantity_change(self):

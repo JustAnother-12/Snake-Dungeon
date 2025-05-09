@@ -26,11 +26,12 @@ class Game:
         self.audio = Share.audio
 
         self.load_audio()
+        self._state_stack: list[State] = []
         self.state_stack: list[State] = []
         self.load_states()
     
     def update(self):
-        for state in self.state_stack:
+        for state in self._state_stack:
             if state.visible:
                 state.update()
     
@@ -43,22 +44,29 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
                 self.playing = False
-            self.state_stack[-1].get_event(event)
+            
+            for state in self._state_stack:
+                if state.visible:
+                    state.get_event(event)
+            # self.state_stack[-1].get_event(event)
 
     def render(self):
         self.screen.fill("#000000")
-        for state in self.state_stack:
+        for state in self._state_stack:
             state.draw(self.screen)
         # self.state_stack[-1].(self.game_canvas)
         pygame.display.flip()
+        # print(self.state_stack)
+        self._state_stack = self.state_stack.copy()
         
     def run(self):
         while self.playing:
             # print(self.state_stack, end=" " * 50 + "\r", flush=True)
+
             EventManager.update()
             self.get_events()
-            self.render()
             self.update()
+            self.render()
             self.clock.tick(60)
         pygame.quit()
         sys.exit()
@@ -66,6 +74,15 @@ class Game:
     def load_states(self):
         self.Loading = MainMenu(self)
         self.state_stack.append(self.Loading)
+    
+    def get_state(self):
+        return self.state_stack[-1]
+    
+    def get_state_by_class(self, state_class: type[State]):
+        for state in self.state_stack:
+            if isinstance(state, state_class):
+                return state
+        return None
 
 if __name__ == '__main__':
     game = Game()

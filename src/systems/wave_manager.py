@@ -104,7 +104,7 @@ class WaveManager:
                     self.show_countdown()
     
     def show_countdown(self):
-        self.level.game.state_stack.append(WaveScreen(self.level.game, self.level))
+        WaveScreen(self.level.game, self.level).enter_state()
     
     def _spawn_next_entity(self, wave):
         """Spawn the next entity from the wave config, return True if spawned"""

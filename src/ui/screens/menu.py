@@ -6,7 +6,6 @@ from ui.screens.state import State
 class Menu(State):
     def __init__(self, game) -> None:
         super().__init__(game)
-        self.game = game
         self.buttons = []
         self.keymap = {}
 

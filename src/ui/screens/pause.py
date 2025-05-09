@@ -12,6 +12,7 @@ import pygame
 class Pause_menu(Menu):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.module = True
 
         self.Paused_text = TextElement("PAUSED", "white", 35, (game.SCREEN_WIDTH_TILES/2)*game.TILE_SIZE, (game.SCREEN_HEIGHT_TILES/2 - 15)*game.TILE_SIZE, "center")
 
@@ -28,8 +29,7 @@ class Pause_menu(Menu):
 
     def update(self):
         if pygame.key.get_just_pressed()[pygame.K_ESCAPE]:
-            self.game.state_stack.pop()
-            self.game.state_stack[-1].visible = True
+            self.exit_state()
         return super().update()
 
     def get_event(self, event):
@@ -40,21 +40,17 @@ class Pause_menu(Menu):
                     button.on_click()
 
     def restart_button_event(self):
-        self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
-        self.game.state_stack[-1].visible = True
+        self.exit_state()
+        self.game.get_state().reset()
 
     def continue_button_event(self):
-        self.game.state_stack.pop()
-        self.game.state_stack[-1].visible = True
+        self.exit_state()
 
     def stats_button_event(self):
         new_state = Stats_menu(self.game)
-        self.game.state_stack.pop()
         new_state.enter_state()
-        self.game.state_stack[-1].visible = True
     
     def main_menu_button_event(self):
         while len(self.game.state_stack) > 1:
-            self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
+            self.game.get_state().exit_state()
+        self.game.get_state().reset()

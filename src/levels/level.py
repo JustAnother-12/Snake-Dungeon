@@ -12,7 +12,6 @@ from entities.items.equipment.fire_gem_amulet import FireGemAmuletEntity
 from entities.items.equipment.midas_blood import MidasBloodEntity
 from entities.items.equipment.trail_of_flame import FlameTrailEntity
 from entities.items.instant.food import FoodEntity
-from entities.items.skill.dragon_breath import DragonBreathStack
 from entities.items.skill.gun_devil_contract import GunEntity
 from entities.items.skill.ritual_dagger import RitualDaggerStack
 from levels.components.chest import Chest
@@ -30,6 +29,7 @@ from systems.wave_manager import Wave, WaveManager
 from ui.hud.HUD import HUD
 from levels.region_generator import RegionGenerator
 from ui.screens.Instruction import Instruction
+from ui.screens.count_down import Count_down
 from ui.screens.pause import Pause_menu
 from ui.screens.room_cleared import RoomCleared
 from ui.screens.state import NestedGroup, State
@@ -49,6 +49,7 @@ class LevelStatus(Enum):
 class Level(State):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.module = True
         from entities.Player import Snake
         self.snake_history: list[Snake] = []
         self.max_level = 5
@@ -185,8 +186,8 @@ class Level(State):
 
     def reset(self):
         Stats.reset()
-        self.game.state_stack.pop()
-        self.game.state_stack.append(Level(self.game))
+        self.exit_state()
+        Level(self.game).enter_state()
 
     def get_event(self, event: pygame.Event):
         self.snake.inventory.handle_key_event(event)
@@ -194,16 +195,17 @@ class Level(State):
     def handle_input(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_ESCAPE]:
-            self.game.state_stack[-1].visible = False
-            self.game.state_stack.append(Pause_menu(self.game))
+            print('hello')
+            Pause_menu(self.game).enter_state()
 
         self.interaction_manager.handle_input()
 
     def update(self):
 
         if self.level_status == LevelStatus.CREATED:
-            self.game.state_stack[-1].visible = False
-            self.game.state_stack.append(Instruction(self.game, self))
+            Count_down(self.game, self).enter_state()
+            if self.current_level == 0:
+                Instruction(self.game, self).enter_state()
             Share.audio.play_music("level", -1, 2000)
 
         if self.level_status == LevelStatus.PLAYING:
@@ -227,7 +229,7 @@ class Level(State):
         
     def _room_cleared(self):
         if self._config.room_type != RoomType.SHOP:
-            self.game.state_stack.append(RoomCleared(self.game))
+            RoomCleared(self.game).enter_state()
 
         # tạo random từ 2 -> 3 cửa
         doors = random.randint(2, 3)
@@ -257,7 +259,7 @@ class Level(State):
 
     def next_level(self, config: LevelConfig):
         if self.current_level >= self.max_level - 1:
-            self.game.state_stack.append(YouWin_menu(self.game))
+            YouWin_menu(self.game).enter_state()
             Share.audio.stop_music()
             return
 

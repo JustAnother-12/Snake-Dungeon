@@ -1,4 +1,3 @@
-from typing import Any
 from config import constant
 from time import time
 
@@ -27,5 +26,5 @@ class RoomCleared(State):
 
     def update(self) -> None:
         if time() - self.timer > 1:
-            self.game.state_stack.pop()
+            self.exit_state()
         return super().update()

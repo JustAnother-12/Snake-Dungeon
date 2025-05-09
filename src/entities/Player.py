@@ -552,8 +552,8 @@ class Snake(pygame.sprite.AbstractGroup):
 
     def die(self):
         if len(self.blocks) == 0:
-            self.level.game.state_stack[-1].visible = False
-            self.level.game.state_stack.append(GameOver_menu(self.level.game))
+            game = GameOver_menu(self.level.game)
+            game.enter_state()
             return
         block = self.blocks.pop(0)
         self._block_positions.pop(0)

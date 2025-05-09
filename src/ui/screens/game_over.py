@@ -4,11 +4,11 @@ from ui.elements.button import ButtonElement
 from ui.elements.text import TextElement
 from ui.screens.menu import Menu
 from config.constant import SCREEN_HEIGHT_TILES, SCREEN_WIDTH_TILES, TILE_SIZE
-from utils.help import Share
 
 class GameOver_menu(Menu):
     def __init__(self, game) -> None:
         super().__init__(game)
+        self.module = True
 
         self.Gamer_over_text = TextElement("GAME OVER", "white", 45, (SCREEN_WIDTH_TILES//2)*TILE_SIZE, (SCREEN_HEIGHT_TILES//2 - 8)*TILE_SIZE, "center")
 
@@ -31,11 +31,13 @@ class GameOver_menu(Menu):
                     button.on_click()
 
     def restart_button_event(self):
-        self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
-        self.game.state_stack[-1].visible = True
+        print("Restarting game...")
+        self.exit_state()
+        from levels.level import Level
+        new_state = Level(self.game)
+        new_state.enter_state()
 
     def main_menu_button_event(self):
         while len(self.game.state_stack) > 1:
-            self.game.state_stack.pop()
-        self.game.state_stack[-1].reset()
+            self.game.get_state().exit_state()   
+        self.game.get_state().reset()

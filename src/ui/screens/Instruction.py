@@ -3,11 +3,11 @@ from ui.screens.count_down import Count_down
 from ui.screens.state import State
 from config.constant import SCREEN_HEIGHT_TILES, SCREEN_WIDTH_TILES, TILE_SIZE
 from ui.elements.text import TextElement
-from ui.elements.image import ImageElement
 
 class Instruction(State):
     def __init__(self, game, level) -> None:
         super().__init__(game)
+        self.module = True
 
         self.level = level
         self.bg_sprite = pygame.sprite.Sprite()
@@ -91,6 +91,5 @@ class Instruction(State):
 
     def update(self):
         if pygame.key.get_just_pressed()[pygame.K_SPACE]:
-            self.game.state_stack.pop()
-            self.game.state_stack.append(Count_down(self.game, self.level))
+            self.exit_state()
         return super().update()
