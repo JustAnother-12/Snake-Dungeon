@@ -71,9 +71,9 @@ class Level(State):
         
 
         # TODO: nhớ xóa
-        Stats.setValue(StatType.ENERGY_CAPACITY, 100)
-        self.snake.inventory.add_item(CelestineAmuletStack())
-        self.snake.inventory.add_item(FireBombStack(5))
+        # Stats.setValue(StatType.ENERGY_CAPACITY, 100)
+        # self.snake.inventory.add_item(CelestineAmuletStack())
+        # self.snake.inventory.add_item(FireBombStack(5))
         # self.snake.inventory.add_item(MolotovStack(5))
         # self.snake.inventory.add_item(CreditCardStack())
         # TODO: nhớ xóa
@@ -87,7 +87,7 @@ class Level(State):
 
         # level đầu tiên lúc nào cũng giống nhau
         self._config: LevelConfig = LevelConfig(
-            region_generator=RegionGeneratorConfig(0.3, 0.4, 1.0, 1.0),
+            region_generator=RegionGeneratorConfig(0.3, 0.7, 1.0, 1.0),
             wave_manager=WaveManagerConfig(2, 1, 1, {
                 "monster": 1
             }),

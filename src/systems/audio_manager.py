@@ -9,7 +9,7 @@ class AudioManager:
         self.sound_volume = 1.0  # Default full volume
         self.music_volume = 0.5  # Default half volume
         self.sound_channels = {}  # To track which sound is playing on which channel
-        self.channel_count = 16   # Default number of channels for Pygame
+        self.channel_count = 30   # Default number of channels for Pygame
         
     def initialize(self):
         """Initialize the audio system"""
