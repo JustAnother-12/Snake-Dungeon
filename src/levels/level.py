@@ -87,7 +87,7 @@ class Level(State):
 
         # level đầu tiên lúc nào cũng giống nhau
         self._config: LevelConfig = LevelConfig(
-            region_generator=RegionGeneratorConfig(0.3, 0.4, 0.6, 0.8),
+            region_generator=RegionGeneratorConfig(0.3, 0.4, 1.0, 1.0),
             wave_manager=WaveManagerConfig(2, 1, 1, {
                 "monster": 1
             }),
@@ -119,10 +119,10 @@ class Level(State):
     def create_config_room(self, room_config: LevelConfig):
         region_generator = room_config.region_generator
         self.region_generator = RegionGenerator(
-            has_trap=random.random() < region_generator.has_trap,
-            has_obstacle=random.random() < region_generator.has_obstacle,
-            has_pot=random.random() < region_generator.has_pot,
-            has_chest=random.random() < region_generator.has_chest,
+            has_trap=random.random() <= region_generator.has_trap,
+            has_obstacle=random.random() <= region_generator.has_obstacle,
+            has_pot=random.random() <= region_generator.has_pot,
+            has_chest=random.random() <= region_generator.has_chest,
         )
 
         self.wave_manager = WaveManager(self)
@@ -152,7 +152,7 @@ class Level(State):
     def generator(self):
         self.level_status = LevelStatus.CREATED
 
-        self.region_generator = RegionGenerator()
+        # self.region_generator = RegionGenerator()
         self.snake.is_curling = True
         for i, v in enumerate(self.snake.blocks):
             self.snake._block_positions[i] = pygame.Vector2(
